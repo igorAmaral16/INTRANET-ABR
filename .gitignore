@@ -1,0 +1,131 @@
+# ============================================================
+# Global / OS / Editor
+# ============================================================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Editor / IDE
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+!.vscode/launch.json
+!.vscode/tasks.json
+.idea/
+*.iml
+*.ipr
+*.iws
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+lerna-debug.log*
+
+# ============================================================
+# Node / JS / TS (npm)
+# ============================================================
+node_modules/
+package-lock.json
+
+# npm cache / local configs
+.npm/
+.npmrc.local
+
+# Caches
+.cache/
+.eslintcache
+.stylelintcache
+*.tsbuildinfo
+
+# Build outputs
+dist/
+build/
+out/
+coverage/
+.nyc_output/
+*.lcov
+
+# Vite
+.vite/
+.vite-cache/
+
+# ============================================================
+# Environment / Secrets
+# ============================================================
+.env
+.env.*
+!.env.example
+!.env.sample
+!.env.template
+*.pem
+*.key
+*.crt
+*.pfx
+*.p12
+*.jks
+
+# Local config
+config/local.*
+config/*.local.*
+
+# ============================================================
+# Backend (Node) Runtime
+# ============================================================
+tmp/
+temp/
+*.pid
+*.seed
+*.pid.lock
+
+# ============================================================
+# Testing / E2E
+# ============================================================
+jest-cache/
+.playwright/
+test-results/
+playwright-report/
+cypress/screenshots/
+cypress/videos/
+
+# ============================================================
+# Prisma (se usar) - migrations normalmente DEVEM ser versionadas
+# ============================================================
+prisma/.env
+# prisma/migrations/
+
+# ============================================================
+# Docker
+# ============================================================
+docker-compose.override.yml
+**/docker-compose.override.yml
+
+# ============================================================
+# Misc
+# ============================================================
+*.tgz
+*.tar
+*.zip
+*.gz
+*.bak
+*.tmp
+*.old
+*.orig
+*.rej
+*.local
+
+# ============================================================
+# Monorepo / Turborepo / Nx (se usar)
+# ============================================================
+.turbo/
+.nx/
+dist-cache/
