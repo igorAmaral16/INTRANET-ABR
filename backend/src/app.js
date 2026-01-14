@@ -5,12 +5,17 @@ import rateLimit from "express-rate-limit";
 import compression from "compression";
 import pinoHttp from "pino-http";
 import { randomUUID } from "crypto";
+import path from "path";
+import { fileURLToPath } from "url";
 
 import { logger } from "./utils/logger.js";
 import { corsOrigins } from "./config/env.js";
 import { router } from "./routes/index.js";
 import { notFound } from "./middlewares/notFound.js";
 import { errorHandler } from "./middlewares/errorHandler.js";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 export function buildApp() {
     const app = express();
@@ -58,6 +63,11 @@ export function buildApp() {
 
     app.use(compression());
     app.use(express.json({ limit: "1mb" }));
+
+    app.use("/uploads", express.static(path.join(__dirname, "..", "uploads"), {
+        fallthrough: false,
+        maxAge: "7d"
+    }));
 
     app.use(router);
 
