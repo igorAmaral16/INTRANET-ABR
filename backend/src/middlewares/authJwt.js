@@ -6,7 +6,9 @@ export function authJwt(req, res, next) {
     const [type, token] = header.split(" ");
 
     if (type !== "Bearer" || !token) {
-        return res.status(401).json({ error: { message: "Não autenticado.", requestId: req.id } });
+        return res.status(401).json({
+            error: { message: "Não autenticado.", requestId: req.id }
+        });
     }
 
     try {
@@ -16,9 +18,12 @@ export function authJwt(req, res, next) {
             audience: env.JWT_AUDIENCE
         });
 
+        // Campos mínimos padronizados
         req.user = {
             id: decoded.sub,
+            role: decoded.role,
             username: decoded.username,
+            matricula: decoded.matricula,
             nivel: decoded.nivel,
             jti: decoded.jti
         };
@@ -26,6 +31,8 @@ export function authJwt(req, res, next) {
         return next();
     } catch (err) {
         req.log?.warn({ err }, "Invalid JWT");
-        return res.status(401).json({ error: { message: "Token inválido ou expirado.", requestId: req.id } });
+        return res.status(401).json({
+            error: { message: "Token inválido ou expirado.", requestId: req.id }
+        });
     }
 }

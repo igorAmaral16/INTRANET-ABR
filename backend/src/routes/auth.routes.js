@@ -1,8 +1,8 @@
 import express from "express";
 import rateLimit from "express-rate-limit";
-import { login, me } from "../controllers/auth.controller.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { authJwt } from "../middlewares/authJwt.js";
+import { loginAdmin, loginColaborador, me } from "../controllers/auth.controller.js";
 
 export const authRouter = express.Router();
 
@@ -13,5 +13,6 @@ const loginLimiter = rateLimit({
     legacyHeaders: false
 });
 
-authRouter.post("/auth/login", loginLimiter, asyncHandler(login));
+authRouter.post("/auth/admin/login", loginLimiter, asyncHandler(loginAdmin));
+authRouter.post("/auth/colaborador/login", loginLimiter, asyncHandler(loginColaborador));
 authRouter.get("/auth/me", authJwt, asyncHandler(me));

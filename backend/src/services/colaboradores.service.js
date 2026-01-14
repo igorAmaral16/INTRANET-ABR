@@ -1,4 +1,6 @@
+import bcrypt from "bcryptjs";
 import { pool } from "../config/db.js";
+import { buildColaboradorDefaultPassword } from "./auth.service.js";
 
 export async function listColaboradores({ status, search, page, pageSize }) {
     const where = [];
@@ -10,21 +12,17 @@ export async function listColaboradores({ status, search, page, pageSize }) {
     }
 
     if (search) {
-        // Busca simples, defensiva, com prefixo e contains
         where.push("(matricula LIKE :s OR nome_completo LIKE :s2)");
         params.s = `${search}%`;
         params.s2 = `%${search}%`;
     }
 
     const whereSql = where.length ? `WHERE ${where.join(" AND ")}` : "";
-
     const limit = pageSize;
     const offset = (page - 1) * pageSize;
 
     const [countRows] = await pool.query(
-        `SELECT COUNT(*) AS total
-     FROM Colaboradores
-     ${whereSql}`,
+        `SELECT COUNT(*) AS total FROM Colaboradores ${whereSql}`,
         params
     );
 
@@ -56,17 +54,28 @@ export async function getColaboradorByMatricula(matricula) {
     return rows?.[0] || null;
 }
 
-export async function createColaborador({ matricula, nome_completo, data_nascimento_ymd, status, adminId }) {
+export async function createColaborador({
+    matricula,
+    nome_completo,
+    data_nascimento_ymd,
+    status,
+    adminId
+}) {
+    const defaultPassword = buildColaboradorDefaultPassword(matricula);
+    const password_hash = await bcrypt.hash(defaultPassword, 12);
+
     await pool.query(
         `INSERT INTO Colaboradores
-      (matricula, nome_completo, data_nascimento, status, created_by_admin_id, updated_by_admin_id)
+      (matricula, nome_completo, data_nascimento, status, password_hash, must_change_password,
+       created_by_admin_id, updated_by_admin_id)
      VALUES
-      (:matricula, :nome_completo, :data_nascimento, :status, :adminId, :adminId)`,
+      (:matricula, :nome_completo, :data_nascimento, :status, :password_hash, 1, :adminId, :adminId)`,
         {
             matricula,
             nome_completo,
             data_nascimento: data_nascimento_ymd,
             status,
+            password_hash,
             adminId
         }
     );
@@ -74,7 +83,13 @@ export async function createColaborador({ matricula, nome_completo, data_nascime
     return getColaboradorByMatricula(matricula);
 }
 
-export async function updateColaboradorByMatricula({ matricula, nome_completo, data_nascimento_ymd, status, adminId }) {
+export async function updateColaboradorByMatricula({
+    matricula,
+    nome_completo,
+    data_nascimento_ymd,
+    status,
+    adminId
+}) {
     const [result] = await pool.query(
         `UPDATE Colaboradores
      SET nome_completo = :nome_completo,
