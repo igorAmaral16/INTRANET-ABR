@@ -8,6 +8,7 @@ import {
     listPublicComunicados,
     listAdminComunicados
 } from "../services/comunicados.service.js";
+import { incrementAcessoHoje, incrementComunicadoViewHoje } from "../services/metrics.service.js";
 
 const ImportanciaEnum = z.enum(["POUCO_RELEVANTE", "RELEVANTE", "IMPORTANTE"]);
 const StatusEnum = z.enum(["RASCUNHO", "PUBLICADO"]);
@@ -24,9 +25,6 @@ const AdminListQuery = z.object({
     pageSize: z.coerce.number().int().min(1).max(100).default(20)
 });
 
-// Aceita:
-// - caminho relativo do seu servidor: /uploads/announcements/<arquivo>
-// - URL absoluta: http(s)://...
 const AnexoUrlSchema = z
     .string()
     .max(500)
@@ -50,7 +48,6 @@ const CreateUpdateSchema = z.object({
 
     status: StatusEnum,
 
-    // dd/mm/aaaa; exigido se PUBLICADO
     expira_em: z.string().min(10).max(10).optional(),
 
     anexo_url: AnexoUrlSchema.optional(),
@@ -93,7 +90,6 @@ function normalizeAnexo(body) {
         return { anexo_url: null, anexo_tipo: "NENHUM" };
     }
 
-    // anexo_tipo precisa ser coerente
     if (body.anexo_tipo === "NENHUM") {
         const e = new Error("anexo_tipo deve ser IMAGEM ou DOCUMENTO quando anexo_url é informado.");
         e.statusCode = 400;
@@ -102,7 +98,6 @@ function normalizeAnexo(body) {
 
     const raw = body.anexo_url.trim();
 
-    // Se vier URL absoluta, salva somente o path para padronizar
     if (!raw.startsWith("/uploads/")) {
         const u = new URL(raw);
         return { anexo_url: u.pathname, anexo_tipo: body.anexo_tipo };
@@ -116,6 +111,13 @@ function normalizeAnexo(body) {
 ========================= */
 
 export async function listarPublico(req, res) {
+    // Instrumentação: “acesso” = GET /comunicados
+    try {
+        await incrementAcessoHoje();
+    } catch (err) {
+        req.log?.warn({ err }, "Failed to increment access metric");
+    }
+
     const q = PublicListQuery.parse(req.query);
     const data = await listPublicComunicados(q);
     res.json(data);
@@ -123,6 +125,14 @@ export async function listarPublico(req, res) {
 
 export async function obterPublico(req, res) {
     const id = z.coerce.number().int().positive().parse(req.params.id);
+
+    // Instrumentação: view do comunicado no dia
+    try {
+        await incrementComunicadoViewHoje(id);
+    } catch (err) {
+        req.log?.warn({ err }, "Failed to increment view metric");
+    }
+
     const item = await getComunicadoById(id, { includeRascunho: false });
     if (!item) {
         return res.status(404).json({
@@ -144,6 +154,14 @@ export async function listarAdmin(req, res) {
 
 export async function obterAdmin(req, res) {
     const id = z.coerce.number().int().positive().parse(req.params.id);
+
+    // Também conta view quando o admin abre o detalhe (pode ser útil)
+    try {
+        await incrementComunicadoViewHoje(id);
+    } catch (err) {
+        req.log?.warn({ err }, "Failed to increment view metric (admin)");
+    }
+
     const item = await getComunicadoById(id, { includeRascunho: true });
     if (!item) {
         return res.status(404).json({
