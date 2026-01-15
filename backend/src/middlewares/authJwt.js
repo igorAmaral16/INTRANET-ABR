@@ -1,6 +1,18 @@
 import jwt from "jsonwebtoken";
 import { env } from "../config/env.js";
 
+function inferRole(decoded) {
+    // Compatibilidade e inferência defensiva
+    if (decoded?.role) return decoded.role;
+    if (decoded?.username || decoded?.nivel) return "ADMIN";
+    if (decoded?.matricula) return "COLAB";
+    return undefined;
+}
+
+function normalizeRole(role) {
+    return String(role || "").trim().toUpperCase();
+}
+
 export function authJwt(req, res, next) {
     const header = req.headers.authorization || "";
     const [type, token] = header.split(" ");
@@ -18,12 +30,19 @@ export function authJwt(req, res, next) {
             audience: env.JWT_AUDIENCE
         });
 
-        // Campos mínimos padronizados
+        const role = normalizeRole(inferRole(decoded));
+
+        if (!role) {
+            return res.status(401).json({
+                error: { message: "Token inválido (role ausente).", requestId: req.id }
+            });
+        }
+
         req.user = {
             id: decoded.sub,
-            role: decoded.role,
+            role,
             username: decoded.username,
-            matricula: decoded.matricula,
+            matricula: decoded.matricula ? String(decoded.matricula).trim().toUpperCase() : undefined,
             nivel: decoded.nivel,
             jti: decoded.jti
         };

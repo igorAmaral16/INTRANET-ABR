@@ -13,3 +13,5 @@ comunicadoReadsRouter.post(
     requireRole("COLAB"),
     asyncHandler(confirmarLeitura)
 );
+
+
