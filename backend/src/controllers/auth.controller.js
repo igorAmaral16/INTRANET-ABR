@@ -6,7 +6,8 @@ import {
     markAdminLastLogin,
     findColaboradorByMatricula,
     issueJwtColaborador,
-    markColaboradorLastLogin
+    markColaboradorLastLogin,
+    normalizeMatricula
 } from "../services/auth.service.js";
 
 const AdminLoginSchema = z.object({
@@ -52,10 +53,13 @@ export async function loginAdmin(req, res) {
 
 export async function loginColaborador(req, res) {
     const body = ColabLoginSchema.parse(req.body);
+    const matricula = normalizeMatricula(body.matricula);
 
-    const colab = await findColaboradorByMatricula(body.matricula);
+    const colab = await findColaboradorByMatricula(matricula);
 
-    // Só permite login se existir, tiver senha cadastrada e status ATIVO
+    // status precisa bater exatamente com o que você usa no banco
+    // se você usa 'Ativo'/'Inativo' (ou 'ativo'), isso derruba login.
+    // Recomendo padronizar no banco para 'ATIVO' e 'INATIVO'.
     if (!colab || colab.status !== "ATIVO" || !colab.password_hash) {
         return res.status(401).json({
             error: { message: "Credenciais inválidas.", requestId: req.id }
@@ -80,7 +84,7 @@ export async function loginColaborador(req, res) {
         role: "COLAB",
         user: {
             id: colab.id,
-            matricula: colab.matricula,
+            matricula: normalizeMatricula(colab.matricula),
             mustChangePassword: Boolean(colab.must_change_password)
         }
     });

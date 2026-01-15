@@ -1,6 +1,6 @@
 import bcrypt from "bcryptjs";
 import { pool } from "../config/db.js";
-import { buildColaboradorDefaultPassword } from "./auth.service.js";
+import { buildColaboradorDefaultPassword, normalizeMatricula } from "./auth.service.js";
 
 export async function listColaboradores({ status, search, page, pageSize }) {
     const where = [];
@@ -41,13 +41,15 @@ export async function listColaboradores({ status, search, page, pageSize }) {
     return { total, page, pageSize, items: rows };
 }
 
-export async function getColaboradorByMatricula(matricula) {
+export async function getColaboradorByMatricula(matriculaRaw) {
+    const matricula = normalizeMatricula(matriculaRaw);
+
     const [rows] = await pool.query(
         `SELECT id, matricula, nome_completo,
             DATE_FORMAT(data_nascimento, '%d/%m/%Y') AS data_nascimento,
             status, created_at, updated_at
      FROM Colaboradores
-     WHERE matricula = :matricula
+     WHERE UPPER(TRIM(matricula)) = :matricula
      LIMIT 1`,
         { matricula }
     );
@@ -61,7 +63,9 @@ export async function createColaborador({
     status,
     adminId
 }) {
-    const defaultPassword = buildColaboradorDefaultPassword(matricula);
+    const matriculaNorm = normalizeMatricula(matricula);
+
+    const defaultPassword = buildColaboradorDefaultPassword(matriculaNorm);
     const password_hash = await bcrypt.hash(defaultPassword, 12);
 
     await pool.query(
@@ -71,7 +75,7 @@ export async function createColaborador({
      VALUES
       (:matricula, :nome_completo, :data_nascimento, :status, :password_hash, 1, :adminId, :adminId)`,
         {
-            matricula,
+            matricula: matriculaNorm,
             nome_completo,
             data_nascimento: data_nascimento_ymd,
             status,
@@ -80,7 +84,7 @@ export async function createColaborador({
         }
     );
 
-    return getColaboradorByMatricula(matricula);
+    return getColaboradorByMatricula(matriculaNorm);
 }
 
 export async function updateColaboradorByMatricula({
@@ -90,15 +94,17 @@ export async function updateColaboradorByMatricula({
     status,
     adminId
 }) {
+    const matriculaNorm = normalizeMatricula(matricula);
+
     const [result] = await pool.query(
         `UPDATE Colaboradores
      SET nome_completo = :nome_completo,
          data_nascimento = :data_nascimento,
          status = :status,
          updated_by_admin_id = :adminId
-     WHERE matricula = :matricula`,
+     WHERE UPPER(TRIM(matricula)) = :matricula`,
         {
-            matricula,
+            matricula: matriculaNorm,
             nome_completo,
             data_nascimento: data_nascimento_ymd,
             status,
@@ -107,12 +113,14 @@ export async function updateColaboradorByMatricula({
     );
 
     if (result.affectedRows === 0) return null;
-    return getColaboradorByMatricula(matricula);
+    return getColaboradorByMatricula(matriculaNorm);
 }
 
-export async function deleteColaboradorByMatricula(matricula) {
+export async function deleteColaboradorByMatricula(matriculaRaw) {
+    const matricula = normalizeMatricula(matriculaRaw);
+
     const [result] = await pool.query(
-        `DELETE FROM Colaboradores WHERE matricula = :matricula`,
+        `DELETE FROM Colaboradores WHERE UPPER(TRIM(matricula)) = :matricula`,
         { matricula }
     );
     return result.affectedRows > 0;
