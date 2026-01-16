@@ -64,10 +64,22 @@ export function buildApp() {
     app.use(compression());
     app.use(express.json({ limit: "1mb" }));
 
-    app.use("/uploads", express.static(path.join(__dirname, "..", "uploads"), {
-        fallthrough: false,
-        maxAge: "7d"
-    }));
+    app.use("/uploads",
+        (req, res, next) => {
+            // Permite que imagens/PDFs sejam consumidos por outro origin (ex.: Vite 5173)
+            res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
+
+            // Opcional, mas útil (principalmente para PDFs e downloads):
+            res.setHeader("Access-Control-Allow-Origin", "*");
+            res.setHeader("Vary", "Origin");
+
+            next();
+        },
+        express.static(path.join(__dirname, "..", "uploads"), {
+            fallthrough: false,
+            maxAge: "7d"
+        })
+    );
 
     app.use(router);
 

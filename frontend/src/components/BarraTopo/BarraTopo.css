@@ -1,0 +1,77 @@
+.barraTopo {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: rgba(247, 248, 250, 0.85);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.barraTopo__conteudo {
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 14px 16px;
+
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+
+    width: 100%;
+    min-width: 0;
+    /* evita overflow em flex */
+}
+
+.barraTopo__marca {
+    flex: 0 0 auto;
+}
+
+.barraTopo__logo {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 900;
+    letter-spacing: 0.5px;
+    height: 38px;
+    width: 64px;
+    border-radius: 12px;
+    background: #ffffff;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+.barraTopo__busca {
+    flex: 1 1 260px;
+    /* cresce e quebra linha se necessário */
+    min-width: 0;
+}
+
+.barraTopo__busca input {
+    width: 100%;
+    height: 40px;
+    border-radius: 14px;
+    border: 1px solid rgba(0, 0, 0, 0.10);
+    padding: 0 14px;
+    outline: none;
+    background: #fff;
+    min-width: 0;
+}
+
+.barraTopo__busca input:focus {
+    border-color: rgba(0, 0, 0, 0.25);
+}
+
+.barraTopo__botaoEntrar {
+    flex: 0 0 auto;
+    height: 40px;
+    padding: 0 14px;
+    border-radius: 14px;
+    border: 1px solid rgba(0, 0, 0, 0.10);
+    background: #111827;
+    color: #fff;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.barraTopo__botaoEntrar:active {
+    transform: translateY(1px);
+}
