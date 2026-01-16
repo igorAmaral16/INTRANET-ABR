@@ -1,11 +1,15 @@
 import "./BarraTopo.css";
 import { MenuUsuario } from "../MenuUsuario/MenuUsuario";
+import logo from "../../assets/logo.webp";
 
 type Props = {
     busca: string;
     aoMudarBusca: (v: string) => void;
 
     mostrarBusca?: boolean;
+
+    // NOVO: clique na logo vai para a home
+    aoIrParaInicio: () => void;
 
     estaLogadoColab: boolean;
     aoClicarEntrar: () => void;
@@ -21,6 +25,7 @@ export function BarraTopo({
     busca,
     aoMudarBusca,
     mostrarBusca = true,
+    aoIrParaInicio,
     estaLogadoColab,
     aoClicarEntrar,
     aoMeuPerfil,
@@ -32,9 +37,14 @@ export function BarraTopo({
     return (
         <header className="barraTopo">
             <div className="barraTopo__conteudo">
-                <div className="barraTopo__marca" aria-label="Marca">
-                    <span className="barraTopo__logo">ABR</span>
-                </div>
+                <button
+                    className="barraTopo__marca"
+                    type="button"
+                    aria-label="Ir para a página principal"
+                    onClick={aoIrParaInicio}
+                >
+                    <img className="barraTopo__logoImg" src={logo} alt="Logo" />
+                </button>
 
                 {mostrarBusca ? (
                     <div className="barraTopo__busca">

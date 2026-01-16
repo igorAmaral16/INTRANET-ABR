@@ -36,6 +36,7 @@ export function PaginaComunicados() {
                 busca={busca}
                 aoMudarBusca={setBusca}
                 mostrarBusca={true}
+                aoIrParaInicio={() => navigate("/")}
                 estaLogadoColab={estaLogadoColab}
                 aoClicarEntrar={() => setLoginColabAberto(true)}
                 aoMeuPerfil={() => navigate("/meu-perfil")}

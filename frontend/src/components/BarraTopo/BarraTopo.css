@@ -23,19 +23,35 @@
 
 .barraTopo__marca {
     flex: 0 0 auto;
-}
 
-.barraTopo__logo {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    font-weight: 900;
-    letter-spacing: 0.5px;
-    height: 38px;
+
+    height: 40px;
     width: 64px;
+
     border-radius: 12px;
     background: #ffffff;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+
+    border: none;
+    cursor: pointer;
+    padding: 0;
+
+    /* remove estilo padrão do botão */
+    appearance: none;
+}
+
+.barraTopo__marca:active {
+    transform: translateY(1px);
+}
+
+.barraTopo__logoImg {
+    width: 52px;
+    height: 30px;
+    object-fit: contain;
+    display: block;
 }
 
 .barraTopo__busca {

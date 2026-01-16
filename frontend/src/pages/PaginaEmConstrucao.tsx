@@ -14,6 +14,7 @@ export function PaginaEmConstrucao({ titulo }: { titulo: string }) {
                 busca=""
                 aoMudarBusca={() => { }}
                 mostrarBusca={false}
+                aoIrParaInicio={() => navigate("/")}
                 estaLogadoColab={estaLogadoColab}
                 aoClicarEntrar={() => navigate("/")}
                 aoMeuPerfil={() => navigate("/meu-perfil")}

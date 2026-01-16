@@ -52,6 +52,41 @@ export function bearerHeaders(token?: string) {
     return { Authorization: `Bearer ${token}` };
 }
 
+/* =========================
+   AUTH: logout global (sem acoplar em hook)
+========================= */
+
+function mensagemSessaoExpirada() {
+    return "Sua sessão expirou. Faça login novamente para continuar.";
+}
+
+function publicarLogoutGlobal(mensagem?: string) {
+    window.dispatchEvent(new CustomEvent("auth:logout", { detail: { message: mensagem || mensagemSessaoExpirada() } }));
+}
+
+function extrairMensagemErro(body: any, status: number) {
+    return body?.error?.message || body?.message || `Falha na requisição (${status}).`;
+}
+
+function pareceErroDeToken(msg: string) {
+    const m = String(msg || "").toLowerCase();
+    // cobre: "Token inválido ou expirado", "jwt expired", etc.
+    return (
+        m.includes("token") &&
+        (m.includes("expir") || m.includes("inval") || m.includes("invál") || m.includes("jwt"))
+    );
+}
+
+function tratarAuthAutoLogout(status: number, msg: string) {
+    // IMPORTANTE: somente para 401/403
+    if (status !== 401 && status !== 403) return;
+
+    // Só dispara logout se realmente for token
+    if (pareceErroDeToken(msg)) {
+        publicarLogoutGlobal(mensagemSessaoExpirada());
+    }
+}
+
 export async function httpGet<T>(caminho: string, opts?: Opts): Promise<T> {
     const { signal, limpar } = criarSignalComTimeout(opts);
 
@@ -67,7 +102,8 @@ export async function httpGet<T>(caminho: string, opts?: Opts): Promise<T> {
         const body = isJson ? await res.json().catch(() => null) : await res.text().catch(() => null);
 
         if (!res.ok) {
-            const msg = (body as any)?.error?.message || `Falha na requisição (${res.status}).`;
+            const msg = extrairMensagemErro(body as any, res.status);
+            tratarAuthAutoLogout(res.status, msg);
             throw new ErroHttp(msg, res.status, body);
         }
 
@@ -97,7 +133,8 @@ export async function httpPost<T>(caminho: string, body: unknown, opts?: Opts): 
         const payload = isJson ? await res.json().catch(() => null) : await res.text().catch(() => null);
 
         if (!res.ok) {
-            const msg = (payload as any)?.error?.message || `Falha na requisição (${res.status}).`;
+            const msg = extrairMensagemErro(payload as any, res.status);
+            tratarAuthAutoLogout(res.status, msg);
             throw new ErroHttp(msg, res.status, payload);
         }
 

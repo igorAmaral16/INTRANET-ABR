@@ -78,6 +78,7 @@ export function PaginaMeuPerfil() {
                 busca=""
                 aoMudarBusca={() => { }}
                 mostrarBusca={false}
+                aoIrParaInicio={() => navigate("/")}
                 estaLogadoColab={estaLogadoColab}
                 aoClicarEntrar={() => navigate("/")}
                 aoMeuPerfil={() => navigate("/meu-perfil")}
