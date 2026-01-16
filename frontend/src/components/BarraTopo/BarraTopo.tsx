@@ -1,12 +1,13 @@
-import { MenuUsuario } from "../MenuUsuario/MenuUsuario";
 import "./BarraTopo.css";
+import { MenuUsuario } from "../MenuUsuario/MenuUsuario";
 
 type Props = {
     busca: string;
     aoMudarBusca: (v: string) => void;
 
-    estaLogadoColab: boolean;
+    mostrarBusca?: boolean;
 
+    estaLogadoColab: boolean;
     aoClicarEntrar: () => void;
 
     aoMeuPerfil: () => void;
@@ -19,6 +20,7 @@ type Props = {
 export function BarraTopo({
     busca,
     aoMudarBusca,
+    mostrarBusca = true,
     estaLogadoColab,
     aoClicarEntrar,
     aoMeuPerfil,
@@ -34,14 +36,18 @@ export function BarraTopo({
                     <span className="barraTopo__logo">ABR</span>
                 </div>
 
-                <div className="barraTopo__busca">
-                    <input
-                        value={busca}
-                        onChange={(e) => aoMudarBusca(e.target.value)}
-                        placeholder="Pesquisar comunicados"
-                        aria-label="Pesquisar comunicados"
-                    />
-                </div>
+                {mostrarBusca ? (
+                    <div className="barraTopo__busca">
+                        <input
+                            value={busca}
+                            onChange={(e) => aoMudarBusca(e.target.value)}
+                            placeholder="Pesquisar comunicados"
+                            aria-label="Pesquisar comunicados"
+                        />
+                    </div>
+                ) : (
+                    <div className="barraTopo__espacador" />
+                )}
 
                 <div className="barraTopo__acoesDireita">
                     {!estaLogadoColab ? (

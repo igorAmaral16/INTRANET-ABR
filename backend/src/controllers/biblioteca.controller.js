@@ -12,7 +12,8 @@ import {
     createDocumento,
     listDocumentosByPasta,
     getDocumentoById,
-    deleteDocumentoById
+    deleteDocumentoById,
+    listArvorePublica
 } from "../services/biblioteca.service.js";
 
 import { normalizeFolderName, normalizeDocName, toSlug } from "../utils/normalize.js";
@@ -52,6 +53,15 @@ export async function listarDocumentosPublico(req, res) {
     }
     const docs = await listDocumentosByPasta(pastaId);
     res.json({ pasta, items: docs });
+}
+
+/* =========================
+   PÚBLICO: árvore (pastas -> documentos)
+   - 2 queries no service (leve/rápido)
+========================= */
+export async function listarArvorePublico(req, res) {
+    const items = await listArvorePublica();
+    return res.json({ items });
 }
 
 /* =========================

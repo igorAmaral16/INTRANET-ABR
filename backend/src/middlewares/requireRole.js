@@ -3,34 +3,27 @@ const ROLE_ALIASES = {
     COLAB: new Set(["COLAB", "COLABORADOR", "COLABORADORES"])
 };
 
-function normalizeRole(role) {
-    return String(role || "").trim().toUpperCase();
-}
-
 function matchesRole(userRole, requiredRole) {
-    const ur = normalizeRole(userRole);
-    const rr = normalizeRole(requiredRole);
+    if (!userRole) return false;
+    if (userRole === requiredRole) return true;
 
-    if (!ur || !rr) return false;
-    if (ur === rr) return true;
-
-    const aliases = ROLE_ALIASES[rr];
+    const aliases = ROLE_ALIASES[requiredRole];
     if (!aliases) return false;
 
-    return aliases.has(ur);
+    return aliases.has(String(userRole).toUpperCase());
 }
 
-export function requireRole(requiredRole) {
+export function requireRole(role) {
     return function (req, res, next) {
-        const userRole = req.user?.role;
+        if (!req.user) {
+            return res.status(401).json({
+                error: { message: "Não autenticado.", requestId: req.id }
+            });
+        }
 
-        if (!matchesRole(userRole, requiredRole)) {
-            // Retorna o que interessa para depuração (sem expor token)
-            req.log?.warn(
-                { userRole, requiredRole, user: req.user },
-                "Role check failed"
-            );
+        const userRole = String(req.user?.role || "").toUpperCase();
 
+        if (!matchesRole(userRole, role)) {
             return res.status(403).json({
                 error: { message: "Acesso negado.", requestId: req.id }
             });

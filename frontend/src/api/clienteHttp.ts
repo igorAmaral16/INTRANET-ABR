@@ -17,33 +17,48 @@ export class ErroHttp extends Error {
     }
 }
 
+type Opts = {
+    signal?: AbortSignal;
+    timeoutMs?: number;
+    headers?: Record<string, string>;
+};
 
-
-export async function httpGet<T>(
-    caminho: string,
-    opts?: { signal?: AbortSignal; timeoutMs?: number }
-): Promise<T> {
+function criarSignalComTimeout(opts?: Opts) {
     const timeoutMs = opts?.timeoutMs ?? 12000;
     const controller = new AbortController();
 
-    const timeout = setTimeout(() => controller.abort(), timeoutMs);
+    const timeout = window.setTimeout(() => controller.abort(), timeoutMs);
 
-    let signal: AbortSignal = controller.signal;
-
+    // Se o chamador abortar, aborta o nosso controller também
+    let onAbort: (() => void) | null = null;
     if (opts?.signal) {
-        // Usar AbortSignal.any() se disponível (Chrome 120+, Firefox 124+)
-        if (AbortSignal.any) {
-            signal = AbortSignal.any([opts.signal, controller.signal]);
-        } else {
-            // Fallback: apenas usar o sinal do controller
-            signal = controller.signal;
-        }
+        onAbort = () => controller.abort();
+        if (opts.signal.aborted) controller.abort();
+        else opts.signal.addEventListener("abort", onAbort, { once: true });
     }
+
+    const limpar = () => {
+        window.clearTimeout(timeout);
+        if (opts?.signal && onAbort) {
+            opts.signal.removeEventListener("abort", onAbort);
+        }
+    };
+
+    return { signal: controller.signal, limpar };
+}
+
+export function bearerHeaders(token?: string) {
+    if (!token) return {};
+    return { Authorization: `Bearer ${token}` };
+}
+
+export async function httpGet<T>(caminho: string, opts?: Opts): Promise<T> {
+    const { signal, limpar } = criarSignalComTimeout(opts);
 
     try {
         const res = await fetch(montarUrl(caminho), {
             method: "GET",
-            headers: { "Accept": "application/json" },
+            headers: { Accept: "application/json", ...(opts?.headers || {}) },
             signal
         });
 
@@ -58,35 +73,21 @@ export async function httpGet<T>(
 
         return body as T;
     } finally {
-        clearTimeout(timeout);
+        limpar();
     }
 }
 
-export async function httpPost<T>(
-    caminho: string,
-    body: unknown,
-    opts?: { signal?: AbortSignal; timeoutMs?: number }
-): Promise<T> {
-    const timeoutMs = opts?.timeoutMs ?? 12000;
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), timeoutMs);
-
-    let signal: AbortSignal = controller.signal;
-
-    if (opts?.signal) {
-        // Usar AbortSignal.any() se disponível (Chrome 120+, Firefox 124+)
-        if (AbortSignal.any) {
-            signal = AbortSignal.any([opts.signal, controller.signal]);
-        } else {
-            // Fallback: apenas usar o sinal do controller
-            signal = controller.signal;
-        }
-    }
+export async function httpPost<T>(caminho: string, body: unknown, opts?: Opts): Promise<T> {
+    const { signal, limpar } = criarSignalComTimeout(opts);
 
     try {
         const res = await fetch(montarUrl(caminho), {
             method: "POST",
-            headers: { "Accept": "application/json", "Content-Type": "application/json" },
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json",
+                ...(opts?.headers || {})
+            },
             body: JSON.stringify(body),
             signal
         });
@@ -102,7 +103,6 @@ export async function httpPost<T>(
 
         return payload as T;
     } finally {
-        clearTimeout(timeout);
+        limpar();
     }
 }
-

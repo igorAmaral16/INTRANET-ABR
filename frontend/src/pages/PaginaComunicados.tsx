@@ -10,6 +10,7 @@ import { ModalLogin } from "../components/ModalLogin/ModalLogin";
 import { ModalInfo } from "../components/ModalInfo/ModalInfo";
 import { useSessaoAuth } from "../hooks/useSessaoAuth";
 import { inferirTipoAnexoPorUrl, resolverUrlApi } from "../utils/urlApi";
+import { useNavigate } from "react-router-dom";
 import React from "react";
 
 export function PaginaComunicados() {
@@ -27,18 +28,20 @@ export function PaginaComunicados() {
     const [loginColabAberto, setLoginColabAberto] = React.useState(false);
     const [loginAdminAberto, setLoginAdminAberto] = React.useState(false);
     const [infoEsqueciAberto, setInfoEsqueciAberto] = React.useState(false);
+    const navigate = useNavigate();
 
     return (
         <div className="paginaComunicados">
             <BarraTopo
                 busca={busca}
                 aoMudarBusca={setBusca}
+                mostrarBusca={true}
                 estaLogadoColab={estaLogadoColab}
                 aoClicarEntrar={() => setLoginColabAberto(true)}
-                aoMeuPerfil={() => alert("Meu Perfil (próxima tela)")}
-                aoVerDocumentos={() => alert("Ver Documentos (próxima tela)")}
-                aoFaq={() => alert("Dúvidas Frequentes (FAQ)")}
-                aoFaleComRh={() => alert("Fale com o RH (última feature)")}
+                aoMeuPerfil={() => navigate("/meu-perfil")}
+                aoVerDocumentos={() => navigate("/documentos")}
+                aoFaq={() => navigate("/faq")}
+                aoFaleComRh={() => navigate("/fale-com-rh")}
                 aoSair={sair}
             />
 

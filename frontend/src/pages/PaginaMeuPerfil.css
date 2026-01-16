@@ -1,0 +1,70 @@
+.card {
+    padding: 14px;
+    border-radius: 16px;
+    border: 1px solid rgba(0, 0, 0, 0.10);
+    background: rgba(255, 255, 255, 0.96);
+}
+
+.cardErro {
+    border-color: rgba(239, 68, 68, 0.35);
+    background: rgba(239, 68, 68, 0.10);
+    font-weight: 900;
+}
+
+.perfil {
+    display: grid;
+    gap: 12px;
+}
+
+.perfil__linha {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+@media (max-width: 720px) {
+    .perfil__linha {
+        grid-template-columns: 1fr;
+    }
+}
+
+.perfil__campo {
+    padding: 14px;
+    border-radius: 16px;
+    border: 1px solid rgba(0, 0, 0, 0.10);
+    background: rgba(255, 255, 255, 0.96);
+    display: grid;
+    gap: 8px;
+}
+
+.perfil__rotulo {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    font-weight: 950;
+    opacity: 0.80;
+}
+
+.perfil__valor {
+    font-size: 16px;
+    font-weight: 950;
+}
+
+.status.ativo {
+    color: #065f46;
+    background: rgba(16, 185, 129, 0.10);
+    padding: 6px 10px;
+    border-radius: 999px;
+    display: inline-flex;
+    width: fit-content;
+}
+
+.status.inativo {
+    color: #991b1b;
+    background: rgba(239, 68, 68, 0.10);
+    padding: 6px 10px;
+    border-radius: 999px;
+    display: inline-flex;
+    width: fit-content;
+}

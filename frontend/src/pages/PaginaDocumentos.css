@@ -1,0 +1,73 @@
+.card {
+    padding: 14px;
+    border-radius: 16px;
+    border: 1px solid rgba(0, 0, 0, 0.10);
+    background: rgba(255, 255, 255, 0.96);
+}
+
+.cardErro {
+    border-color: rgba(239, 68, 68, 0.35);
+    background: rgba(239, 68, 68, 0.10);
+    font-weight: 900;
+}
+
+.arvore {
+    display: grid;
+    gap: 10px;
+}
+
+.pasta {
+    border-radius: 16px;
+    border: 1px solid rgba(0, 0, 0, 0.10);
+    background: rgba(255, 255, 255, 0.96);
+    overflow: hidden;
+}
+
+.pasta__topo {
+    width: 100%;
+    text-align: left;
+    height: 48px;
+    padding: 0 12px;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-weight: 950;
+}
+
+.pasta__topo:hover {
+    background: rgba(0, 0, 0, 0.04);
+}
+
+.pasta__nome {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.pasta__filhos {
+    padding: 10px 12px 12px 36px;
+    display: grid;
+    gap: 8px;
+    border-top: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.docItem {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    height: 44px;
+    padding: 0 12px;
+    border-radius: 14px;
+    border: 1px solid rgba(0, 0, 0, 0.10);
+    background: rgba(255, 255, 255, 1);
+    text-decoration: none;
+    color: #111827;
+    font-weight: 900;
+}
+
+.docItem:hover {
+    background: rgba(0, 0, 0, 0.04);
+}

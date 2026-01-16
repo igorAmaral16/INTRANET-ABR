@@ -7,8 +7,12 @@ import { listar, obter, criar, atualizar, excluir } from "../controllers/colabor
 
 export const colaboradoresRouter = express.Router();
 
-// Painel administrativo: somente ADMIN e RH Senior (nível >= 2)
-colaboradoresRouter.use(authJwt, requireRole("ADMIN"), requireNivel(2));
+// IMPORTANTE:
+// Antes estava: colaboradoresRouter.use(authJwt, requireRole("ADMIN"), requireNivel(2));
+// Isso intercepta QUALQUER rota do sistema porque o router está montado em "/".
+//
+// Correção definitiva: aplica o gate SOMENTE no prefixo admin
+colaboradoresRouter.use("/admin/colaboradores", authJwt, requireRole("ADMIN"), requireNivel(2));
 
 colaboradoresRouter.get("/admin/colaboradores", asyncHandler(listar));
 colaboradoresRouter.post("/admin/colaboradores", asyncHandler(criar));

@@ -22,7 +22,7 @@ router.use(comunicadosRouter);
 router.use(bibliotecaRouter);
 router.use(faqRouter);
 
-// colaborador (não pode ser interceptado por "gates" genéricos)
+// colaborador
 router.use(comunicadoReadsRouter);
 
 // admin

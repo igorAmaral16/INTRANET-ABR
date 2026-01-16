@@ -12,7 +12,8 @@ import {
     downloadDocumentoPublico,
     criarPasta,
     adicionarDocumento,
-    excluirDocumento
+    excluirDocumento,
+    listarArvorePublico
 } from "../controllers/biblioteca.controller.js";
 
 export const bibliotecaRouter = express.Router();
@@ -53,3 +54,5 @@ bibliotecaRouter.delete(
     requireNivel(1),
     asyncHandler(excluirDocumento)
 );
+
+bibliotecaRouter.get("/biblioteca/arvore", asyncHandler(listarArvorePublico));

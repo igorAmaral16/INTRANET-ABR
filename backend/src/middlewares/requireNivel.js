@@ -1,5 +1,11 @@
 export function requireNivel(minNivel) {
     return function (req, res, next) {
+        if (!req.user) {
+            return res.status(401).json({
+                error: { message: "Não autenticado.", requestId: req.id }
+            });
+        }
+
         if (req.user?.role !== "ADMIN") {
             return res.status(403).json({
                 error: { message: "Acesso negado.", requestId: req.id }
@@ -7,7 +13,7 @@ export function requireNivel(minNivel) {
         }
 
         const nivel = Number(req.user?.nivel);
-        if (!nivel || nivel < minNivel) {
+        if (!Number.isFinite(nivel) || nivel < minNivel) {
             return res.status(403).json({
                 error: { message: "Acesso negado.", requestId: req.id }
             });
