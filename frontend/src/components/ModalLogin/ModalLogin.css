@@ -1,0 +1,97 @@
+.modalLogin {
+    display: grid;
+    gap: 12px;
+}
+
+.modalLogin__descricao {
+    margin: 0;
+    opacity: 0.8;
+    line-height: 1.45;
+}
+
+.modalLogin__campo {
+    display: grid;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 800;
+    opacity: 0.9;
+}
+
+.modalLogin__campo input {
+    height: 44px;
+    border-radius: 14px;
+    border: 1px solid rgba(0, 0, 0, 0.10);
+    padding: 0 12px;
+    outline: none;
+}
+
+.modalLogin__campo input:focus {
+    border-color: rgba(0, 0, 0, 0.28);
+}
+
+.modalLogin__erro {
+    padding: 10px 12px;
+    border-radius: 14px;
+    border: 1px solid rgba(239, 68, 68, 0.35);
+    background: rgba(239, 68, 68, 0.10);
+    color: #991b1b;
+    font-weight: 800;
+}
+
+.modalLogin__acoes {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-top: 2px;
+}
+
+.modalLogin__secundario {
+    background: transparent;
+    border: none;
+    font-weight: 900;
+    cursor: pointer;
+    opacity: 0.85;
+    padding: 8px 10px;
+    border-radius: 12px;
+}
+
+.modalLogin__secundario:hover {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+.modalLogin__primario {
+    min-width: 140px;
+    height: 44px;
+    border-radius: 14px;
+    border: 1px solid rgba(0, 0, 0, 0.10);
+    background: #111827;
+    color: #fff;
+    font-weight: 900;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modalLogin__primario:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.modalLogin__spinner {
+    width: 18px;
+    height: 18px;
+    border-radius: 999px;
+    border: 2px solid rgba(255, 255, 255, 0.35);
+    border-top-color: rgba(255, 255, 255, 1);
+    display: inline-block;
+    animation: girar 0.8s linear infinite;
+}
+
+@keyframes girar {
+    to {
+        transform: rotate(360deg);
+    }
+}

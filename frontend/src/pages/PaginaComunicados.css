@@ -130,3 +130,17 @@
     overflow: hidden;
     background: #fff;
 }
+
+.paginaComunicados__rodapeBotao {
+    height: 44px;
+    width: 100%;
+    border: none;
+    background: transparent;
+    font-weight: 900;
+    cursor: pointer;
+    opacity: 0.8;
+}
+
+.paginaComunicados__rodapeBotao:hover {
+    opacity: 1;
+}

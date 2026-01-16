@@ -6,7 +6,11 @@ import { EstadoCarregando } from "../components/Estados/EstadoCarregando";
 import { EstadoErro } from "../components/Estados/EstadoErro";
 import { EstadoVazio } from "../components/Estados/EstadoVazio";
 import { useComunicados } from "../hooks/useComunicados";
+import { ModalLogin } from "../components/ModalLogin/ModalLogin";
+import { ModalInfo } from "../components/ModalInfo/ModalInfo";
+import { useSessaoAuth } from "../hooks/useSessaoAuth";
 import { inferirTipoAnexoPorUrl, resolverUrlApi } from "../utils/urlApi";
+import React from "react";
 
 export function PaginaComunicados() {
     const {
@@ -18,17 +22,26 @@ export function PaginaComunicados() {
         abrirDetalhe, fecharDetalhe
     } = useComunicados();
 
+    const { estaLogadoColab, definirSessao, sair } = useSessaoAuth();
+
+    const [loginColabAberto, setLoginColabAberto] = React.useState(false);
+    const [loginAdminAberto, setLoginAdminAberto] = React.useState(false);
+    const [infoEsqueciAberto, setInfoEsqueciAberto] = React.useState(false);
+
     return (
         <div className="paginaComunicados">
             <BarraTopo
                 busca={busca}
                 aoMudarBusca={setBusca}
-                aoClicarEntrar={() => {
-                    // Por enquanto, apenas navegação futura.
-                    // Aqui você pode integrar react-router e enviar para /entrar.
-                    alert("Tela de login será a próxima etapa.");
-                }}
+                estaLogadoColab={estaLogadoColab}
+                aoClicarEntrar={() => setLoginColabAberto(true)}
+                aoMeuPerfil={() => alert("Meu Perfil (próxima tela)")}
+                aoVerDocumentos={() => alert("Ver Documentos (próxima tela)")}
+                aoFaq={() => alert("Dúvidas Frequentes (FAQ)")}
+                aoFaleComRh={() => alert("Fale com o RH (última feature)")}
+                aoSair={sair}
             />
+
 
             <main className="paginaComunicados__conteudo">
                 <section className="paginaComunicados__cabecalho">
@@ -69,9 +82,17 @@ export function PaginaComunicados() {
             </main>
 
             <footer className="paginaComunicados__rodape">
-                <span>Painel {`—`} ABR {new Date().getFullYear()}</span>
+                <button
+                    type="button"
+                    className="paginaComunicados__rodapeBotao"
+                    onClick={() => setLoginAdminAberto(true)}
+                    aria-label="Entrar no painel administrativo"
+                >
+                    Painel ADM — ABR {new Date().getFullYear()}
+                </button>
             </footer>
 
+            {/* Modal do detalhe (com anexo resolvido para API) */}
             <Modal
                 aberto={Boolean(detalheAberto) || detalheEstado === "carregando" || detalheEstado === "erro"}
                 titulo={detalheAberto?.titulo || "Comunicado"}
@@ -105,9 +126,8 @@ export function PaginaComunicados() {
                                 return (
                                     <>
                                         <a className="paginaComunicados__anexo" href={url} target="_blank" rel="noreferrer">
-                                            Abrir imagem em nova aba
+                                            Abrir imagem
                                         </a>
-
                                         <div className="paginaComunicados__previewImagem">
                                             <img src={url} alt="Anexo do comunicado" loading="lazy" />
                                         </div>
@@ -115,17 +135,44 @@ export function PaginaComunicados() {
                                 );
                             }
 
-                            // PDF ou desconhecido: abrir/baixar
                             return (
                                 <a className="paginaComunicados__anexo" href={url} target="_blank" rel="noreferrer">
                                     Abrir anexo
                                 </a>
                             );
                         })() : null}
-
                     </div>
                 )}
             </Modal>
+
+            {/* Login COLAB */}
+            <ModalLogin
+                aberto={loginColabAberto}
+                tipo="COLAB"
+                aoFechar={() => setLoginColabAberto(false)}
+                aoEsqueciSenha={() => setInfoEsqueciAberto(true)}
+                aoSucesso={({ token, role, user }) => definirSessao({ token, role, user })}
+            />
+
+            {/* Login ADMIN */}
+            <ModalLogin
+                aberto={loginAdminAberto}
+                tipo="ADMIN"
+                aoFechar={() => setLoginAdminAberto(false)}
+                aoEsqueciSenha={() => setInfoEsqueciAberto(true)}
+                aoSucesso={({ token, role, user }) => {
+                    definirSessao({ token, role, user });
+                    alert("Login administrativo realizado. O painel ADM será implementado nas próximas telas.");
+                }}
+            />
+
+            {/* Esqueci minha senha */}
+            <ModalInfo
+                aberto={infoEsqueciAberto}
+                titulo="Recuperação de senha"
+                mensagem="Para recuperar sua senha, procure o RH para validar seus dados e realizar a atualização."
+                aoFechar={() => setInfoEsqueciAberto(false)}
+            />
         </div>
     );
 }

@@ -19,7 +19,6 @@
 
     width: 100%;
     min-width: 0;
-    /* evita overflow em flex */
 }
 
 .barraTopo__marca {
@@ -41,7 +40,6 @@
 
 .barraTopo__busca {
     flex: 1 1 260px;
-    /* cresce e quebra linha se necessário */
     min-width: 0;
 }
 
@@ -60,15 +58,21 @@
     border-color: rgba(0, 0, 0, 0.25);
 }
 
-.barraTopo__botaoEntrar {
+.barraTopo__acoesDireita {
     flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.barraTopo__botaoEntrar {
     height: 40px;
     padding: 0 14px;
     border-radius: 14px;
     border: 1px solid rgba(0, 0, 0, 0.10);
     background: #111827;
     color: #fff;
-    font-weight: 700;
+    font-weight: 900;
     cursor: pointer;
 }
 

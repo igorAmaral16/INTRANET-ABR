@@ -1,0 +1,200 @@
+/* =========================
+   DESKTOP (inline)
+========================= */
+.menuUsuario__desktop {
+    display: none;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: nowrap;
+}
+
+.menuUsuario__botaoTopo {
+    height: 40px;
+    border-radius: 14px;
+    border: 1px solid rgba(0, 0, 0, 0.10);
+    background: rgba(255, 255, 255, 0.92);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 12px;
+    font-weight: 900;
+    color: #111827;
+    white-space: nowrap;
+}
+
+.menuUsuario__botaoTopo:hover {
+    background: rgba(0, 0, 0, 0.04);
+}
+
+.menuUsuario__sairTopo {
+    border-color: rgba(239, 68, 68, 0.35);
+    background: rgba(239, 68, 68, 0.08);
+}
+
+.menuUsuario__icone {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.menuUsuario__texto {
+    font-size: 13px;
+}
+
+@media (min-width: 900px) {
+    .menuUsuario__desktop {
+        display: inline-flex;
+    }
+}
+
+/* =========================
+   MOBILE (hamb + drawer)
+========================= */
+.menuUsuario__hambBotao {
+    display: inline-flex;
+    height: 40px;
+    width: 44px;
+    border-radius: 14px;
+    border: 1px solid rgba(0, 0, 0, 0.10);
+    background: #fff;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+}
+
+@media (min-width: 900px) {
+    .menuUsuario__hambBotao {
+        display: none;
+    }
+}
+
+/* Overlay no body */
+.menuUsuario__overlayRoot {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+}
+
+/* Backdrop nítido */
+.menuUsuario__backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.58);
+    backdrop-filter: blur(6px);
+}
+
+/* Drawer: largura mais contida e padrão de espaçamento */
+.menuUsuario__drawer {
+    position: fixed;
+    top: 12px;
+    right: 12px;
+    height: calc(100% - 24px);
+
+    width: min(320px, 86vw);
+    /* corrigido: menos largo */
+    max-width: 320px;
+    /* garante padrão */
+    background: rgba(255, 255, 255, 0.98);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 18px;
+
+    box-shadow:
+        0 30px 90px rgba(0, 0, 0, 0.35),
+        0 2px 0 rgba(255, 255, 255, 0.5) inset;
+
+    transform: translateX(0);
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    /* topo, conteúdo, rodapé */
+    overflow: hidden;
+}
+
+/* Topo */
+.menuUsuario__drawerTopo {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 12px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.menuUsuario__drawerTitulo {
+    font-weight: 1000;
+    font-size: 14px;
+}
+
+.menuUsuario__drawerSubtitulo {
+    font-size: 12px;
+    opacity: 0.70;
+    margin-top: 2px;
+}
+
+.menuUsuario__drawerFechar {
+    border: 1px solid rgba(0, 0, 0, 0.10);
+    background: rgba(255, 255, 255, 0.95);
+    cursor: pointer;
+    height: 38px;
+    width: 40px;
+    border-radius: 14px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.menuUsuario__drawerFechar:hover {
+    background: rgba(0, 0, 0, 0.04);
+}
+
+/* Conteúdo: itens do topo com espaçamento regular */
+.menuUsuario__drawerConteudo {
+    padding: 12px;
+    display: grid;
+    gap: 10px;
+    /* espaçamento adequado */
+    align-content: start;
+    /* começa do topo, sem “esticar” */
+    overflow: auto;
+}
+
+/* Rodapé fixo */
+.menuUsuario__drawerRodape {
+    padding: 12px;
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
+    background: rgba(255, 255, 255, 0.98);
+}
+
+/* Item */
+.menuUsuario__item {
+    text-align: left;
+    height: 46px;
+    border-radius: 14px;
+    border: 1px solid rgba(0, 0, 0, 0.10);
+    background: rgba(255, 255, 255, 1);
+    cursor: pointer;
+    font-weight: 950;
+    padding: 0 12px;
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.menuUsuario__item:hover {
+    background: rgba(0, 0, 0, 0.04);
+}
+
+.menuUsuario__itemIcone {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+}
+
+.menuUsuario__itemTexto {
+    font-size: 14px;
+}
+
+.menuUsuario__itemSair {
+    border-color: rgba(239, 68, 68, 0.35);
+    background: rgba(239, 68, 68, 0.10);
+}
