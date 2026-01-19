@@ -1,0 +1,174 @@
+.admColabs__toolbar {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.admColabs__busca {
+    flex: 1 1 260px;
+    min-width: 0;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    border: 1px solid rgba(0, 0, 0, 0.10);
+    border-radius: 14px;
+    padding: 0 12px;
+    height: 40px;
+    background: #fff;
+}
+
+.admColabs__busca input {
+    border: 0;
+    outline: none;
+    width: 100%;
+    min-width: 0;
+    background: transparent;
+}
+
+.admColabs__btn {
+    height: 40px;
+    padding: 0 14px;
+    border-radius: 14px;
+    border: 1px solid rgba(0, 0, 0, 0.10);
+    background: #fff;
+    font-weight: 900;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.admColabs__lista {
+    margin-top: 12px;
+    padding: 12px;
+}
+
+.admColabs__listaTopo {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+}
+
+.admColabs__paginacao {
+    display: inline-flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.admColabs__tabela {
+    display: grid;
+    gap: 8px;
+}
+
+.admColabs__row {
+    width: 100%;
+    text-align: left;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    background: #fff;
+    border-radius: 14px;
+    padding: 12px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+}
+
+.admColabs__row:hover {
+    background: rgba(0, 0, 0, 0.02);
+}
+
+.admColabs__rowEsq {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+}
+
+.admColabs__rowTxt {
+    min-width: 0;
+}
+
+.admColabs__rowNome {
+    font-weight: 900;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 520px;
+}
+
+.admColabs__rowMeta {
+    opacity: 0.85;
+    margin-top: 2px;
+    font-size: 13px;
+}
+
+.admColabs__status {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 900;
+    padding: 8px 10px;
+    border-radius: 999px;
+    border: 1px solid rgba(0, 0, 0, 0.10);
+}
+
+.admColabs__status.ativo {
+    background: rgba(16, 185, 129, 0.10);
+}
+
+.admColabs__status.inativo {
+    background: rgba(239, 68, 68, 0.10);
+}
+
+.admColabs__fab {
+    position: fixed;
+    right: 18px;
+    bottom: 18px;
+    height: 52px;
+    width: 52px;
+    border-radius: 18px;
+    border: 1px solid rgba(0, 0, 0, 0.10);
+    background: #111827;
+    color: #fff;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.20);
+}
+
+.admColabs__detalheBloco {
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 14px;
+    padding: 12px;
+    display: grid;
+    gap: 10px;
+}
+
+.admColabs__detalheTitulo {
+    font-weight: 900;
+}
+
+.admColabs__danger {
+    background: rgba(239, 68, 68, 0.06);
+}
+
+.admColabs__btnDanger {
+    height: 40px;
+    padding: 0 14px;
+    border-radius: 14px;
+    border: 1px solid rgba(239, 68, 68, 0.35);
+    background: #fff;
+    color: #b42318;
+    font-weight: 900;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
