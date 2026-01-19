@@ -271,3 +271,39 @@ export async function httpPostDownloadBlob(caminho: string, body: unknown, opts?
         limpar();
     }
 }
+
+export async function httpDeleteJson<T>(caminho: string, body: unknown, opts?: Opts): Promise<T> {
+    const { signal, limpar } = criarSignalComTimeout(opts);
+
+    try {
+        const res = await fetch(montarUrl(caminho), {
+            method: "DELETE",
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json",
+                ...(opts?.headers || {})
+            },
+            body: JSON.stringify(body),
+            signal
+        });
+
+        // 204 sem body
+        if (res.status === 204) return null as T;
+
+        const contentType = res.headers.get("content-type") || "";
+        const isJson = contentType.includes("application/json");
+        const payload = isJson ? await res.json().catch(() => null) : await res.text().catch(() => null);
+
+        if (!res.ok) {
+            const msg = (payload as any)?.error?.message || `Falha na requisição (${res.status}).`;
+            // reaproveita seu auto-logout, se estiver no mesmo arquivo
+            // tratarAuthAutoLogout(res.status, msg);
+            throw new ErroHttp(msg, res.status, payload);
+        }
+
+        return payload as T;
+    } finally {
+        limpar();
+    }
+}
+

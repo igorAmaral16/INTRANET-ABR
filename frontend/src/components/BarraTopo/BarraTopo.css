@@ -100,3 +100,37 @@
     flex: 1 1 260px;
     min-width: 0;
 }
+
+.barraTopo__marca {
+    flex: 0 0 auto;
+    border: 0;
+    background: transparent;
+    padding: 0;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+}
+
+.barraTopo__logoImg {
+    height: 38px;
+    width: auto;
+    display: block;
+    border-radius: 10px;
+}
+
+.barraTopo__marca {
+    flex: 0 0 auto;
+    border: 0;
+    background: transparent;
+    padding: 0;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+}
+
+.barraTopo__logoImg {
+    height: 38px;
+    width: auto;
+    display: block;
+    border-radius: 10px;
+}

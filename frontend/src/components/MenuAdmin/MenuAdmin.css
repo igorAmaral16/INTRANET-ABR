@@ -1,0 +1,118 @@
+.menuAdmin__hambBotao {
+    height: 40px;
+    width: 44px;
+    border-radius: 14px;
+    border: 1px solid rgba(0, 0, 0, 0.10);
+    background: #fff;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.menuAdmin__hambBotao:active {
+    transform: translateY(1px);
+}
+
+.menuAdmin__overlayRoot {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+}
+
+.menuAdmin__backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.35);
+}
+
+.menuAdmin__drawer {
+    position: absolute;
+    top: 16px;
+    bottom: 16px;
+    right: 16px;
+    width: min(360px, calc(100vw - 32px));
+    background: #fff;
+    border-radius: 18px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.menuAdmin__drawerTopo {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 14px 10px 14px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.menuAdmin__drawerTitulo {
+    font-weight: 900;
+    font-size: 16px;
+    line-height: 1.1;
+}
+
+.menuAdmin__drawerSubtitulo {
+    font-size: 12px;
+    opacity: 0.7;
+    margin-top: 2px;
+}
+
+.menuAdmin__drawerFechar {
+    height: 36px;
+    width: 36px;
+    border-radius: 12px;
+    border: 1px solid rgba(0, 0, 0, 0.10);
+    background: #fff;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.menuAdmin__drawerConteudo {
+    padding: 12px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    overflow: auto;
+}
+
+.menuAdmin__item {
+    height: 46px;
+    border-radius: 14px;
+    border: 1px solid rgba(0, 0, 0, 0.10);
+    background: #fff;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 14px;
+    cursor: pointer;
+    text-align: left;
+}
+
+.menuAdmin__itemIcone {
+    width: 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.9;
+}
+
+.menuAdmin__itemTexto {
+    font-weight: 800;
+}
+
+.menuAdmin__drawerRodape {
+    margin-top: auto;
+    padding: 12px 14px;
+    border-top: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.menuAdmin__itemSair {
+    background: rgba(239, 68, 68, 0.06);
+    border-color: rgba(239, 68, 68, 0.30);
+}

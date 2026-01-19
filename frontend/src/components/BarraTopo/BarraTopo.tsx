@@ -1,23 +1,35 @@
 import "./BarraTopo.css";
 import { MenuUsuario } from "../MenuUsuario/MenuUsuario";
+import { MenuAdmin } from "../MenuAdmin/MenuAdmin";
 import logo from "../../assets/logo.webp";
+
+type Role = "COLAB" | "ADMIN" | null | undefined;
 
 type Props = {
     busca: string;
     aoMudarBusca: (v: string) => void;
-
     mostrarBusca?: boolean;
 
-    // NOVO: clique na logo vai para a home
     aoIrParaInicio: () => void;
 
-    estaLogadoColab: boolean;
+    estaLogado: boolean;
+    role?: Role;
+
     aoClicarEntrar: () => void;
 
-    aoMeuPerfil: () => void;
-    aoVerDocumentos: () => void;
-    aoFaq: () => void;
-    aoFaleComRh: () => void;
+    // COLAB
+    aoMeuPerfil?: () => void;
+    aoVerDocumentos?: () => void;
+    aoFaq?: () => void;
+    aoFaleComRh?: () => void;
+
+    // ADMIN
+    aoAdminCriarComunicado?: () => void;
+    aoAdminDocumentos?: () => void;
+    aoAdminColaboradores?: () => void;
+    aoAdminFaq?: () => void;
+    aoAdminRelatorios?: () => void;
+
     aoSair: () => void;
 };
 
@@ -26,12 +38,21 @@ export function BarraTopo({
     aoMudarBusca,
     mostrarBusca = true,
     aoIrParaInicio,
-    estaLogadoColab,
+    estaLogado,
+    role,
     aoClicarEntrar,
+
     aoMeuPerfil,
     aoVerDocumentos,
     aoFaq,
     aoFaleComRh,
+
+    aoAdminCriarComunicado,
+    aoAdminDocumentos,
+    aoAdminColaboradores,
+    aoAdminFaq,
+    aoAdminRelatorios,
+
     aoSair,
 }: Props) {
     return (
@@ -39,8 +60,8 @@ export function BarraTopo({
             <div className="barraTopo__conteudo">
                 <button
                     className="barraTopo__marca"
+                    aria-label="Ir para página inicial"
                     type="button"
-                    aria-label="Ir para a página principal"
                     onClick={aoIrParaInicio}
                 >
                     <img className="barraTopo__logoImg" src={logo} alt="Logo" />
@@ -60,16 +81,25 @@ export function BarraTopo({
                 )}
 
                 <div className="barraTopo__acoesDireita">
-                    {!estaLogadoColab ? (
+                    {!estaLogado ? (
                         <button className="barraTopo__botaoEntrar" onClick={aoClicarEntrar} type="button">
                             Entrar
                         </button>
+                    ) : role === "ADMIN" ? (
+                        <MenuAdmin
+                            aoCriarComunicado={aoAdminCriarComunicado || (() => { })}
+                            aoDocumentos={aoAdminDocumentos || (() => { })}
+                            aoColaboradores={aoAdminColaboradores || (() => { })}
+                            aoFaq={aoAdminFaq || (() => { })}
+                            aoRelatorios={aoAdminRelatorios || (() => { })}
+                            aoSair={aoSair}
+                        />
                     ) : (
                         <MenuUsuario
-                            aoMeuPerfil={aoMeuPerfil}
-                            aoVerDocumentos={aoVerDocumentos}
-                            aoFaq={aoFaq}
-                            aoFaleComRh={aoFaleComRh}
+                            aoMeuPerfil={aoMeuPerfil || (() => { })}
+                            aoVerDocumentos={aoVerDocumentos || (() => { })}
+                            aoFaq={aoFaq || (() => { })}
+                            aoFaleComRh={aoFaleComRh || (() => { })}
                             aoSair={aoSair}
                         />
                     )}

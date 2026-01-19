@@ -1,4 +1,4 @@
-import { bearerHeaders, httpGet } from "./clienteHttp";
+import { bearerHeaders, httpGet, httpPost, httpPut, httpDeleteJson } from "./clienteHttp";
 
 export type PerfilColaborador = {
     id: number | string;
@@ -9,7 +9,6 @@ export type PerfilColaborador = {
 };
 
 function normalizarPerfil(data: any): PerfilColaborador {
-    // suporta respostas { user: ... } ou direto
     const src = data?.user || data;
 
     return {
@@ -21,14 +20,19 @@ function normalizarPerfil(data: any): PerfilColaborador {
     };
 }
 
-export async function obterMeuPerfilColaborador(params: { token: string; userId?: string | number }, signal?: AbortSignal) {
+/* =========================
+   COLAB: meu perfil
+========================= */
+export async function obterMeuPerfilColaborador(
+    params: { token: string; userId?: string | number },
+    signal?: AbortSignal
+) {
     const headersObj = bearerHeaders(params.token);
-    const headers = Object.fromEntries(Object.entries(headersObj).filter(([_, v]) => v !== undefined)) as Record<string, string> | undefined;
+    const headers = Object.fromEntries(Object.entries(headersObj).filter(([_, v]) => v !== undefined)) as
+        | Record<string, string>
+        | undefined;
 
-    // Ordem de tentativa: endpoints típicos para painel colaborador
-    const candidatos = [
-        "/colaborador/perfil"
-    ].filter(Boolean) as string[];
+    const candidatos = ["/colaborador/perfil"].filter(Boolean) as string[];
 
     let ultimoErro: any = null;
 
@@ -38,10 +42,84 @@ export async function obterMeuPerfilColaborador(params: { token: string; userId?
             return normalizarPerfil(data);
         } catch (e: any) {
             ultimoErro = e;
-            // tenta o próximo
             continue;
         }
     }
 
     throw ultimoErro || new Error("Não foi possível carregar o perfil.");
+}
+
+/* =========================
+   ADMIN: colaboradores
+========================= */
+
+export type ColaboradorAdmin = {
+    matricula: string;
+    nome_completo: string;
+    data_nascimento: string; // backend espera dd/mm/aaaa no create/update; no retorno pode vir yyyy-mm-dd
+    status: "ATIVO" | "INATIVO";
+};
+
+export type ListaColaboradoresAdminResponse = {
+    items: ColaboradorAdmin[];
+    total: number;
+    page: number;
+    pageSize: number;
+};
+
+export async function listarColaboradoresAdmin(
+    params: { token: string; page: number; pageSize: number; status?: "ATIVO" | "INATIVO"; search?: string },
+    signal?: AbortSignal
+) {
+    const qs = new URLSearchParams({
+        page: String(params.page),
+        pageSize: String(params.pageSize)
+    });
+    if (params.status) qs.set("status", params.status);
+    if (params.search && params.search.trim()) qs.set("search", params.search.trim());
+
+    return httpGet<ListaColaboradoresAdminResponse>(`/admin/colaboradores?${qs.toString()}`, {
+        signal,
+        headers: bearerHeaders(params.token)
+    });
+}
+
+export async function obterColaboradorAdmin(
+    params: { token: string; matricula: string },
+    signal?: AbortSignal
+) {
+    return httpGet<ColaboradorAdmin>(`/admin/colaboradores/${encodeURIComponent(params.matricula)}`, {
+        signal,
+        headers: bearerHeaders(params.token)
+    });
+}
+
+export async function criarColaboradorAdmin(
+    params: { token: string; body: { matricula: string; nome_completo: string; data_nascimento: string; status?: "ATIVO" | "INATIVO" } },
+    signal?: AbortSignal
+) {
+    return httpPost<ColaboradorAdmin>(`/admin/colaboradores`, params.body, {
+        signal,
+        headers: bearerHeaders(params.token)
+    });
+}
+
+export async function atualizarColaboradorAdmin(
+    params: { token: string; matricula: string; body: { nome_completo: string; data_nascimento: string; status: "ATIVO" | "INATIVO" } },
+    signal?: AbortSignal
+) {
+    return httpPut<ColaboradorAdmin>(`/admin/colaboradores/${encodeURIComponent(params.matricula)}`, params.body, {
+        signal,
+        headers: bearerHeaders(params.token)
+    });
+}
+
+export async function excluirColaboradorAdmin(
+    params: { token: string; matricula: string; confirm: string },
+    signal?: AbortSignal
+) {
+    return httpDeleteJson<void>(`/admin/colaboradores/${encodeURIComponent(params.matricula)}`, { confirm: params.confirm }, {
+        signal,
+        headers: bearerHeaders(params.token)
+    });
 }

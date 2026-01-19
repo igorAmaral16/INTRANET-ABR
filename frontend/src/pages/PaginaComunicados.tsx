@@ -23,12 +23,14 @@ export function PaginaComunicados() {
         abrirDetalhe, fecharDetalhe
     } = useComunicados();
 
-    const { estaLogadoColab, definirSessao, sair } = useSessaoAuth();
+    const { sessao, estaLogadoColab, definirSessao, sair } = useSessaoAuth();
 
     const [loginColabAberto, setLoginColabAberto] = React.useState(false);
     const [loginAdminAberto, setLoginAdminAberto] = React.useState(false);
     const [infoEsqueciAberto, setInfoEsqueciAberto] = React.useState(false);
     const navigate = useNavigate();
+    const estaLogado = Boolean(sessao?.token);
+    const role = sessao?.role;
 
     return (
         <div className="paginaComunicados">
@@ -37,7 +39,8 @@ export function PaginaComunicados() {
                 aoMudarBusca={setBusca}
                 mostrarBusca={true}
                 aoIrParaInicio={() => navigate("/")}
-                estaLogadoColab={estaLogadoColab}
+                estaLogado={estaLogado}
+                role={role}
                 aoClicarEntrar={() => setLoginColabAberto(true)}
                 aoMeuPerfil={() => navigate("/meu-perfil")}
                 aoVerDocumentos={() => navigate("/documentos")}
@@ -45,7 +48,6 @@ export function PaginaComunicados() {
                 aoFaleComRh={() => navigate("/fale-com-rh")}
                 aoSair={sair}
             />
-
 
             <main className="paginaComunicados__conteudo">
                 <section className="paginaComunicados__cabecalho">
@@ -96,7 +98,6 @@ export function PaginaComunicados() {
                 </button>
             </footer>
 
-            {/* Modal do detalhe (com anexo resolvido para API) */}
             <Modal
                 aberto={Boolean(detalheAberto) || detalheEstado === "carregando" || detalheEstado === "erro"}
                 titulo={detalheAberto?.titulo || "Comunicado"}
@@ -166,11 +167,11 @@ export function PaginaComunicados() {
                 aoEsqueciSenha={() => setInfoEsqueciAberto(true)}
                 aoSucesso={({ token, role, user }) => {
                     definirSessao({ token, role, user });
-                    alert("Login administrativo realizado. O painel ADM será implementado nas próximas telas.");
+                    setLoginAdminAberto(false);
+                    navigate("/admin");
                 }}
             />
 
-            {/* Esqueci minha senha */}
             <ModalInfo
                 aberto={infoEsqueciAberto}
                 titulo="Recuperação de senha"

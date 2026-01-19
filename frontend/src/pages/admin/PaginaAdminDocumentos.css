@@ -1,0 +1,116 @@
+.admDocs__acoes {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.admDocs__acaoBtn {
+    height: 40px;
+    padding: 0 14px;
+    border-radius: 14px;
+    border: 1px solid rgba(0, 0, 0, 0.10);
+    background: #fff;
+    font-weight: 900;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.admDocs__arvore {
+    margin-top: 12px;
+    padding: 12px;
+}
+
+.admDocs__pasta {
+    margin: 6px 0;
+}
+
+.admDocs__filhos {
+    margin-left: 18px;
+    border-left: 1px solid rgba(0, 0, 0, 0.08);
+    padding-left: 12px;
+    margin-top: 6px;
+}
+
+.admDocs__linha {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 10px;
+    border-radius: 12px;
+}
+
+.admDocs__linha:hover {
+    background: rgba(0, 0, 0, 0.03);
+}
+
+.admDocs__linhaEsq {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+    flex: 1 1 auto;
+}
+
+.admDocs__nome {
+    font-weight: 900;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.admDocs__toggle {
+    height: 34px;
+    width: 34px;
+    border-radius: 12px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    background: #fff;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.admDocs__menuBtn {
+    height: 34px;
+    width: 34px;
+    border-radius: 12px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    background: #fff;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.admDocs__menu {
+    position: fixed;
+    width: 190px;
+    background: #fff;
+    border: 1px solid rgba(0, 0, 0, 0.10);
+    border-radius: 14px;
+    box-shadow: 0 14px 34px rgba(0, 0, 0, 0.12);
+    padding: 8px;
+    z-index: 9999;
+}
+
+.admDocs__menuItem {
+    width: 100%;
+    text-align: left;
+    padding: 10px 10px;
+    border-radius: 12px;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+    font-weight: 900;
+}
+
+.admDocs__menuItem:hover {
+    background: rgba(0, 0, 0, 0.04);
+}
+
+.admDocs__menuItemDanger {
+    color: #b42318;
+}

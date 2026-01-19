@@ -1,4 +1,4 @@
-import { bearerHeaders, httpDelete, httpGet, httpPost, httpPut } from "./clienteHttp";
+import { httpGet, httpPost, httpPut, httpDelete, bearerHeaders } from "./clienteHttp";
 import type { ComunicadoDetalhe, ListaComunicadosResponse } from "../tipos/comunicados";
 
 /* =========================
@@ -13,9 +13,6 @@ export function listarComunicados(params: { page: number; pageSize: number }, si
     return httpGet<ListaComunicadosResponse>(`/comunicados?${qs.toString()}`, { signal });
 }
 
-/**
- * Importante: este endpoint incrementa "views" no backend.
- */
 export function obterComunicado(id: number, signal?: AbortSignal) {
     return httpGet<ComunicadoDetalhe>(`/comunicados/${id}`, { signal });
 }
@@ -24,27 +21,24 @@ export function obterComunicado(id: number, signal?: AbortSignal) {
    ADMIN
 ========================= */
 
-export function listarComunicadosAdmin(
-    params: { token: string; status?: "RASCUNHO" | "PUBLICADO"; page?: number; pageSize?: number },
-    signal?: AbortSignal
-) {
-    const qs = new URLSearchParams();
-    if (params.status) qs.set("status", params.status);
-    qs.set("page", String(params.page ?? 1));
-    qs.set("pageSize", String(params.pageSize ?? 20));
+export type ComunicadoAdminItem = {
+    id: number;
+    titulo: string;
+    descricao: string;
+    importancia: "POUCO_RELEVANTE" | "RELEVANTE" | "IMPORTANTE";
+    status: "RASCUNHO" | "PUBLICADO";
+    expira_em?: string | null;
+    fixado_topo?: number | boolean;
+    anexo_url?: string | null;
+    anexo_tipo?: "NENHUM" | "IMAGEM" | "DOCUMENTO";
+};
 
-    return httpGet<ListaComunicadosResponse>(`/admin/comunicados?${qs.toString()}`, {
-        signal,
-        headers: bearerHeaders(params.token)
-    });
-}
-
-export function obterComunicadoAdmin(params: { token: string; id: number }, signal?: AbortSignal) {
-    return httpGet<ComunicadoDetalhe>(`/admin/comunicados/${params.id}`, {
-        signal,
-        headers: bearerHeaders(params.token)
-    });
-}
+export type ListaComunicadosAdminResponse = {
+    items: ComunicadoAdminItem[];
+    total?: number;
+    page?: number;
+    pageSize?: number;
+};
 
 export type ComunicadoAdminPayload = {
     titulo: string;
@@ -52,13 +46,36 @@ export type ComunicadoAdminPayload = {
     importancia: "POUCO_RELEVANTE" | "RELEVANTE" | "IMPORTANTE";
     fixado_topo?: boolean;
     status: "RASCUNHO" | "PUBLICADO";
-    expira_em?: string; // dd/mm/aaaa (se PUBLICADO obrigatório no backend)
-    anexo_url?: string;
+    expira_em?: string; // dd/mm/aaaa (obrigatório se PUBLICADO)
+    anexo_url?: string; // /uploads/... ou URL
     anexo_tipo?: "NENHUM" | "IMAGEM" | "DOCUMENTO";
 };
 
+export function listarComunicadosAdmin(
+    params: { token: string; page: number; pageSize: number; status?: "RASCUNHO" | "PUBLICADO" },
+    signal?: AbortSignal
+) {
+    const qs = new URLSearchParams({
+        page: String(params.page),
+        pageSize: String(params.pageSize)
+    });
+    if (params.status) qs.set("status", params.status);
+
+    return httpGet<ListaComunicadosAdminResponse>(`/admin/comunicados?${qs.toString()}`, {
+        signal,
+        headers: bearerHeaders(params.token)
+    });
+}
+
+export function obterComunicadoAdmin(params: { token: string; id: number }, signal?: AbortSignal) {
+    return httpGet<ComunicadoAdminItem>(`/admin/comunicados/${params.id}`, {
+        signal,
+        headers: bearerHeaders(params.token)
+    });
+}
+
 export function criarComunicadoAdmin(params: { token: string; body: ComunicadoAdminPayload }, signal?: AbortSignal) {
-    return httpPost<ComunicadoDetalhe>(`/admin/comunicados`, params.body, {
+    return httpPost<ComunicadoAdminItem>(`/admin/comunicados`, params.body, {
         signal,
         headers: bearerHeaders(params.token)
     });
@@ -68,14 +85,14 @@ export function atualizarComunicadoAdmin(
     params: { token: string; id: number; body: ComunicadoAdminPayload },
     signal?: AbortSignal
 ) {
-    return httpPut<ComunicadoDetalhe>(`/admin/comunicados/${params.id}`, params.body, {
+    return httpPut<ComunicadoAdminItem>(`/admin/comunicados/${params.id}`, params.body, {
         signal,
         headers: bearerHeaders(params.token)
     });
 }
 
 export function excluirComunicadoAdmin(params: { token: string; id: number }, signal?: AbortSignal) {
-    return httpDelete<void>(`/admin/comunicados/${params.id}`, {
+    return httpDelete<null>(`/admin/comunicados/${params.id}`, {
         signal,
         headers: bearerHeaders(params.token)
     });
