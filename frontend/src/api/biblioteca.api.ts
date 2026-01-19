@@ -1,4 +1,5 @@
-import { httpGet } from "./clienteHttp";
+import { bearerHeaders, httpDelete, httpGet, httpPost, httpPostFormData, httpPut } from "./clienteHttp";
+
 const BASE_URL = import.meta.env.VITE_API_BASE_URL?.trim() || "http://localhost:4000";
 const API_BASE_URL = BASE_URL.endsWith("/") ? BASE_URL.slice(0, -1) : BASE_URL;
 
@@ -28,7 +29,7 @@ function normalizarArvore(data: any): NoBiblioteca[] {
             id: n.id ?? n.codigo ?? `${n.nome}-${Math.random()}`,
             nome: String(n.nome || n.titulo || "SEM_NOME"),
             tipo,
-            url: tipo === "DOCUMENTO" ? absolutizarUrl(n.url || n.arquivo_url || n.documento_url) : null,
+            url: tipo === "DOCUMENTO" ? absolutizarUrl(n.url || n.arquivo_url || n.documento_url) : null
         };
 
         if (tipo === "PASTA") {
@@ -41,7 +42,63 @@ function normalizarArvore(data: any): NoBiblioteca[] {
     return arr.map(mapear);
 }
 
+/* =========================
+   PÚBLICO
+========================= */
+
 export async function obterArvoreBiblioteca(signal?: AbortSignal) {
     const data = await httpGet<any>("/biblioteca/arvore", { signal });
     return normalizarArvore(data);
+}
+
+/* =========================
+   ADMIN
+========================= */
+
+export type PastaAdmin = {
+    id: number;
+    nome: string;
+    slug: string;
+};
+
+export async function criarPastaAdmin(params: { token: string; nome: string }, signal?: AbortSignal) {
+    return httpPost<PastaAdmin>("/admin/biblioteca/pastas", { nome: params.nome }, {
+        signal,
+        headers: bearerHeaders(params.token)
+    });
+}
+
+// Estes 2 endpoints exigem que você tenha implementado no backend:
+// PUT /admin/biblioteca/pastas/:pastaId
+// DELETE /admin/biblioteca/pastas/:pastaId
+export async function atualizarPastaAdmin(params: { token: string; pastaId: number; nome: string }, signal?: AbortSignal) {
+    return httpPut<PastaAdmin>(`/admin/biblioteca/pastas/${params.pastaId}`, { nome: params.nome }, {
+        signal,
+        headers: bearerHeaders(params.token)
+    });
+}
+
+export async function excluirPastaAdmin(params: { token: string; pastaId: number }, signal?: AbortSignal) {
+    return httpDelete<void>(`/admin/biblioteca/pastas/${params.pastaId}`, {
+        signal,
+        headers: bearerHeaders(params.token)
+    });
+}
+
+export async function adicionarDocumentoAdmin(params: { token: string; pastaId: number; nome: string; file: File }, signal?: AbortSignal) {
+    const form = new FormData();
+    form.append("nome", params.nome);
+    form.append("file", params.file);
+
+    return httpPostFormData<any>(`/admin/biblioteca/pastas/${params.pastaId}/documentos`, form, {
+        signal,
+        headers: bearerHeaders(params.token)
+    });
+}
+
+export async function excluirDocumentoAdmin(params: { token: string; docId: number }, signal?: AbortSignal) {
+    return httpDelete<void>(`/admin/biblioteca/documentos/${params.docId}`, {
+        signal,
+        headers: bearerHeaders(params.token)
+    });
 }

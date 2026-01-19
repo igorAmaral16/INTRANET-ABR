@@ -13,7 +13,9 @@ import {
     criarPasta,
     adicionarDocumento,
     excluirDocumento,
-    listarArvorePublico
+    listarArvorePublico,
+    atualizarPasta,
+    excluirPasta
 } from "../controllers/biblioteca.controller.js";
 
 export const bibliotecaRouter = express.Router();
@@ -53,6 +55,22 @@ bibliotecaRouter.delete(
     requireRole("ADMIN"),
     requireNivel(1),
     asyncHandler(excluirDocumento)
+);
+
+bibliotecaRouter.put(
+    "/admin/biblioteca/pastas/:pastaId",
+    authJwt,
+    requireRole("ADMIN"),
+    requireNivel(1),
+    asyncHandler(atualizarPasta)
+);
+
+bibliotecaRouter.delete(
+    "/admin/biblioteca/pastas/:pastaId",
+    authJwt,
+    requireRole("ADMIN"),
+    requireNivel(1),
+    asyncHandler(excluirPasta)
 );
 
 bibliotecaRouter.get("/biblioteca/arvore", asyncHandler(listarArvorePublico));

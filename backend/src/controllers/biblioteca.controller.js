@@ -13,12 +13,17 @@ import {
     listDocumentosByPasta,
     getDocumentoById,
     deleteDocumentoById,
-    listArvorePublica
+    listArvorePublica,
+    updatePastaById
 } from "../services/biblioteca.service.js";
+
 
 import { normalizeFolderName, normalizeDocName, toSlug } from "../utils/normalize.js";
 
 const CreatePastaSchema = z.object({
+    nome: z.string().min(3).max(120)
+});
+const UpdatePastaSchema = z.object({
     nome: z.string().min(3).max(120)
 });
 
@@ -43,6 +48,63 @@ function sha256File(filePath) {
 export async function listarPastasPublico(req, res) {
     const items = await listPastas();
     res.json(items);
+}
+
+export async function atualizarPasta(req, res) {
+    const pastaId = PastaIdSchema.parse(req.params.pastaId);
+    const body = UpdatePastaSchema.parse(req.body);
+
+    const pasta = await getPastaById(pastaId);
+    if (!pasta) {
+        return res.status(404).json({ error: { message: "Pasta não encontrada.", requestId: req.id } });
+    }
+
+    const normalized = normalizeFolderName(body.nome);
+    if (!normalized) {
+        return res.status(400).json({
+            error: { message: "Nome de pasta inválido.", requestId: req.id }
+        });
+    }
+
+    const slug = toSlug(normalized);
+
+    try {
+        const updated = await updatePastaById({
+            pastaId,
+            nome: normalized,
+            slug,
+            adminId: Number(req.user.id)
+        });
+
+        if (!updated) {
+            return res.status(404).json({ error: { message: "Pasta não encontrada.", requestId: req.id } });
+        }
+
+        return res.json(updated);
+    } catch (err) {
+        if (err?.code === "ER_DUP_ENTRY") {
+            return res.status(409).json({
+                error: { message: "Nome de pasta já existe.", requestId: req.id }
+            });
+        }
+        throw err;
+    }
+}
+
+export async function excluirPasta(req, res) {
+    const pastaId = PastaIdSchema.parse(req.params.pastaId);
+
+    const pasta = await getPastaById(pastaId);
+    if (!pasta) {
+        return res.status(404).json({ error: { message: "Pasta não encontrada.", requestId: req.id } });
+    }
+
+    const ok = await deletePastaById(pastaId);
+    if (!ok) {
+        return res.status(404).json({ error: { message: "Pasta não encontrada.", requestId: req.id } });
+    }
+
+    return res.status(204).send();
 }
 
 export async function listarDocumentosPublico(req, res) {

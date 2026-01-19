@@ -120,46 +120,58 @@ export async function deleteDocumentoById(id) {
    - 2 queries (rápido / não pesa)
 ========================= */
 export async function listArvorePublica() {
+    // 1) pastas
     const [pastas] = await pool.query(
-        `SELECT id, nome, slug
-     FROM BibliotecaPastas
-     ORDER BY nome ASC`
+        `SELECT id, nome
+         FROM BibliotecaPastas
+         ORDER BY nome ASC`
     );
 
+    // 2) docs
     const [docs] = await pool.query(
-        `SELECT id, pasta_id, nome, slug, file_size, created_at, updated_at
-     FROM BibliotecaDocumentos
-     ORDER BY nome ASC`
+        `SELECT id, pasta_id, nome
+         FROM BibliotecaDocumentos
+         ORDER BY nome ASC`
     );
 
-    const map = new Map();
+    const mapPastas = new Map();
     for (const p of pastas) {
-        map.set(Number(p.id), {
+        mapPastas.set(String(p.id), {
             id: p.id,
             nome: p.nome,
-            slug: p.slug,
             tipo: "PASTA",
             filhos: []
         });
     }
 
+    // Sem subpastas no seu modelo atual (não há parent_id no service/controller que você enviou),
+    // então a árvore é: raiz = todas as pastas; dentro delas, documentos.
+    const raiz = Array.from(mapPastas.values());
+
     for (const d of docs) {
-        const pastaId = Number(d.pasta_id);
-        const nodeDoc = {
+        const pastaId = String(d.pasta_id || "");
+        const docNode = {
             id: d.id,
             nome: d.nome,
-            slug: d.slug,
             tipo: "DOCUMENTO",
-            file_size: d.file_size,
-            url: `/biblioteca/documentos/${d.id}/download`,
-            created_at: d.created_at,
-            updated_at: d.updated_at
+            url: `/biblioteca/documentos/${d.id}/download`
         };
-
-        if (map.has(pastaId)) {
-            map.get(pastaId).filhos.push(nodeDoc);
-        }
+        if (mapPastas.has(pastaId)) mapPastas.get(pastaId).filhos.push(docNode);
     }
 
-    return Array.from(map.values());
+    return raiz;
+}
+
+export async function updatePastaById({ pastaId, nome, slug, adminId }) {
+    const [result] = await pool.query(
+        `UPDATE BibliotecaPastas
+         SET nome = :nome,
+             slug = :slug,
+             updated_at = NOW()
+         WHERE id = :id`,
+        { id: pastaId, nome, slug, adminId }
+    );
+
+    if (result.affectedRows === 0) return null;
+    return getPastaById(pastaId);
 }

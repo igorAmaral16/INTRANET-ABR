@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import {
     Menu as IconMenu,
@@ -22,11 +22,11 @@ type Props = {
 type Item = {
     id: string;
     titulo: string;
-    icon: React.ReactNode;
+    icon: ReactNode;
     onClick: () => void;
 };
 
-function Portal({ children }: { children: React.ReactNode }) {
+function Portal({ children }: { children: ReactNode }) {
     if (typeof document === "undefined") return null;
     return createPortal(children, document.body);
 }
@@ -79,7 +79,6 @@ export function MenuUsuario({
 
     return (
         <>
-            {/* Desktop: menu inline */}
             <nav className="menuUsuario__desktop" aria-label="Menu do usuário">
                 {itens.map((it) => (
                     <button
@@ -107,7 +106,6 @@ export function MenuUsuario({
                 </button>
             </nav>
 
-            {/* Mobile: botão hambúrguer */}
             <button
                 className="menuUsuario__hambBotao"
                 type="button"
@@ -143,7 +141,6 @@ export function MenuUsuario({
                                 </button>
                             </div>
 
-                            {/* Conteúdo (itens principais) */}
                             <div className="menuUsuario__drawerConteudo">
                                 {itens.map((it) => (
                                     <button
@@ -158,9 +155,12 @@ export function MenuUsuario({
                                 ))}
                             </div>
 
-                            {/* Rodapé fixo com Sair */}
                             <div className="menuUsuario__drawerRodape">
-                                <button type="button" className="menuUsuario__item menuUsuario__itemSair" onClick={sair}>
+                                <button
+                                    type="button"
+                                    className="menuUsuario__item menuUsuario__itemSair"
+                                    onClick={sair}
+                                >
                                     <span className="menuUsuario__itemIcone">
                                         <IconLogout size={18} />
                                     </span>
