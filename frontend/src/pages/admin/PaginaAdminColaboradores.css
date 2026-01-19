@@ -1,20 +1,36 @@
+.admColabs__header {
+    display: grid;
+    gap: 4px;
+}
+
+.admColabs__subtitulo {
+    opacity: 0.8;
+    font-size: 13px;
+}
+
+.admColabs__dot {
+    margin: 0 6px;
+    opacity: 0.6;
+}
+
 .admColabs__toolbar {
     display: flex;
     gap: 10px;
     align-items: center;
     flex-wrap: wrap;
+    padding: 12px;
 }
 
 .admColabs__busca {
-    flex: 1 1 260px;
+    flex: 1 1 320px;
     min-width: 0;
     display: flex;
     gap: 10px;
     align-items: center;
     border: 1px solid rgba(0, 0, 0, 0.10);
     border-radius: 14px;
-    padding: 0 12px;
-    height: 40px;
+    padding: 0 10px;
+    height: 42px;
     background: #fff;
 }
 
@@ -26,8 +42,45 @@
     background: transparent;
 }
 
+.admColabs__clear {
+    height: 32px;
+    width: 32px;
+    border-radius: 10px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    background: rgba(0, 0, 0, 0.02);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.admColabs__chips {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.admColabs__chip {
+    height: 42px;
+    padding: 0 12px;
+    border-radius: 999px;
+    border: 1px solid rgba(0, 0, 0, 0.10);
+    background: #fff;
+    font-weight: 900;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.admColabs__chip.ativo {
+    background: rgba(17, 24, 39, 0.06);
+    border-color: rgba(17, 24, 39, 0.18);
+}
+
 .admColabs__btn {
-    height: 40px;
+    height: 42px;
     padding: 0 14px;
     border-radius: 14px;
     border: 1px solid rgba(0, 0, 0, 0.10);
@@ -50,64 +103,138 @@
     gap: 10px;
     align-items: center;
     flex-wrap: wrap;
-    margin-bottom: 10px;
+    margin-bottom: 12px;
+}
+
+.admColabs__totalPill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 12px;
+    border-radius: 14px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    background: rgba(0, 0, 0, 0.02);
+    font-weight: 900;
 }
 
 .admColabs__paginacao {
     display: inline-flex;
     gap: 8px;
     align-items: center;
+    flex-wrap: wrap;
 }
 
-.admColabs__tabela {
+.admColabs__paginacao button {
+    height: 38px;
+    padding: 0 12px;
+    border-radius: 12px;
+    border: 1px solid rgba(0, 0, 0, 0.10);
+    background: #fff;
+    font-weight: 900;
+    cursor: pointer;
+}
+
+.admColabs__paginacao button:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+.admColabs__paginacao select {
+    height: 38px;
+    border-radius: 12px;
+    border: 1px solid rgba(0, 0, 0, 0.10);
+    padding: 0 10px;
+    background: #fff;
+    font-weight: 900;
+}
+
+.admColabs__pageTxt {
+    font-size: 13px;
+    opacity: 0.85;
+}
+
+.admColabs__grid {
     display: grid;
-    gap: 8px;
+    gap: 10px;
+    grid-template-columns: 1fr;
 }
 
-.admColabs__row {
+@media (min-width: 860px) {
+    .admColabs__grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+.admColabs__card {
     width: 100%;
     text-align: left;
     border: 1px solid rgba(0, 0, 0, 0.08);
     background: #fff;
-    border-radius: 14px;
-    padding: 12px;
-    display: flex;
+    border-radius: 16px;
+    padding: 14px;
+    display: grid;
     gap: 10px;
+    cursor: pointer;
+    box-shadow: 0 10px 26px rgba(0, 0, 0, 0.05);
+}
+
+.admColabs__card:hover {
+    background: rgba(0, 0, 0, 0.015);
+}
+
+.admColabs__cardTop {
+    display: flex;
     align-items: center;
     justify-content: space-between;
-    cursor: pointer;
+    gap: 12px;
 }
 
-.admColabs__row:hover {
-    background: rgba(0, 0, 0, 0.02);
-}
-
-.admColabs__rowEsq {
+.admColabs__avatar {
+    height: 44px;
+    width: 44px;
+    border-radius: 14px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    background: rgba(17, 24, 39, 0.04);
     display: inline-flex;
     align-items: center;
-    gap: 10px;
-    min-width: 0;
-}
-
-.admColabs__rowTxt {
-    min-width: 0;
-}
-
-.admColabs__rowNome {
+    justify-content: center;
     font-weight: 900;
+    letter-spacing: 0.5px;
+}
+
+.admColabs__avatar.grande {
+    height: 52px;
+    width: 52px;
+    border-radius: 16px;
+}
+
+.admColabs__nome {
+    font-weight: 900;
+    font-size: 16px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    max-width: 520px;
 }
 
-.admColabs__rowMeta {
-    opacity: 0.85;
-    margin-top: 2px;
+.admColabs__meta {
+    display: grid;
+    gap: 6px;
     font-size: 13px;
+    opacity: 0.85;
 }
 
-.admColabs__status {
+.admColabs__metaItem {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.admColabs__cardHint {
+    font-size: 12px;
+    opacity: 0.65;
+}
+
+.admColabs__statusPill {
     flex: 0 0 auto;
     display: inline-flex;
     align-items: center;
@@ -116,22 +243,25 @@
     padding: 8px 10px;
     border-radius: 999px;
     border: 1px solid rgba(0, 0, 0, 0.10);
+    background: #fff;
 }
 
-.admColabs__status.ativo {
+.admColabs__statusPill.ativo {
     background: rgba(16, 185, 129, 0.10);
+    border-color: rgba(16, 185, 129, 0.25);
 }
 
-.admColabs__status.inativo {
+.admColabs__statusPill.inativo {
     background: rgba(239, 68, 68, 0.10);
+    border-color: rgba(239, 68, 68, 0.25);
 }
 
 .admColabs__fab {
     position: fixed;
     right: 18px;
     bottom: 18px;
-    height: 52px;
-    width: 52px;
+    height: 54px;
+    width: 54px;
     border-radius: 18px;
     border: 1px solid rgba(0, 0, 0, 0.10);
     background: #111827;
@@ -141,22 +271,173 @@
     align-items: center;
     justify-content: center;
     box-shadow: 0 18px 50px rgba(0, 0, 0, 0.20);
+    z-index: 20;
 }
 
-.admColabs__detalheBloco {
-    border: 1px solid rgba(0, 0, 0, 0.08);
+/* Estados vazios */
+.admColabs__vazio {
+    border: 1px dashed rgba(0, 0, 0, 0.18);
+    border-radius: 16px;
+    padding: 18px;
+    background: rgba(0, 0, 0, 0.02);
+}
+
+.admColabs__vazioTitulo {
+    font-weight: 900;
+    font-size: 15px;
+}
+
+.admColabs__vazioSub {
+    margin-top: 4px;
+    opacity: 0.8;
+    font-size: 13px;
+}
+
+/* Modais */
+.admColabs__modalGrid {
+    display: grid;
+    gap: 12px;
+}
+
+.admColabs__modalCampo {
+    display: grid;
+    gap: 6px;
+}
+
+.admColabs__modalCampo span {
+    font-weight: 900;
+}
+
+.admColabs__modalCampo input,
+.admColabs__modalCampo select {
+    height: 40px;
     border-radius: 14px;
+    border: 1px solid rgba(0, 0, 0, 0.10);
+    padding: 0 12px;
+    outline: none;
+    background: #fff;
+}
+
+.admColabs__modalAcoes {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.admColabs__modalAcoes button {
+    height: 40px;
+    padding: 0 14px;
+    border-radius: 14px;
+    border: 1px solid rgba(0, 0, 0, 0.10);
+    background: #111827;
+    color: #fff;
+    font-weight: 900;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.admColabs__ghost {
+    background: #fff !important;
+    color: #111827 !important;
+}
+
+.admColabs__modalLoading {
+    padding: 8px 0;
+    opacity: 0.85;
+}
+
+/* Detalhe */
+.admColabs__detalheGrid {
+    display: grid;
+    gap: 12px;
+}
+
+@media (min-width: 860px) {
+    .admColabs__detalheGrid {
+        grid-template-columns: 1.6fr 1fr;
+        align-items: start;
+    }
+}
+
+.admColabs__detalheCard {
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 16px;
     padding: 12px;
+    display: grid;
+    gap: 12px;
+    background: #fff;
+}
+
+.admColabs__detalheResumo {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.admColabs__detalheNome {
+    font-weight: 900;
+    font-size: 16px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.admColabs__detalheMeta {
+    margin-top: 2px;
+    opacity: 0.8;
+    font-size: 13px;
+}
+
+.admColabs__divider {
+    height: 1px;
+    background: rgba(0, 0, 0, 0.06);
+}
+
+.admColabs__formGrid {
+    display: grid;
+    gap: 12px;
+}
+
+/* Zona de risco */
+.admColabs__detalheDanger {
+    border: 1px solid rgba(239, 68, 68, 0.25);
+    border-radius: 16px;
+    padding: 12px;
+    background: rgba(239, 68, 68, 0.06);
     display: grid;
     gap: 10px;
 }
 
-.admColabs__detalheTitulo {
+.admColabs__dangerTitulo {
+    font-weight: 900;
+    color: #7a1212;
+}
+
+.admColabs__dangerTexto {
+    opacity: 0.9;
+    font-size: 13px;
+}
+
+.admColabs__dangerCode {
+    margin-top: 8px;
+    display: inline-flex;
+    padding: 8px 10px;
+    border-radius: 12px;
+    border: 1px solid rgba(239, 68, 68, 0.25);
+    background: rgba(255, 255, 255, 0.7);
     font-weight: 900;
 }
 
-.admColabs__danger {
-    background: rgba(239, 68, 68, 0.06);
+.admColabs__dangerInput {
+    height: 40px;
+    border-radius: 14px;
+    border: 1px solid rgba(239, 68, 68, 0.35);
+    padding: 0 12px;
+    outline: none;
+    background: #fff;
 }
 
 .admColabs__btnDanger {
@@ -171,4 +452,14 @@
     display: inline-flex;
     align-items: center;
     gap: 8px;
+}
+
+.admColabs__btnDanger:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.admColabs__dangerHint {
+    font-size: 12px;
+    opacity: 0.75;
 }

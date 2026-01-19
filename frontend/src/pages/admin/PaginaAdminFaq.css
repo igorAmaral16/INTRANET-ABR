@@ -1,0 +1,383 @@
+.admFaq__header {
+    display: grid;
+    gap: 4px;
+}
+
+.admFaq__sub {
+    opacity: 0.8;
+    font-size: 13px;
+}
+
+.admFaq__dot {
+    margin: 0 6px;
+    opacity: 0.6;
+}
+
+/* Toolbar */
+.admFaq__toolbar {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+    padding: 12px;
+}
+
+.admFaq__busca {
+    flex: 1 1 320px;
+    min-width: 0;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    border: 1px solid rgba(0, 0, 0, 0.10);
+    border-radius: 14px;
+    padding: 0 12px;
+    height: 42px;
+    background: #fff;
+}
+
+.admFaq__busca input {
+    border: 0;
+    outline: none;
+    width: 100%;
+    min-width: 0;
+    background: transparent;
+}
+
+.admFaq__btn {
+    height: 42px;
+    padding: 0 14px;
+    border-radius: 14px;
+    border: 1px solid rgba(0, 0, 0, 0.10);
+    background: #fff;
+    font-weight: 900;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.admFaq__lista {
+    margin-top: 12px;
+    padding: 12px;
+}
+
+.admFaq__listaTopo {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+}
+
+.admFaq__listaTitulo {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 900;
+}
+
+.admFaq__chips {
+    display: inline-flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.admFaq__chip {
+    padding: 7px 10px;
+    border-radius: 999px;
+    border: 1px solid rgba(0, 0, 0, 0.10);
+    background: rgba(0, 0, 0, 0.02);
+    font-weight: 900;
+    font-size: 12px;
+    opacity: 0.85;
+}
+
+.admFaq__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+}
+
+@media (max-width: 820px) {
+    .admFaq__grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.admFaq__card {
+    width: 100%;
+    text-align: left;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    background: #fff;
+    border-radius: 16px;
+    padding: 12px;
+    cursor: pointer;
+    box-shadow: 0 10px 26px rgba(0, 0, 0, 0.05);
+}
+
+.admFaq__card:hover {
+    background: rgba(0, 0, 0, 0.015);
+}
+
+.admFaq__cardTop {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    justify-content: space-between;
+}
+
+.admFaq__cardTitle {
+    display: inline-flex;
+    gap: 10px;
+    align-items: flex-start;
+    min-width: 0;
+}
+
+.admFaq__icon {
+    height: 36px;
+    width: 36px;
+    border-radius: 14px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    background: rgba(17, 24, 39, 0.04);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.admFaq__titleTxt {
+    min-width: 0;
+}
+
+.admFaq__titulo {
+    font-weight: 900;
+    font-size: 14px;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 520px;
+}
+
+.admFaq__meta {
+    opacity: 0.85;
+    margin-top: 4px;
+    font-size: 13px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.admFaq__categoria {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border: 1px solid rgba(0, 0, 0, 0.10);
+    padding: 6px 10px;
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.02);
+    font-weight: 900;
+    font-size: 12px;
+}
+
+.admFaq__ordem {
+    font-size: 12px;
+    opacity: 0.85;
+    font-weight: 900;
+}
+
+.admFaq__status {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 900;
+    padding: 8px 10px;
+    border-radius: 999px;
+    border: 1px solid rgba(0, 0, 0, 0.10);
+    height: fit-content;
+}
+
+.admFaq__status.ativo {
+    background: rgba(16, 185, 129, 0.10);
+}
+
+.admFaq__status.inativo {
+    background: rgba(239, 68, 68, 0.10);
+}
+
+.admFaq__desc {
+    margin-top: 10px;
+    opacity: 0.85;
+    white-space: pre-wrap;
+    font-size: 13px;
+}
+
+.admFaq__vazio {
+    border: 1px dashed rgba(0, 0, 0, 0.18);
+    border-radius: 16px;
+    padding: 16px;
+    background: rgba(0, 0, 0, 0.02);
+    font-size: 13px;
+    opacity: 0.9;
+}
+
+.admFaq__alert {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+}
+
+/* FAB */
+.admFaq__fab {
+    position: fixed;
+    right: 18px;
+    bottom: 18px;
+    height: 52px;
+    width: 52px;
+    border-radius: 18px;
+    border: 1px solid rgba(0, 0, 0, 0.10);
+    background: #111827;
+    color: #fff;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.20);
+}
+
+/* Modal */
+.admFaq__modalGrid {
+    display: grid;
+    gap: 12px;
+}
+
+.admFaq__campo {
+    display: grid;
+    gap: 6px;
+}
+
+.admFaq__campo span {
+    font-weight: 900;
+}
+
+.admFaq__campo input,
+.admFaq__campo textarea,
+.admFaq__campo select {
+    width: 100%;
+    border-radius: 14px;
+    border: 1px solid rgba(0, 0, 0, 0.10);
+    padding: 10px 12px;
+    outline: none;
+    background: #fff;
+}
+
+.admFaq__modalAcoes {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.admFaq__modalAcoes button {
+    height: 40px;
+    padding: 0 14px;
+    border-radius: 14px;
+    border: 1px solid rgba(0, 0, 0, 0.10);
+    background: #111827;
+    color: #fff;
+    font-weight: 900;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.admFaq__ghost {
+    background: #fff !important;
+    color: #111827 !important;
+}
+
+.admFaq__linha2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    align-items: end;
+}
+
+@media (max-width: 720px) {
+    .admFaq__linha2 {
+        grid-template-columns: 1fr;
+    }
+}
+
+.admFaq__check {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 14px;
+    border: 1px solid rgba(0, 0, 0, 0.10);
+    background: rgba(0, 0, 0, 0.02);
+    font-weight: 900;
+}
+
+.admFaq__detalheGrid {
+    display: grid;
+    gap: 12px;
+}
+
+.admFaq__detalheBloco {
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 14px;
+    padding: 12px;
+    display: grid;
+    gap: 10px;
+}
+
+.admFaq__detalheTitulo {
+    font-weight: 900;
+}
+
+.admFaq__btnSalvar {
+    height: 40px;
+    padding: 0 14px;
+    border-radius: 14px;
+    border: 1px solid rgba(0, 0, 0, 0.10);
+    background: #111827;
+    color: #fff;
+    font-weight: 900;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.admFaq__btnSalvar:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.admFaq__danger {
+    background: rgba(239, 68, 68, 0.06);
+}
+
+.admFaq__dangerHint {
+    opacity: 0.85;
+    font-size: 13px;
+}
+
+.admFaq__btnDanger {
+    height: 40px;
+    padding: 0 14px;
+    border-radius: 14px;
+    border: 1px solid rgba(239, 68, 68, 0.35);
+    background: #fff;
+    color: #b42318;
+    font-weight: 900;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}

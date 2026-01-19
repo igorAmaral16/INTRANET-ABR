@@ -1,6 +1,18 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Search, Filter, Plus, User, BadgeCheck, BadgeX, Trash2 } from "lucide-react";
+import {
+    ArrowLeft,
+    Search,
+    Filter,
+    Plus,
+    User,
+    BadgeCheck,
+    BadgeX,
+    Trash2,
+    Users,
+    X,
+    Save,
+} from "lucide-react";
 
 import { BarraTopo } from "../../components/BarraTopo/BarraTopo";
 import { Modal } from "../../components/Modal/Modal";
@@ -12,7 +24,7 @@ import {
     criarColaboradorAdmin,
     atualizarColaboradorAdmin,
     excluirColaboradorAdmin,
-    type ColaboradorAdmin
+    type ColaboradorAdmin,
 } from "../../api/colaborador.api";
 
 import "./PaginaAdminColaboradores.css";
@@ -33,6 +45,15 @@ function formatarDataBR(valor: string) {
     const mm = String(d.getMonth() + 1).padStart(2, "0");
     const yyyy = d.getFullYear();
     return `${dd}/${mm}/${yyyy}`;
+}
+
+function iniciais(nome: string) {
+    const n = String(nome || "").trim();
+    if (!n) return "??";
+    const partes = n.split(/\s+/).filter(Boolean);
+    const a = partes[0]?.[0] || "?";
+    const b = partes.length > 1 ? partes[partes.length - 1]?.[0] : "";
+    return `${a}${b}`.toUpperCase();
 }
 
 export function PaginaAdminColaboradores() {
@@ -57,6 +78,7 @@ export function PaginaAdminColaboradores() {
     const [novoNome, setNovoNome] = useState("");
     const [novoNascimento, setNovoNascimento] = useState(""); // dd/mm/aaaa
     const [novoStatus, setNovoStatus] = useState<"ATIVO" | "INATIVO">("ATIVO");
+    const [criando, setCriando] = useState(false);
 
     const [modalDetalhe, setModalDetalhe] = useState<{ matricula: string } | null>(null);
     const [detalheCarregando, setDetalheCarregando] = useState(false);
@@ -64,7 +86,10 @@ export function PaginaAdminColaboradores() {
     const [editNome, setEditNome] = useState("");
     const [editNascimento, setEditNascimento] = useState("");
     const [editStatus, setEditStatus] = useState<"ATIVO" | "INATIVO">("ATIVO");
+    const [salvando, setSalvando] = useState(false);
+
     const [confirmExclusao, setConfirmExclusao] = useState("");
+    const [excluindo, setExcluindo] = useState(false);
 
     const acRef = useRef<AbortController | null>(null);
 
@@ -76,9 +101,9 @@ export function PaginaAdminColaboradores() {
             navigate("/", { replace: true });
             return;
         }
-    }, [estaLogadoAdmin, sessao?.token]);
+    }, [estaLogadoAdmin, sessao?.token, navigate]);
 
-    // debounce de busca
+    // debounce “leve”: a lista recarrega ao mudar search, mas resetando página
     const buscaDebounced = useMemo(() => search.trim(), [search]);
     useEffect(() => {
         setPage(1);
@@ -97,7 +122,7 @@ export function PaginaAdminColaboradores() {
                     page,
                     pageSize,
                     status: filtroStatus === "TODOS" ? undefined : filtroStatus,
-                    search: buscaDebounced || undefined
+                    search: buscaDebounced || undefined,
                 },
                 signal
             );
@@ -158,6 +183,10 @@ export function PaginaAdminColaboradores() {
     async function salvarAlteracoes() {
         if (!sessao?.token || !detalhe) return;
 
+        if (editNome.trim().length < 3) return alert("Informe o nome completo (mín. 3).");
+        if (editNascimento.trim().length !== 10) return alert("Data inválida. Use dd/mm/aaaa.");
+
+        setSalvando(true);
         try {
             await atualizarColaboradorAdmin({
                 token: sessao.token,
@@ -165,8 +194,8 @@ export function PaginaAdminColaboradores() {
                 body: {
                     nome_completo: editNome.trim(),
                     data_nascimento: editNascimento.trim(), // dd/mm/aaaa
-                    status: editStatus
-                }
+                    status: editStatus,
+                },
             });
 
             setModalDetalhe(null);
@@ -174,6 +203,8 @@ export function PaginaAdminColaboradores() {
         } catch (e: any) {
             const msg = e instanceof ErroHttp ? e.message : e?.message;
             alert(msg || "Não foi possível salvar alterações.");
+        } finally {
+            setSalvando(false);
         }
     }
 
@@ -189,11 +220,12 @@ export function PaginaAdminColaboradores() {
         const ok = window.confirm("Confirmar exclusão definitiva do colaborador?");
         if (!ok) return;
 
+        setExcluindo(true);
         try {
             await excluirColaboradorAdmin({
                 token: sessao.token,
                 matricula: detalhe.matricula,
-                confirm: confirmExclusao
+                confirm: confirmExclusao,
             });
 
             setModalDetalhe(null);
@@ -201,6 +233,8 @@ export function PaginaAdminColaboradores() {
         } catch (e: any) {
             const msg = e instanceof ErroHttp ? e.message : e?.message;
             alert(msg || "Não foi possível excluir o colaborador.");
+        } finally {
+            setExcluindo(false);
         }
     }
 
@@ -211,13 +245,14 @@ export function PaginaAdminColaboradores() {
             matricula: novoMatricula.trim(),
             nome_completo: novoNome.trim(),
             data_nascimento: novoNascimento.trim(),
-            status: novoStatus
+            status: novoStatus,
         };
 
         if (!body.matricula) return alert("Informe a matrícula.");
         if (body.nome_completo.length < 3) return alert("Informe o nome completo (mín. 3).");
         if (body.data_nascimento.length !== 10) return alert("Data inválida. Use dd/mm/aaaa.");
 
+        setCriando(true);
         try {
             await criarColaboradorAdmin({ token: sessao.token, body });
             setModalNovo(false);
@@ -229,6 +264,8 @@ export function PaginaAdminColaboradores() {
         } catch (e: any) {
             const msg = e instanceof ErroHttp ? e.message : e?.message;
             alert(msg || "Não foi possível criar o colaborador.");
+        } finally {
+            setCriando(false);
         }
     }
 
@@ -260,7 +297,14 @@ export function PaginaAdminColaboradores() {
                     <button className="botaoVoltar" type="button" onClick={() => navigate(-1)}>
                         <ArrowLeft size={18} /> Voltar
                     </button>
-                    <h1 className="paginaBase__titulo">Admin — Colaboradores</h1>
+
+                    <div className="admColabs__header">
+                        <h1 className="paginaBase__titulo">Admin — Colaboradores</h1>
+                        <div className="admColabs__subtitulo">
+                            Gerencie cadastro, status e dados de colaboradores. <span className="admColabs__dot">•</span>{" "}
+                            <strong>{total}</strong> registros
+                        </div>
+                    </div>
                 </div>
 
                 <section className="admColabs__toolbar card">
@@ -272,6 +316,40 @@ export function PaginaAdminColaboradores() {
                             placeholder="Buscar por matrícula ou nome"
                             aria-label="Buscar colaboradores"
                         />
+                        {search ? (
+                            <button
+                                type="button"
+                                className="admColabs__clear"
+                                aria-label="Limpar busca"
+                                onClick={() => setSearch("")}
+                            >
+                                <X size={16} />
+                            </button>
+                        ) : null}
+                    </div>
+
+                    <div className="admColabs__chips">
+                        <button
+                            type="button"
+                            className={`admColabs__chip ${filtroStatus === "TODOS" ? "ativo" : ""}`}
+                            onClick={() => setFiltroStatus("TODOS")}
+                        >
+                            <Users size={16} /> Todos
+                        </button>
+                        <button
+                            type="button"
+                            className={`admColabs__chip ${filtroStatus === "ATIVO" ? "ativo" : ""}`}
+                            onClick={() => setFiltroStatus("ATIVO")}
+                        >
+                            <BadgeCheck size={16} /> Ativos
+                        </button>
+                        <button
+                            type="button"
+                            className={`admColabs__chip ${filtroStatus === "INATIVO" ? "ativo" : ""}`}
+                            onClick={() => setFiltroStatus("INATIVO")}
+                        >
+                            <BadgeX size={16} /> Inativos
+                        </button>
                     </div>
 
                     <button type="button" className="admColabs__btn" onClick={() => setModalFiltros(true)}>
@@ -280,19 +358,34 @@ export function PaginaAdminColaboradores() {
                 </section>
 
                 {estado === "carregando" ? <div className="card">Carregando...</div> : null}
-                {estado === "erro" ? <div className="card cardErro">{erro}</div> : null}
+                {estado === "erro" ? (
+                    <div className="card cardErro">
+                        <div style={{ fontWeight: 900, marginBottom: 6 }}>Não foi possível carregar</div>
+                        <div style={{ opacity: 0.85 }}>{erro}</div>
+                        <div style={{ marginTop: 10 }}>
+                            <button type="button" onClick={() => carregarLista()}>
+                                Tentar novamente
+                            </button>
+                        </div>
+                    </div>
+                ) : null}
 
                 {estado === "pronto" ? (
                     <section className="admColabs__lista card">
                         <div className="admColabs__listaTopo">
-                            <div style={{ fontWeight: 900 }}>Total: {total}</div>
+                            <div className="admColabs__totalPill">
+                                <Users size={16} />
+                                <span>
+                                    Exibindo <strong>{items.length}</strong> de <strong>{total}</strong>
+                                </span>
+                            </div>
 
                             <div className="admColabs__paginacao">
                                 <button type="button" onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page <= 1}>
                                     Anterior
                                 </button>
-                                <span style={{ fontWeight: 900 }}>
-                                    {page} / {totalPaginas}
+                                <span className="admColabs__pageTxt">
+                                    Página <strong>{page}</strong> de <strong>{totalPaginas}</strong>
                                 </span>
                                 <button
                                     type="button"
@@ -302,7 +395,7 @@ export function PaginaAdminColaboradores() {
                                     Próxima
                                 </button>
 
-                                <select value={pageSize} onChange={(e) => setPageSize(Number(e.target.value))}>
+                                <select value={pageSize} onChange={(e) => setPageSize(Number(e.target.value))} aria-label="Itens por página">
                                     <option value={10}>10</option>
                                     <option value={20}>20</option>
                                     <option value={50}>50</option>
@@ -311,30 +404,51 @@ export function PaginaAdminColaboradores() {
                         </div>
 
                         {items.length === 0 ? (
-                            <div className="card">Nenhum colaborador encontrado.</div>
+                            <div className="admColabs__vazio">
+                                <div className="admColabs__vazioTitulo">Nenhum colaborador encontrado</div>
+                                <div className="admColabs__vazioSub">
+                                    Ajuste os filtros ou refine a busca por matrícula/nome.
+                                </div>
+                                <div style={{ marginTop: 10 }}>
+                                    <button type="button" onClick={() => setModalNovo(true)}>
+                                        <Plus size={18} /> Cadastrar colaborador
+                                    </button>
+                                </div>
+                            </div>
                         ) : (
-                            <div className="admColabs__tabela">
+                            <div className="admColabs__grid">
                                 {items.map((c) => (
                                     <button
                                         key={c.matricula}
                                         type="button"
-                                        className="admColabs__row"
+                                        className="admColabs__card"
                                         onClick={() => abrirDetalhe(c.matricula)}
                                     >
-                                        <div className="admColabs__rowEsq">
-                                            <User size={18} />
-                                            <div className="admColabs__rowTxt">
-                                                <div className="admColabs__rowNome">{c.nome_completo}</div>
-                                                <div className="admColabs__rowMeta">
-                                                    Matrícula: <strong>{c.matricula}</strong> • Nasc.: {formatarDataBR(c.data_nascimento)}
-                                                </div>
+                                        <div className="admColabs__cardTop">
+                                            <div className="admColabs__avatar" aria-hidden="true">
+                                                {iniciais(c.nome_completo)}
+                                            </div>
+
+                                            <div className={`admColabs__statusPill ${c.status === "ATIVO" ? "ativo" : "inativo"}`}>
+                                                {c.status === "ATIVO" ? <BadgeCheck size={16} /> : <BadgeX size={16} />}
+                                                {c.status}
                                             </div>
                                         </div>
 
-                                        <div className={`admColabs__status ${c.status === "ATIVO" ? "ativo" : "inativo"}`}>
-                                            {c.status === "ATIVO" ? <BadgeCheck size={16} /> : <BadgeX size={16} />}
-                                            {c.status}
+                                        <div className="admColabs__nome" title={c.nome_completo}>
+                                            {c.nome_completo}
                                         </div>
+
+                                        <div className="admColabs__meta">
+                                            <span className="admColabs__metaItem">
+                                                <User size={14} /> Matrícula: <strong>{c.matricula}</strong>
+                                            </span>
+                                            <span className="admColabs__metaItem">
+                                                Nasc.: <strong>{formatarDataBR(c.data_nascimento)}</strong>
+                                            </span>
+                                        </div>
+
+                                        <div className="admColabs__cardHint">Clique para abrir, editar ou excluir</div>
                                     </button>
                                 ))}
                             </div>
@@ -343,21 +457,16 @@ export function PaginaAdminColaboradores() {
                 ) : null}
 
                 {/* Botão flutuante + */}
-                <button
-                    type="button"
-                    className="admColabs__fab"
-                    aria-label="Adicionar colaborador"
-                    onClick={() => setModalNovo(true)}
-                >
+                <button type="button" className="admColabs__fab" aria-label="Adicionar colaborador" onClick={() => setModalNovo(true)}>
                     <Plus size={20} />
                 </button>
             </main>
 
             {/* Modal filtros */}
             <Modal aberto={modalFiltros} titulo="Filtros" aoFechar={() => setModalFiltros(false)}>
-                <div style={{ display: "grid", gap: 12 }}>
-                    <label style={{ display: "grid", gap: 6 }}>
-                        <span style={{ fontWeight: 900 }}>Status</span>
+                <div className="admColabs__modalGrid">
+                    <label className="admColabs__modalCampo">
+                        <span>Status</span>
                         <select value={filtroStatus} onChange={(e) => setFiltroStatus(e.target.value as any)}>
                             <option value="TODOS">Todos</option>
                             <option value="ATIVO">Ativo</option>
@@ -365,9 +474,28 @@ export function PaginaAdminColaboradores() {
                         </select>
                     </label>
 
-                    <div style={{ display: "flex", gap: 10 }}>
-                        <button type="button" onClick={() => setModalFiltros(false)}>Aplicar</button>
-                        <button type="button" onClick={() => { setFiltroStatus("TODOS"); setModalFiltros(false); }}>
+                    <label className="admColabs__modalCampo">
+                        <span>Itens por página</span>
+                        <select value={pageSize} onChange={(e) => setPageSize(Number(e.target.value))}>
+                            <option value={10}>10</option>
+                            <option value={20}>20</option>
+                            <option value={50}>50</option>
+                        </select>
+                    </label>
+
+                    <div className="admColabs__modalAcoes">
+                        <button type="button" onClick={() => setModalFiltros(false)}>
+                            Aplicar
+                        </button>
+                        <button
+                            type="button"
+                            className="admColabs__ghost"
+                            onClick={() => {
+                                setFiltroStatus("TODOS");
+                                setPageSize(20);
+                                setModalFiltros(false);
+                            }}
+                        >
                             Limpar
                         </button>
                     </div>
@@ -376,33 +504,37 @@ export function PaginaAdminColaboradores() {
 
             {/* Modal novo */}
             <Modal aberto={modalNovo} titulo="Novo colaborador" aoFechar={() => setModalNovo(false)}>
-                <div style={{ display: "grid", gap: 10 }}>
-                    <label style={{ display: "grid", gap: 6 }}>
-                        <span style={{ fontWeight: 900 }}>Matrícula</span>
+                <div className="admColabs__modalGrid">
+                    <label className="admColabs__modalCampo">
+                        <span>Matrícula</span>
                         <input value={novoMatricula} onChange={(e) => setNovoMatricula(e.target.value)} placeholder="ex: 12345" />
                     </label>
 
-                    <label style={{ display: "grid", gap: 6 }}>
-                        <span style={{ fontWeight: 900 }}>Nome completo</span>
-                        <input value={novoNome} onChange={(e) => setNovoNome(e.target.value)} />
+                    <label className="admColabs__modalCampo">
+                        <span>Nome completo</span>
+                        <input value={novoNome} onChange={(e) => setNovoNome(e.target.value)} placeholder="Nome do colaborador" />
                     </label>
 
-                    <label style={{ display: "grid", gap: 6 }}>
-                        <span style={{ fontWeight: 900 }}>Data de nascimento (dd/mm/aaaa)</span>
+                    <label className="admColabs__modalCampo">
+                        <span>Data de nascimento (dd/mm/aaaa)</span>
                         <input value={novoNascimento} onChange={(e) => setNovoNascimento(e.target.value)} placeholder="dd/mm/aaaa" />
                     </label>
 
-                    <label style={{ display: "grid", gap: 6 }}>
-                        <span style={{ fontWeight: 900 }}>Status</span>
+                    <label className="admColabs__modalCampo">
+                        <span>Status</span>
                         <select value={novoStatus} onChange={(e) => setNovoStatus(e.target.value as any)}>
                             <option value="ATIVO">ATIVO</option>
                             <option value="INATIVO">INATIVO</option>
                         </select>
                     </label>
 
-                    <div style={{ display: "flex", gap: 10 }}>
-                        <button type="button" onClick={criarNovo}>Criar</button>
-                        <button type="button" onClick={() => setModalNovo(false)}>Cancelar</button>
+                    <div className="admColabs__modalAcoes">
+                        <button type="button" onClick={criarNovo} disabled={criando}>
+                            {criando ? "Criando..." : <><Plus size={18} /> Criar</>}
+                        </button>
+                        <button type="button" className="admColabs__ghost" onClick={() => setModalNovo(false)} disabled={criando}>
+                            Cancelar
+                        </button>
                     </div>
                 </div>
             </Modal>
@@ -414,55 +546,88 @@ export function PaginaAdminColaboradores() {
                 aoFechar={() => setModalDetalhe(null)}
             >
                 {detalheCarregando ? (
-                    <div>Carregando...</div>
+                    <div className="admColabs__modalLoading">Carregando...</div>
                 ) : detalhe ? (
-                    <div style={{ display: "grid", gap: 12 }}>
-                        <div className="admColabs__detalheBloco">
-                            <div className="admColabs__detalheTitulo">Dados</div>
+                    <div className="admColabs__detalheGrid">
+                        <div className="admColabs__detalheCard">
+                            <div className="admColabs__detalheResumo">
+                                <div className="admColabs__avatar grande" aria-hidden="true">
+                                    {iniciais(detalhe.nome_completo)}
+                                </div>
+                                <div style={{ minWidth: 0 }}>
+                                    <div className="admColabs__detalheNome" title={detalhe.nome_completo}>
+                                        {detalhe.nome_completo}
+                                    </div>
+                                    <div className="admColabs__detalheMeta">
+                                        Matrícula: <strong>{detalhe.matricula}</strong> • Nasc.:{" "}
+                                        <strong>{formatarDataBR(detalhe.data_nascimento)}</strong>
+                                    </div>
+                                </div>
 
-                            <label style={{ display: "grid", gap: 6 }}>
-                                <span style={{ fontWeight: 900 }}>Matrícula</span>
-                                <input value={detalhe.matricula} readOnly />
-                            </label>
+                                <div className={`admColabs__statusPill ${detalhe.status === "ATIVO" ? "ativo" : "inativo"}`}>
+                                    {detalhe.status === "ATIVO" ? <BadgeCheck size={16} /> : <BadgeX size={16} />}
+                                    {detalhe.status}
+                                </div>
+                            </div>
 
-                            <label style={{ display: "grid", gap: 6 }}>
-                                <span style={{ fontWeight: 900 }}>Nome completo</span>
-                                <input value={editNome} onChange={(e) => setEditNome(e.target.value)} />
-                            </label>
+                            <div className="admColabs__divider" />
 
-                            <label style={{ display: "grid", gap: 6 }}>
-                                <span style={{ fontWeight: 900 }}>Data de nascimento (dd/mm/aaaa)</span>
-                                <input value={editNascimento} onChange={(e) => setEditNascimento(e.target.value)} placeholder="dd/mm/aaaa" />
-                            </label>
+                            <div className="admColabs__formGrid">
+                                <label className="admColabs__modalCampo">
+                                    <span>Matrícula</span>
+                                    <input value={detalhe.matricula} readOnly />
+                                </label>
 
-                            <label style={{ display: "grid", gap: 6 }}>
-                                <span style={{ fontWeight: 900 }}>Status</span>
-                                <select value={editStatus} onChange={(e) => setEditStatus(e.target.value as any)}>
-                                    <option value="ATIVO">ATIVO</option>
-                                    <option value="INATIVO">INATIVO</option>
-                                </select>
-                            </label>
+                                <label className="admColabs__modalCampo">
+                                    <span>Nome completo</span>
+                                    <input value={editNome} onChange={(e) => setEditNome(e.target.value)} />
+                                </label>
 
-                            <button type="button" onClick={salvarAlteracoes} disabled={!alterou}>
-                                Salvar alterações
-                            </button>
+                                <label className="admColabs__modalCampo">
+                                    <span>Data de nascimento (dd/mm/aaaa)</span>
+                                    <input value={editNascimento} onChange={(e) => setEditNascimento(e.target.value)} placeholder="dd/mm/aaaa" />
+                                </label>
+
+                                <label className="admColabs__modalCampo">
+                                    <span>Status</span>
+                                    <select value={editStatus} onChange={(e) => setEditStatus(e.target.value as any)}>
+                                        <option value="ATIVO">ATIVO</option>
+                                        <option value="INATIVO">INATIVO</option>
+                                    </select>
+                                </label>
+                            </div>
+
+                            <div className="admColabs__modalAcoes">
+                                <button type="button" onClick={salvarAlteracoes} disabled={!alterou || salvando}>
+                                    {salvando ? "Salvando..." : <><Save size={18} /> Salvar alterações</>}
+                                </button>
+                                <button type="button" className="admColabs__ghost" onClick={() => setModalDetalhe(null)} disabled={salvando}>
+                                    Fechar
+                                </button>
+                            </div>
                         </div>
 
-                        <div className="admColabs__detalheBloco admColabs__danger">
-                            <div className="admColabs__detalheTitulo">Excluir</div>
-                            <div style={{ opacity: 0.85 }}>
-                                Para excluir, digite exatamente: <strong>EXCLUIR {detalhe.matricula}</strong>
+                        <div className="admColabs__detalheDanger">
+                            <div className="admColabs__dangerTitulo">Zona de risco</div>
+                            <div className="admColabs__dangerTexto">
+                                Para excluir definitivamente, digite exatamente:
+                                <div className="admColabs__dangerCode">EXCLUIR {detalhe.matricula}</div>
                             </div>
 
                             <input
+                                className="admColabs__dangerInput"
                                 value={confirmExclusao}
                                 onChange={(e) => setConfirmExclusao(e.target.value)}
                                 placeholder={`EXCLUIR ${detalhe.matricula}`}
                             />
 
-                            <button type="button" className="admColabs__btnDanger" onClick={excluirColaborador}>
-                                <Trash2 size={16} /> Excluir colaborador
+                            <button type="button" className="admColabs__btnDanger" onClick={excluirColaborador} disabled={excluindo}>
+                                {excluindo ? "Excluindo..." : <><Trash2 size={16} /> Excluir colaborador</>}
                             </button>
+
+                            <div className="admColabs__dangerHint">
+                                Esta ação não pode ser desfeita.
+                            </div>
                         </div>
                     </div>
                 ) : (
