@@ -1,0 +1,246 @@
+.admCriar__grid {
+    display: grid;
+    gap: 12px;
+    grid-template-columns: 1.2fr 0.8fr;
+    align-items: start;
+}
+
+@media (max-width: 860px) {
+    .admCriar__grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.admCriar__alert {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    padding: 12px;
+}
+
+.admCriar__form {
+    display: grid;
+    gap: 12px;
+    padding: 16px;
+}
+
+.admCriar__campo {
+    display: grid;
+    gap: 6px;
+}
+
+.admCriar__campo span {
+    font-weight: 900;
+    font-size: 13px;
+    opacity: 0.9;
+}
+
+.admCriar__campo input,
+.admCriar__campo select,
+.admCriar__campo textarea {
+    border-radius: 14px;
+    border: 1px solid rgba(0, 0, 0, 0.10);
+    padding: 10px 12px;
+    outline: none;
+    background: #fff;
+    min-width: 0;
+}
+
+.admCriar__campo textarea {
+    resize: vertical;
+}
+
+.admCriar__linha2 {
+    display: grid;
+    gap: 12px;
+    grid-template-columns: 1fr 1fr;
+}
+
+@media (max-width: 860px) {
+    .admCriar__linha2 {
+        grid-template-columns: 1fr;
+    }
+}
+
+.admCriar__check {
+    display: inline-flex;
+    gap: 10px;
+    align-items: center;
+    font-weight: 900;
+}
+
+.admCriar__anexo {
+    padding: 16px;
+    display: grid;
+    gap: 12px;
+}
+
+.admCriar__anexoTopo {
+    display: grid;
+    gap: 4px;
+}
+
+.admCriar__anexoTitulo {
+    font-weight: 900;
+    display: inline-flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.admCriar__anexoSub {
+    opacity: 0.85;
+    font-size: 13px;
+}
+
+.admCriar__file input {
+    display: none;
+}
+
+.admCriar__fileBox {
+    border: 1px dashed rgba(0, 0, 0, 0.22);
+    border-radius: 16px;
+    padding: 14px;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    background: rgba(17, 24, 39, 0.03);
+    cursor: pointer;
+}
+
+.admCriar__fileTxt {
+    font-weight: 900;
+}
+
+.admCriar__fileHint {
+    opacity: 0.8;
+    font-size: 13px;
+    margin-top: 2px;
+}
+
+.admCriar__filePreview {
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 14px;
+    padding: 10px 12px;
+    background: #fff;
+}
+
+.admCriar__fileName {
+    font-weight: 900;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.admCriar__fileMeta {
+    opacity: 0.85;
+    margin-top: 4px;
+    font-size: 13px;
+}
+
+.admCriar__btnAnexo {
+    height: 40px;
+    border-radius: 14px;
+    border: 1px solid rgba(0, 0, 0, 0.10);
+    background: #111827;
+    color: #fff;
+    font-weight: 900;
+    cursor: pointer;
+}
+
+.admCriar__btnAnexo:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.admCriar__anexoOk {
+    display: grid;
+    gap: 12px;
+}
+
+.admCriar__anexoBadge {
+    display: inline-flex;
+    gap: 8px;
+    align-items: center;
+    padding: 8px 10px;
+    border-radius: 999px;
+    border: 1px solid rgba(0, 0, 0, 0.10);
+    background: rgba(0, 0, 0, 0.03);
+    font-weight: 900;
+    width: fit-content;
+}
+
+.admCriar__anexoUrl {
+    opacity: 0.85;
+    font-size: 13px;
+    word-break: break-all;
+}
+
+.admCriar__imgWrap {
+    border-radius: 16px;
+    border: 1px solid rgba(0, 0, 0, 0.10);
+    overflow: hidden;
+    background: #fff;
+}
+
+.admCriar__imgWrap img {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+.admCriar__linkPdf {
+    font-weight: 900;
+    text-decoration: none;
+}
+
+.admCriar__btnRemover {
+    height: 40px;
+    border-radius: 14px;
+    border: 1px solid rgba(239, 68, 68, 0.35);
+    background: #fff;
+    color: #b42318;
+    font-weight: 900;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.admCriar__acoes {
+    margin-top: 12px;
+    padding: 14px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.admCriar__btnPrimario,
+.admCriar__btnSec,
+.admCriar__btnGhost {
+    height: 40px;
+    padding: 0 14px;
+    border-radius: 14px;
+    border: 1px solid rgba(0, 0, 0, 0.10);
+    font-weight: 900;
+    cursor: pointer;
+}
+
+.admCriar__btnPrimario {
+    background: #111827;
+    color: #fff;
+}
+
+.admCriar__btnSec {
+    background: #fff;
+}
+
+.admCriar__btnGhost {
+    background: rgba(17, 24, 39, 0.04);
+}
+
+.admCriar__status {
+    opacity: 0.85;
+    font-weight: 900;
+}

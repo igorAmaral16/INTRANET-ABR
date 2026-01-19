@@ -1,0 +1,147 @@
+.admRel__hero {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 16px;
+}
+
+.admRel__heroIcon {
+    height: 44px;
+    width: 44px;
+    border-radius: 16px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    background: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 10px 26px rgba(0, 0, 0, 0.08);
+    flex: 0 0 auto;
+}
+
+.admRel__heroTxt {
+    min-width: 0;
+    flex: 1 1 auto;
+}
+
+.admRel__heroTitulo {
+    font-weight: 900;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.admRel__tag {
+    display: inline-flex;
+    gap: 6px;
+    align-items: center;
+    padding: 6px 10px;
+    border-radius: 999px;
+    border: 1px solid rgba(0, 0, 0, 0.10);
+    background: rgba(17, 24, 39, 0.04);
+    font-weight: 900;
+    font-size: 12px;
+}
+
+.admRel__heroSub {
+    margin-top: 6px;
+    opacity: 0.85;
+}
+
+.admRel__btnPrimario {
+    height: 42px;
+    padding: 0 16px;
+    border-radius: 14px;
+    border: 1px solid rgba(0, 0, 0, 0.10);
+    background: #111827;
+    color: #fff;
+    font-weight: 900;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    flex: 0 0 auto;
+}
+
+.admRel__btnPrimario:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.admRel__periodo {
+    margin-top: 12px;
+    padding: 16px;
+    display: grid;
+    gap: 12px;
+}
+
+.admRel__periodoTopo {
+    display: grid;
+    gap: 4px;
+}
+
+.admRel__periodoTitulo {
+    font-weight: 900;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.admRel__periodoHint {
+    opacity: 0.8;
+    font-size: 13px;
+}
+
+.admRel__grid {
+    display: grid;
+    gap: 12px;
+    grid-template-columns: 1fr 1fr auto;
+    align-items: end;
+}
+
+@media (max-width: 720px) {
+    .admRel__grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.admRel__campo {
+    display: grid;
+    gap: 6px;
+}
+
+.admRel__campo span {
+    font-weight: 900;
+    font-size: 13px;
+    opacity: 0.9;
+}
+
+.admRel__campo input {
+    height: 40px;
+    border-radius: 14px;
+    border: 1px solid rgba(0, 0, 0, 0.10);
+    padding: 0 12px;
+    outline: none;
+    background: #fff;
+}
+
+.admRel__btnSecundario {
+    height: 40px;
+    padding: 0 14px;
+    border-radius: 14px;
+    border: 1px solid rgba(0, 0, 0, 0.10);
+    background: #fff;
+    font-weight: 900;
+    cursor: pointer;
+}
+
+.admRel__erro {
+    padding: 10px 12px;
+    border-radius: 14px;
+    border: 1px solid rgba(239, 68, 68, 0.30);
+    background: rgba(239, 68, 68, 0.06);
+    color: #7a271a;
+    font-weight: 900;
+}
