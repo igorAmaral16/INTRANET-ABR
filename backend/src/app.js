@@ -29,7 +29,7 @@ export function buildApp() {
                 return typeof incoming === "string" && incoming.trim()
                     ? incoming
                     : randomUUID();
-            }
+            },
         })
     );
 
@@ -48,7 +48,7 @@ export function buildApp() {
                 if (corsOrigins.includes(origin)) return cb(null, true);
                 return cb(new Error("CORS blocked"));
             },
-            credentials: true
+            credentials: true,
         })
     );
 
@@ -57,31 +57,35 @@ export function buildApp() {
             windowMs: 60 * 1000,
             limit: 300,
             standardHeaders: "draft-7",
-            legacyHeaders: false
+            legacyHeaders: false,
         })
     );
 
     app.use(compression());
     app.use(express.json({ limit: "1mb" }));
 
-    app.use("/uploads",
+    const uploadsMiddleware = [
         (req, res, next) => {
-            // Permite que imagens/PDFs sejam consumidos por outro origin (ex.: Vite 5173)
+            // importante para permitir que imagens sejam embutidas/consumidas fora do origin do backend
             res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
-
-            // Opcional, mas útil (principalmente para PDFs e downloads):
             res.setHeader("Access-Control-Allow-Origin", "*");
             res.setHeader("Vary", "Origin");
-
             next();
         },
         express.static(path.join(__dirname, "..", "uploads"), {
             fallthrough: false,
-            maxAge: "7d"
-        })
-    );
+            maxAge: "7d",
+        }),
+    ];
 
-    app.use(router);
+    // rota principal (sem /api)
+    app.use("/uploads", ...uploadsMiddleware);
+
+    // alias opcional (para links antigos que vierem como /api/uploads/...)
+    app.use("/api/uploads", ...uploadsMiddleware);
+
+    // suas rotas de API sob /api
+    app.use("/api", router);
 
     app.use(notFound);
     app.use(errorHandler);

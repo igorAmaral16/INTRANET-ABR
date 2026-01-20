@@ -14,8 +14,11 @@ async function start() {
 
     initSocket(server);
 
-    server.listen(env.PORT, () => {
-        logger.info({ port: env.PORT, nodeEnv: env.NODE_ENV }, "API listening");
+    const HOST = env.HOST || "0.0.0.0";
+    const PORT = Number(env.PORT) || 5051;
+
+    server.listen(PORT, HOST, () => {
+        logger.info({ host: HOST, port: PORT, nodeEnv: env.NODE_ENV }, "API listening");
     });
 
     async function shutdown(signal) {

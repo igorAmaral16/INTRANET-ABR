@@ -1,13 +1,45 @@
 <!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>frontend</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Identidade do Projeto -->
+  <title>INTRANET ABR</title>
+  <meta name="description" content="Portal interno da ABR para comunicados, documentos, FAQ e atendimento RH." />
+  <meta name="theme-color" content="#0B5FFF" />
+
+  <!-- Favicon (empresa) -->
+  <!-- Observação: o Vite não “força” o favicon; quem define é este arquivo.
+         Para evitar fallback visual em alguns navegadores, declaramos mais de um rel. -->
+  <link rel="icon" href="/favicon.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/favicon.png" />
+
+  <!-- Organização / SEO básico -->
+  <meta name="application-name" content="INTRANET ABR" />
+  <meta name="robots" content="index,follow" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
+
+  <!-- Open Graph (para previews quando compartilhar links internos/externos) -->
+  <meta property="og:title" content="INTRANET ABR" />
+  <meta property="og:description" content="Portal interno da ABR para comunicados, documentos, FAQ e atendimento RH." />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="/favicon.png" />
+
+  <!-- Melhoria de performance: define o primeiro paint mais consistente -->
+  <meta name="color-scheme" content="light dark" />
+</head>
+
+<body>
+  <noscript>Este sistema requer JavaScript habilitado para funcionar corretamente.</noscript>
+
+  <div id="root" aria-label="Aplicação INTRANET ABR"></div>
+
+  <script type="module" src="/src/main.jsx"></script>
+</body>
+
 </html>
