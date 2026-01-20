@@ -3,6 +3,7 @@ import { buildApp } from "./app.js";
 import { env } from "./config/env.js";
 import { logger } from "./utils/logger.js";
 import { pool, testConnection } from "./config/db.js";
+import { initSocket } from "./realtime/socket.js";
 
 async function start() {
     const app = buildApp();
@@ -10,6 +11,8 @@ async function start() {
     await testConnection();
 
     const server = http.createServer(app);
+
+    initSocket(server);
 
     server.listen(env.PORT, () => {
         logger.info({ port: env.PORT, nodeEnv: env.NODE_ENV }, "API listening");

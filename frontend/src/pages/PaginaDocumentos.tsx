@@ -105,14 +105,19 @@ export function PaginaDocumentos() {
                 aoMudarBusca={() => { }}
                 mostrarBusca={false}
                 aoIrParaInicio={() => navigate("/")}
-                estaLogadoColab={estaLogadoColab}
+
+                estaLogado={Boolean(estaLogadoColab)}
+                role={"COLAB"}
+
                 aoClicarEntrar={() => navigate("/")}
+
                 aoMeuPerfil={() => navigate("/meu-perfil")}
                 aoVerDocumentos={() => navigate("/documentos")}
                 aoFaq={() => navigate("/faq")}
                 aoFaleComRh={() => navigate("/fale-com-rh")}
                 aoSair={sair}
             />
+
 
             <main className="paginaBase__conteudo">
                 <div className="paginaBase__topoInterno">

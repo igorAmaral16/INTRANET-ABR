@@ -79,14 +79,19 @@ export function PaginaMeuPerfil() {
                 aoMudarBusca={() => { }}
                 mostrarBusca={false}
                 aoIrParaInicio={() => navigate("/")}
-                estaLogadoColab={estaLogadoColab}
+
+                estaLogado={Boolean(sessao?.token && estaLogadoColab)}
+                role={sessao?.role}
+
                 aoClicarEntrar={() => navigate("/")}
+
                 aoMeuPerfil={() => navigate("/meu-perfil")}
                 aoVerDocumentos={() => navigate("/documentos")}
                 aoFaq={() => navigate("/faq")}
                 aoFaleComRh={() => navigate("/fale-com-rh")}
                 aoSair={sair}
             />
+
 
             <main className="paginaBase__conteudo">
                 <div className="paginaBase__topoInterno">

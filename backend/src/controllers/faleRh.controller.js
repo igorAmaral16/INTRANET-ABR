@@ -13,7 +13,7 @@ import {
     markReadAdmin
 } from "../services/faleRh.service.js";
 
-const IdSchema = z.coerce.number().int().positive();
+const IdSchema = z.string().uuid();
 
 const StatusEnum = z.enum(["PENDENTE", "ABERTA", "FECHADA"]);
 
@@ -31,10 +31,15 @@ const CreateColabSchema = z.object({
     mensagem: z.string().trim().min(3).max(4000)
 });
 
+// Aceita conteudo (padrão) e também mensagem (alias) para não quebrar clientes antigos
 const SendMessageSchema = z.object({
     tipo: z.enum(["PRESET", "TEXTO"]).optional().default("TEXTO"),
     preset_key: z.string().trim().min(1).max(60).optional(),
-    conteudo: z.string().trim().min(1).max(4000)
+    conteudo: z.string().trim().min(1).max(4000).optional(),
+    mensagem: z.string().trim().min(1).max(4000).optional()
+}).refine((v) => Boolean(v.conteudo || v.mensagem), {
+    message: "conteudo é obrigatório",
+    path: ["conteudo"]
 });
 
 /* =========================
@@ -75,6 +80,7 @@ export async function colabListarConversas(req, res) {
 
     const colaboradorId = Number(req.user?.id);
     const matricula = String(req.user?.matricula || "");
+
     if (!colaboradorId || !matricula) {
         return res.status(401).json({
             error: { message: "Não autenticado.", requestId: req.id }
@@ -123,17 +129,22 @@ export async function colabEnviarMensagem(req, res) {
         });
     }
 
+    const conteudo = body.conteudo ?? body.mensagem;
+
     const ok = await insertMessageAsColab({
         conversationId: id,
         colaboradorId,
         tipo: body.tipo,
         preset_key: body.tipo === "PRESET" ? (body.preset_key || null) : null,
-        conteudo: body.conteudo
+        conteudo
     });
 
     if (!ok) {
         return res.status(400).json({
-            error: { message: "Não foi possível enviar mensagem (conversa inexistente/fechada ou não pertence ao colaborador).", requestId: req.id }
+            error: {
+                message: "Não foi possível enviar mensagem (conversa inexistente/fechada ou não pertence ao colaborador).",
+                requestId: req.id
+            }
         });
     }
 
@@ -244,17 +255,22 @@ export async function adminEnviarMensagem(req, res) {
 
     const adminId = Number(req.user?.id);
 
+    const conteudo = body.conteudo ?? body.mensagem;
+
     const ok = await insertMessageAsAdmin({
         conversationId: id,
         adminId,
         tipo: body.tipo,
         preset_key: body.tipo === "PRESET" ? (body.preset_key || null) : null,
-        conteudo: body.conteudo
+        conteudo
     });
 
     if (!ok) {
         return res.status(400).json({
-            error: { message: "Não foi possível enviar mensagem (conversa inexistente/fechada).", requestId: req.id }
+            error: {
+                message: "Não foi possível enviar mensagem (conversa inexistente/fechada ou ainda não aceita).",
+                requestId: req.id
+            }
         });
     }
 

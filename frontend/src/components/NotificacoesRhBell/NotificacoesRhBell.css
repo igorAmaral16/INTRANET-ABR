@@ -1,0 +1,103 @@
+.rhBell {
+    position: relative;
+    display: inline-flex;
+}
+
+.rhBell__btn {
+    position: relative;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.rhBell__btn:hover {
+    background: rgba(0, 0, 0, .05);
+}
+
+.rhBell__badge {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    min-width: 16px;
+    height: 16px;
+    padding: 0 4px;
+    border-radius: 999px;
+    font-size: 11px;
+    line-height: 16px;
+    text-align: center;
+    background: #e53935;
+    color: #fff;
+}
+
+.rhBell__popover {
+    position: absolute;
+    right: 0;
+    top: calc(100% + 8px);
+    width: 300px;
+    background: #fff;
+    border: 1px solid rgba(0, 0, 0, .10);
+    border-radius: 14px;
+    box-shadow: 0 10px 26px rgba(0, 0, 0, .12);
+    overflow: hidden;
+    z-index: 2000;
+}
+
+.rhBell__topo {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 12px;
+    border-bottom: 1px solid rgba(0, 0, 0, .06);
+}
+
+.rhBell__titulo {
+    font-weight: 700;
+    font-size: 13px;
+}
+
+.rhBell__limpar {
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+    font-size: 12px;
+    opacity: .85;
+}
+
+.rhBell__limpar:hover {
+    opacity: 1;
+}
+
+.rhBell__vazio {
+    padding: 12px;
+    font-size: 13px;
+    opacity: .75;
+}
+
+.rhBell__item {
+    width: 100%;
+    text-align: left;
+    padding: 10px 12px;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+}
+
+.rhBell__item:hover {
+    background: rgba(0, 0, 0, .04);
+}
+
+.rhBell__itemLinha1 {
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.rhBell__itemLinha2 {
+    font-size: 12px;
+    opacity: .82;
+    margin-top: 2px;
+}

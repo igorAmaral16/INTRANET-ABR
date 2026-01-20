@@ -2,6 +2,7 @@ import "./BarraTopo.css";
 import { MenuUsuario } from "../MenuUsuario/MenuUsuario";
 import { MenuAdmin } from "../MenuAdmin/MenuAdmin";
 import logo from "../../assets/logo.webp";
+import { NotificacoesRhBell } from "../NotificacoesRhBell/NotificacoesRhBell"; // NOVO
 
 type Role = "COLAB" | "ADMIN" | null | undefined;
 
@@ -29,6 +30,7 @@ type Props = {
     aoAdminColaboradores?: () => void;
     aoAdminFaq?: () => void;
     aoAdminRelatorios?: () => void;
+    aoAdminFaleComRh?: () => void;
 
     aoSair: () => void;
 };
@@ -52,6 +54,7 @@ export function BarraTopo({
     aoAdminColaboradores,
     aoAdminFaq,
     aoAdminRelatorios,
+    aoAdminFaleComRh,
 
     aoSair,
 }: Props) {
@@ -92,16 +95,20 @@ export function BarraTopo({
                             aoColaboradores={aoAdminColaboradores || (() => { })}
                             aoFaq={aoAdminFaq || (() => { })}
                             aoRelatorios={aoAdminRelatorios || (() => { })}
+                            aoFaleComRh={aoAdminFaleComRh || (() => { })}
                             aoSair={aoSair}
                         />
                     ) : (
-                        <MenuUsuario
-                            aoMeuPerfil={aoMeuPerfil || (() => { })}
-                            aoVerDocumentos={aoVerDocumentos || (() => { })}
-                            aoFaq={aoFaq || (() => { })}
-                            aoFaleComRh={aoFaleComRh || (() => { })}
-                            aoSair={aoSair}
-                        />
+                        <>
+                            <NotificacoesRhBell />
+                            <MenuUsuario
+                                aoMeuPerfil={aoMeuPerfil || (() => { })}
+                                aoVerDocumentos={aoVerDocumentos || (() => { })}
+                                aoFaq={aoFaq || (() => { })}
+                                aoFaleComRh={aoFaleComRh || (() => { })}
+                                aoSair={aoSair}
+                            />
+                        </>
                     )}
                 </div>
             </div>

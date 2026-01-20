@@ -8,6 +8,7 @@ import {
     Users as IconUsers,
     HelpCircle as IconHelp,
     FileDown as IconReport,
+    MessageSquare as IconMessage, // NOVO
     LogOut as IconLogout,
 } from "lucide-react";
 import "./MenuAdmin.css";
@@ -18,6 +19,7 @@ type Props = {
     aoColaboradores: () => void;
     aoFaq: () => void;
     aoRelatorios: () => void;
+    aoFaleComRh: () => void; // NOVO
     aoSair: () => void;
 };
 
@@ -39,6 +41,7 @@ export function MenuAdmin({
     aoColaboradores,
     aoFaq,
     aoRelatorios,
+    aoFaleComRh,
     aoSair,
 }: Props) {
     const [aberto, setAberto] = useState(false);
@@ -49,9 +52,10 @@ export function MenuAdmin({
             { id: "docs", titulo: "Documentos", icon: <IconFolder size={18} />, onClick: aoDocumentos },
             { id: "colabs", titulo: "Colaboradores", icon: <IconUsers size={18} />, onClick: aoColaboradores },
             { id: "faq", titulo: "FAQ", icon: <IconHelp size={18} />, onClick: aoFaq },
+            { id: "fale", titulo: "Fale com o RH", icon: <IconMessage size={18} />, onClick: aoFaleComRh }, // NOVO
             { id: "rel", titulo: "Gerar relatórios", icon: <IconReport size={18} />, onClick: aoRelatorios },
         ],
-        [aoCriarComunicado, aoDocumentos, aoColaboradores, aoFaq, aoRelatorios]
+        [aoCriarComunicado, aoDocumentos, aoColaboradores, aoFaq, aoFaleComRh, aoRelatorios]
     );
 
     useEffect(() => {

@@ -2,12 +2,12 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { MoreVertical, Pencil, Trash2 } from "lucide-react";
 
-import { BarraTopo } from "../components/BarraTopo/BarraTopo";
-import { useSessaoAuth } from "../hooks/useSessaoAuth";
-import { ErroHttp } from "../api/clienteHttp";
-import { listarComunicadosAdmin, excluirComunicadoAdmin, type ComunicadoAdminItem } from "../api/comunicados.api";
+import { BarraTopo } from "../../components/BarraTopo/BarraTopo";
+import { useSessaoAuth } from "../../hooks/useSessaoAuth";
+import { ErroHttp } from "../../api/clienteHttp";
+import { listarComunicadosAdmin, excluirComunicadoAdmin, type ComunicadoAdminItem } from "../../api/comunicados.api";
 
-import "./PaginaComunicados.css";
+import "../PaginaComunicados.css";
 
 function isAbortError(e: any) {
     return (
@@ -114,18 +114,21 @@ export function PaginaAdminComunicados() {
     return (
         <div className="paginaComunicados">
             <BarraTopo
-                busca={busca}
-                aoMudarBusca={setBusca}
-                mostrarBusca={true}
+                busca=""
+                aoMudarBusca={() => { }}
+                mostrarBusca={false}
                 aoIrParaInicio={() => navigate("/admin")}
-                estaLogado={estaLogado}
-                role={role}
+                estaLogado={Boolean(sessao?.token)}
+                role={sessao?.role}
                 aoClicarEntrar={() => navigate("/")}
+
                 aoAdminCriarComunicado={() => navigate("/admin/criar-comunicado")}
                 aoAdminDocumentos={() => navigate("/admin/documentos")}
                 aoAdminColaboradores={() => navigate("/admin/colaboradores")}
                 aoAdminFaq={() => navigate("/admin/faq")}
+                aoAdminFaleComRh={() => navigate("/admin/fale-com-rh")}   // NOVO
                 aoAdminRelatorios={() => navigate("/admin/relatorios")}
+
                 aoSair={() => {
                     sair();
                     navigate("/", { replace: true });

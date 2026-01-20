@@ -15,12 +15,15 @@
     display: flex;
     gap: 12px;
     align-items: center;
+
+    /* Mantém layout responsivo, mas controlaremos quem quebra via media query */
     flex-wrap: wrap;
 
     width: 100%;
     min-width: 0;
 }
 
+/* Logo/marca (mantém o estilo original em "card") */
 .barraTopo__marca {
     flex: 0 0 auto;
 
@@ -39,7 +42,6 @@
     cursor: pointer;
     padding: 0;
 
-    /* remove estilo padrão do botão */
     appearance: none;
 }
 
@@ -54,6 +56,7 @@
     display: block;
 }
 
+/* Busca */
 .barraTopo__busca {
     flex: 1 1 260px;
     min-width: 0;
@@ -74,11 +77,28 @@
     border-color: rgba(0, 0, 0, 0.25);
 }
 
+/* Espaçador (quando não tem busca) */
+.barraTopo__espacador {
+    flex: 1 1 260px;
+    min-width: 0;
+}
+
+/* Ações à direita */
 .barraTopo__acoesDireita {
     flex: 0 0 auto;
+
     display: inline-flex;
     align-items: center;
-    gap: 10px;
+
+    /* Espaço entre sino e hambúrguer, e demais itens */
+    gap: 12px;
+
+    /* Mantém este bloco sempre na direita quando houver espaço */
+    margin-left: auto;
+
+    /* Impede que itens internos quebrem e "grudem" em múltiplas linhas */
+    flex-wrap: nowrap;
+    white-space: nowrap;
 }
 
 .barraTopo__botaoEntrar {
@@ -96,41 +116,24 @@
     transform: translateY(1px);
 }
 
-.barraTopo__espacador {
-    flex: 1 1 260px;
-    min-width: 0;
-}
+/*
+  Garantia: quando a largura apertar, quem vai para baixo é a busca (ou espaçador),
+  e o bloco da direita (notificação + menu) fica na primeira linha ao lado do logo.
+*/
+@media (max-width: 720px) {
 
-.barraTopo__marca {
-    flex: 0 0 auto;
-    border: 0;
-    background: transparent;
-    padding: 0;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-}
+    .barraTopo__busca,
+    .barraTopo__espacador {
+        flex: 1 1 100%;
+        order: 3;
+    }
 
-.barraTopo__logoImg {
-    height: 38px;
-    width: auto;
-    display: block;
-    border-radius: 10px;
-}
+    .barraTopo__acoesDireita {
+        order: 2;
+        margin-left: auto;
+    }
 
-.barraTopo__marca {
-    flex: 0 0 auto;
-    border: 0;
-    background: transparent;
-    padding: 0;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-}
-
-.barraTopo__logoImg {
-    height: 38px;
-    width: auto;
-    display: block;
-    border-radius: 10px;
+    .barraTopo__marca {
+        order: 1;
+    }
 }

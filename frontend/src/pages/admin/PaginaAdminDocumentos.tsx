@@ -421,19 +421,23 @@ export function PaginaAdminDocumentos() {
                 aoMudarBusca={() => { }}
                 mostrarBusca={false}
                 aoIrParaInicio={() => navigate("/admin")}
-                estaLogado={estaLogado}
-                role={role}
+                estaLogado={Boolean(sessao?.token)}
+                role={sessao?.role}
                 aoClicarEntrar={() => navigate("/")}
+
                 aoAdminCriarComunicado={() => navigate("/admin/criar-comunicado")}
                 aoAdminDocumentos={() => navigate("/admin/documentos")}
                 aoAdminColaboradores={() => navigate("/admin/colaboradores")}
                 aoAdminFaq={() => navigate("/admin/faq")}
+                aoAdminFaleComRh={() => navigate("/admin/fale-com-rh")}   // NOVO
                 aoAdminRelatorios={() => navigate("/admin/relatorios")}
+
                 aoSair={() => {
                     sair();
                     navigate("/", { replace: true });
                 }}
             />
+
 
             <main className="paginaBase__conteudo">
                 <div className="paginaBase__topoInterno">
