@@ -48,7 +48,18 @@ export async function loginAdmin(req, res) {
         tokenType: "Bearer",
         expiresIn: process.env.JWT_EXPIRES_IN || "15m",
         role: "ADMIN",
-        user: { id: admin.id, username: admin.username, nome: admin.nome, nivel: admin.nivel }
+        user: {
+            id: admin.id,
+            username: admin.username,
+            nome: admin.nome,
+            nivel: admin.nivel,
+
+            // novos campos (sem quebrar o fluxo atual)
+            ativo: Boolean(admin.ativo),
+            lastLoginAt: admin.last_login_at || null,
+            createdAt: admin.created_at || null,
+            updatedAt: admin.updated_at || null
+        }
     });
 }
 
@@ -126,7 +137,18 @@ export async function loginColaborador(req, res) {
         user: {
             id: colab.id,
             matricula: normalizeMatricula(colab.matricula),
-            mustChangePassword: Boolean(colab.must_change_password)
+            mustChangePassword: Boolean(colab.must_change_password),
+
+            // novos campos (sem quebrar o fluxo atual)
+            nomeCompleto: colab.nome_completo,
+            dataNascimento: colab.data_nascimento, // dd/mm/aaaa
+            dataNascimentoIso: colab.data_nascimento_iso, // yyyy-mm-dd
+            status: colab.status,
+            lastLoginAt: colab.last_login_at || null,
+            createdByAdminId: colab.created_by_admin_id ?? null,
+            updatedByAdminId: colab.updated_by_admin_id ?? null,
+            createdAt: colab.created_at || null,
+            updatedAt: colab.updated_at || null
         }
     });
 }

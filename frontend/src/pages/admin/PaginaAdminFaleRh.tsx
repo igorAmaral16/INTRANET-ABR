@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Inbox, Send, ShieldAlert, CheckCircle2, XCircle } from "lucide-react";
 
@@ -13,22 +13,49 @@ import {
     adminFecharConversa,
     type RhConversationListItem,
     type RhConversationDetail,
-    type RhStatus
+    type RhStatus,
 } from "../../api/faleRh.api";
 
 import { connectSocket, disconnectSocket, getSocket } from "../../realtime/socketClient";
 
 import "./paginaAdminFaleRh.css";
 
-function isAbortError(e: any) {
-    return e?.name === "AbortError" || String(e?.message || "").toLowerCase().includes("abort");
+type EstadoTela = "carregando" | "erro" | "pronto";
+
+// Ajuste fino de performance/UX
+const MSG_RENDER_INITIAL = 70;
+const MSG_RENDER_STEP = 50;
+
+// Mesmo breakpoint do seu CSS
+const MOBILE_MAX_W = 980;
+
+type RealtimeMessage = {
+    id: string | number;
+    conteudo: string;
+    created_at?: string | null;
+    sender_role: "ADMIN" | "COLAB";
+};
+
+type RealtimeMessagePayload = {
+    conversationId?: string | number;
+    message?: RealtimeMessage;
+};
+
+type RealtimeConvUpdatePayload = {
+    conversationId?: string | number;
+    patch?: Partial<RhConversationListItem> & Record<string, unknown>;
+};
+
+function isAbortError(e: unknown): boolean {
+    const err = e as any;
+    return err?.name === "AbortError" || String(err?.message || "").toLowerCase().includes("abort");
 }
 
 export function PaginaAdminFaleRh() {
     const navigate = useNavigate();
     const { sessao, estaLogadoAdmin, sair } = useSessaoAuth();
 
-    const [estado, setEstado] = useState<"carregando" | "erro" | "pronto">("carregando");
+    const [estado, setEstado] = useState<EstadoTela>("carregando");
     const [erro, setErro] = useState<string | null>(null);
 
     const [status, setStatus] = useState<RhStatus>("PENDENTE");
@@ -36,12 +63,34 @@ export function PaginaAdminFaleRh() {
 
     const [conversaId, setConversaId] = useState<string | null>(null);
     const [detalhe, setDetalhe] = useState<RhConversationDetail | null>(null);
-    const [msg, setMsg] = useState("");
+    const [msg, setMsg] = useState<string>("");
 
     const acListaRef = useRef<AbortController | null>(null);
     const acDetalheRef = useRef<AbortController | null>(null);
 
     const joinedConversationRef = useRef<string | null>(null);
+
+    // Windowing + scroll
+    const msgsRef = useRef<HTMLDivElement | null>(null);
+    const [renderLimit, setRenderLimit] = useState<number>(MSG_RENDER_INITIAL);
+    const pendingKeepScrollRef = useRef<{ prevHeight: number } | null>(null);
+
+    // Mobile navigation (list -> chat)
+    const [isMobile, setIsMobile] = useState<boolean>(() => {
+        if (typeof window === "undefined") return false;
+        return window.innerWidth <= MOBILE_MAX_W;
+    });
+    const [mobileView, setMobileView] = useState<"list" | "chat">("list");
+
+    useEffect(() => {
+        const onResize = () => {
+            const mobile = window.innerWidth <= MOBILE_MAX_W;
+            setIsMobile(mobile);
+            if (!mobile) setMobileView("list");
+        };
+        window.addEventListener("resize", onResize);
+        return () => window.removeEventListener("resize", onResize);
+    }, []);
 
     useEffect(() => {
         if (!estaLogadoAdmin || !sessao?.token) {
@@ -50,31 +99,33 @@ export function PaginaAdminFaleRh() {
         }
     }, [estaLogadoAdmin, sessao?.token, navigate]);
 
-    // GARANTE socket conectado (essencial para realtime)
     useEffect(() => {
         if (!sessao?.token) return;
         connectSocket(sessao.token);
     }, [sessao?.token]);
 
-    async function carregarLista(signal?: AbortSignal) {
-        if (!sessao?.token) return;
+    const carregarLista = useCallback(
+        async (signal?: AbortSignal) => {
+            if (!sessao?.token) return;
 
-        setEstado("carregando");
-        setErro(null);
+            setEstado("carregando");
+            setErro(null);
 
-        try {
-            const data = await adminListarConversas({ token: sessao.token, status }, signal);
-            const items = Array.isArray(data?.items) ? data.items : [];
-            items.sort((a, b) => String(a.created_at || "").localeCompare(String(b.created_at || "")));
-            setConversas(items);
-            setEstado("pronto");
-        } catch (e: any) {
-            if (isAbortError(e)) return;
-            const msgErr = e instanceof ErroHttp ? e.message : e?.message;
-            setErro(msgErr || "Não foi possível carregar as conversas.");
-            setEstado("erro");
-        }
-    }
+            try {
+                const data = await adminListarConversas({ token: sessao.token, status }, signal);
+                const items = Array.isArray((data as any)?.items) ? ((data as any).items as RhConversationListItem[]) : [];
+                items.sort((a, b) => String(a.created_at || "").localeCompare(String(b.created_at || "")));
+                setConversas(items);
+                setEstado("pronto");
+            } catch (e: unknown) {
+                if (isAbortError(e)) return;
+                const msgErr = e instanceof ErroHttp ? e.message : (e as any)?.message;
+                setErro(msgErr || "Não foi possível carregar as conversas.");
+                setEstado("erro");
+            }
+        },
+        [sessao?.token, status]
+    );
 
     useEffect(() => {
         acListaRef.current?.abort();
@@ -83,9 +134,9 @@ export function PaginaAdminFaleRh() {
 
         carregarLista(ac.signal);
         return () => ac.abort();
-    }, [sessao?.token, status]);
+    }, [carregarLista]);
 
-    function joinConversationRoom(conversationId: string) {
+    const joinConversationRoom = useCallback((conversationId: string) => {
         const s = getSocket();
         if (!s) return;
 
@@ -96,37 +147,58 @@ export function PaginaAdminFaleRh() {
 
         s.emit("rh:join", conversationId);
         joinedConversationRef.current = conversationId;
-    }
+    }, []);
 
-    async function abrirConversa(id: string) {
-        if (!sessao?.token) return;
+    const scrollToBottom = useCallback(() => {
+        const el = msgsRef.current;
+        if (!el) return;
+        el.scrollTop = el.scrollHeight;
+    }, []);
 
-        acDetalheRef.current?.abort();
-        const ac = new AbortController();
-        acDetalheRef.current = ac;
+    const isNearBottom = useCallback(() => {
+        const el = msgsRef.current;
+        if (!el) return false;
+        const threshold = 160;
+        return el.scrollHeight - el.scrollTop - el.clientHeight < threshold;
+    }, []);
 
-        setConversaId(id);
-        setDetalhe(null);
+    const abrirConversa = useCallback(
+        async (id: string) => {
+            if (!sessao?.token) return;
 
-        joinConversationRoom(id);
+            acDetalheRef.current?.abort();
+            const ac = new AbortController();
+            acDetalheRef.current = ac;
 
-        try {
-            const data = await adminObterConversa({ token: sessao.token, id }, ac.signal);
-            setDetalhe(data);
-        } catch (e: any) {
-            if (isAbortError(e)) return;
-            const msgErr = e instanceof ErroHttp ? e.message : e?.message;
-            alert(msgErr || "Não foi possível abrir a conversa.");
-            setConversaId(null);
-        }
-    }
+            setConversaId(id);
+            setDetalhe(null);
+            setRenderLimit(MSG_RENDER_INITIAL);
 
-    // Listeners realtime
+            joinConversationRoom(id);
+
+            if (isMobile) setMobileView("chat");
+
+            try {
+                const data = await adminObterConversa({ token: sessao.token, id }, ac.signal);
+                setDetalhe(data);
+                setTimeout(() => scrollToBottom(), 0);
+            } catch (e: unknown) {
+                if (isAbortError(e)) return;
+                const msgErr = e instanceof ErroHttp ? e.message : (e as any)?.message;
+                alert(msgErr || "Não foi possível abrir a conversa.");
+                setConversaId(null);
+                if (isMobile) setMobileView("list");
+            }
+        },
+        [sessao?.token, joinConversationRoom, isMobile, scrollToBottom]
+    );
+
+    // Realtime listeners
     useEffect(() => {
         const s = getSocket();
         if (!s) return;
 
-        const onMessage = (payload: any) => {
+        const onMessage = (payload: RealtimeMessagePayload) => {
             const cid = String(payload?.conversationId ?? "");
             if (!cid) return;
             if (cid !== conversaId) return;
@@ -134,23 +206,25 @@ export function PaginaAdminFaleRh() {
             const message = payload?.message;
             if (!message?.id) return;
 
+            const stick = isNearBottom();
+
             setDetalhe((prev) => {
                 if (!prev) return prev;
                 const exists = (prev.messages || []).some((m: any) => String(m.id) === String(message.id));
                 if (exists) return prev;
-                return { ...prev, messages: [...(prev.messages || []), message] };
+                return { ...prev, messages: [...(prev.messages || []), message as any] };
             });
+
+            if (stick) setTimeout(() => scrollToBottom(), 0);
         };
 
-        const onConvUpdate = (payload: any) => {
+        const onConvUpdate = (payload: RealtimeConvUpdatePayload) => {
             const cid = String(payload?.conversationId ?? "");
             if (!cid) return;
 
-            const patch = payload?.patch || {};
+            const patch = (payload?.patch || {}) as any;
 
-            setConversas((prev) =>
-                prev.map((c) => (String(c.id) === cid ? ({ ...c, ...patch } as any) : c))
-            );
+            setConversas((prev) => prev.map((c) => (String(c.id) === cid ? ({ ...c, ...patch } as any) : c)));
 
             if (cid === conversaId) {
                 setDetalhe((prev) => {
@@ -167,12 +241,35 @@ export function PaginaAdminFaleRh() {
             s.off("rh:message", onMessage);
             s.off("rh:conversation:update", onConvUpdate);
         };
-    }, [conversaId]);
+    }, [conversaId, isNearBottom, scrollToBottom]);
 
     const conversaAtual = detalhe?.conversation;
     const podeResponder = Boolean(conversaAtual && conversaAtual.status === "ABERTA");
 
-    async function aceitar() {
+    const rotuloColaborador = useMemo(() => {
+        const m = (detalhe as any)?.conversation?.colaborador_matricula;
+        const n = (detalhe as any)?.conversation?.colaborador_nome;
+        const categoria = String((detalhe as any)?.conversation?.categoria || "");
+
+        const nome = n || "Colaborador";
+        const matricula = m ? String(m) : "—";
+        const cat = categoria || "—";
+
+        return { nome, matricula, categoria: cat };
+    }, [detalhe]);
+
+    // Admin: título deve ter Nome + Categoria + Matrícula
+    const tituloHeader = useMemo(() => {
+        return `${rotuloColaborador.nome} • ${rotuloColaborador.categoria} • ${rotuloColaborador.matricula}`;
+    }, [rotuloColaborador]);
+
+    const subtituloHeader = useMemo(() => {
+        const assunto = String((detalhe as any)?.conversation?.assunto || "(Sem assunto)");
+        const st = String((detalhe as any)?.conversation?.status || "");
+        return `${assunto} • ${st}`;
+    }, [detalhe]);
+
+    async function aceitar(): Promise<void> {
         if (!sessao?.token || !conversaId) return;
         const ok = window.confirm("Aceitar esta conversa e iniciar o atendimento?");
         if (!ok) return;
@@ -180,18 +277,17 @@ export function PaginaAdminFaleRh() {
         try {
             await adminAceitarConversa({ token: sessao.token, id: conversaId });
 
-            // fallback de consistência
             const data = await adminObterConversa({ token: sessao.token, id: conversaId });
             setDetalhe(data);
 
             await carregarLista();
-        } catch (e: any) {
-            const msgErr = e instanceof ErroHttp ? e.message : e?.message;
+        } catch (e: unknown) {
+            const msgErr = e instanceof ErroHttp ? e.message : (e as any)?.message;
             alert(msgErr || "Não foi possível aceitar a conversa.");
         }
     }
 
-    async function enviar() {
+    async function enviar(): Promise<void> {
         if (!sessao?.token || !conversaId) return;
         const texto = msg.trim();
         if (!texto) return;
@@ -200,19 +296,20 @@ export function PaginaAdminFaleRh() {
         try {
             await adminEnviarMensagem({ token: sessao.token, id: conversaId, body: { conteudo: texto } });
 
-            // fallback (pode remover se quiser 100% realtime)
+            // fallback (mantém seu comportamento atual)
             const data = await adminObterConversa({ token: sessao.token, id: conversaId });
             setDetalhe(data);
 
             await carregarLista();
-        } catch (e: any) {
-            const msgErr = e instanceof ErroHttp ? e.message : e?.message;
+            setTimeout(() => scrollToBottom(), 0);
+        } catch (e: unknown) {
+            const msgErr = e instanceof ErroHttp ? e.message : (e as any)?.message;
             alert(msgErr || "Não foi possível enviar a mensagem.");
             setMsg(texto);
         }
     }
 
-    async function fechar() {
+    async function fechar(): Promise<void> {
         if (!sessao?.token || !conversaId) return;
         const ok = window.confirm("Encerrar esta conversa? Isso finaliza o atendimento.");
         if (!ok) return;
@@ -224,11 +321,43 @@ export function PaginaAdminFaleRh() {
             setDetalhe(data);
 
             await carregarLista();
-        } catch (e: any) {
-            const msgErr = e instanceof ErroHttp ? e.message : e?.message;
+        } catch (e: unknown) {
+            const msgErr = e instanceof ErroHttp ? e.message : (e as any)?.message;
             alert(msgErr || "Não foi possível fechar a conversa.");
         }
     }
+
+    // Windowing
+    const allMessages = (detalhe?.messages || []) as any[];
+    const hasMoreToRender = allMessages.length > renderLimit;
+
+    const visibleMessages = useMemo(() => {
+        if (!allMessages.length) return [];
+        if (allMessages.length <= renderLimit) return allMessages;
+        return allMessages.slice(allMessages.length - renderLimit);
+    }, [allMessages, renderLimit]);
+
+    const onScrollMsgs = useCallback(() => {
+        const el = msgsRef.current;
+        if (!el) return;
+        if (!hasMoreToRender) return;
+
+        if (el.scrollTop <= 0) {
+            pendingKeepScrollRef.current = { prevHeight: el.scrollHeight };
+            setRenderLimit((v) => Math.min(allMessages.length, v + MSG_RENDER_STEP));
+        }
+    }, [hasMoreToRender, allMessages.length]);
+
+    useEffect(() => {
+        const keep = pendingKeepScrollRef.current;
+        const el = msgsRef.current;
+        if (!keep || !el) return;
+
+        const newHeight = el.scrollHeight;
+        const delta = newHeight - keep.prevHeight;
+        el.scrollTop = delta;
+        pendingKeepScrollRef.current = null;
+    }, [renderLimit]);
 
     const tituloLateral = useMemo(() => {
         if (status === "PENDENTE") return "Pendentes";
@@ -236,14 +365,150 @@ export function PaginaAdminFaleRh() {
         return "Fechadas";
     }, [status]);
 
-    const rotuloColaborador = useMemo(() => {
-        const m = detalhe?.conversation?.colaborador_matricula;
-        const n = detalhe?.conversation?.colaborador_nome;
-        if (m && n) return `${m} • ${n}`;
-        if (m) return `Matrícula: ${m}`;
-        if (n) return n;
-        return "Colaborador";
-    }, [detalhe?.conversation?.colaborador_matricula, detalhe?.conversation?.colaborador_nome]);
+    const renderLista = (
+        <aside className="card rhAdm__lista">
+            <div className="rhAdm__listaTopo">
+                <div className="rhAdm__listaTitulo">
+                    <Inbox size={18} /> Inbox — {tituloLateral}
+                </div>
+
+                <select
+                    value={status}
+                    onChange={(e) => {
+                        setStatus(e.target.value as RhStatus);
+                        setConversaId(null);
+                        setDetalhe(null);
+                        setMobileView("list");
+                    }}
+                >
+                    <option value="PENDENTE">Pendentes</option>
+                    <option value="ABERTA">Abertas</option>
+                    <option value="FECHADA">Fechadas</option>
+                </select>
+            </div>
+
+            {estado === "carregando" ? <div className="rhAdm__placeholder">Carregando...</div> : null}
+            {estado === "erro" ? <div className="rhAdm__placeholder">Falha ao carregar.</div> : null}
+
+            {estado === "pronto" && conversas.length === 0 ? (
+                <div className="rhAdm__placeholder">Nenhuma conversa nesta fila.</div>
+            ) : null}
+
+            {estado === "pronto" && conversas.length > 0 ? (
+                <div className="rhAdm__listaItens">
+                    {conversas.map((c) => (
+                        <button
+                            key={String(c.id)}
+                            type="button"
+                            className={`rhAdm__item ${String(c.id) === String(conversaId) ? "ativo" : ""}`}
+                            onClick={() => abrirConversa(String(c.id))}
+                        >
+                            <div className="rhAdm__itemTopo">
+                                <div className="rhAdm__badge">{String((c as any).categoria)}</div>
+                                <div className={`rhAdm__status ${String((c as any).status).toLowerCase()}`}>{(c as any).status}</div>
+                            </div>
+                            <div className="rhAdm__assunto">{(c as any).assunto || "(Sem assunto)"}</div>
+                            <div className="rhAdm__meta">
+                                {(c as any).colaborador_matricula ? `Matrícula: ${(c as any).colaborador_matricula}` : "Colaborador"}
+                                {(c as any).colaborador_nome ? ` • ${(c as any).colaborador_nome}` : ""}
+                            </div>
+                        </button>
+                    ))}
+                </div>
+            ) : null}
+        </aside>
+    );
+
+    const renderChat = (
+        <section className="card rhAdm__chat">
+            {isMobile ? (
+                <div className="rhAdm__chatMobileTopo">
+                    <button type="button" className="rhAdm__chatMobileVoltar" onClick={() => setMobileView("list")}>
+                        <ArrowLeft size={18} /> Voltar
+                    </button>
+                    <div className="rhAdm__chatMobileTitulo">{tituloHeader}</div>
+                    <div className="rhAdm__chatMobileSpacer" />
+                </div>
+            ) : null}
+
+            {!conversaId ? (
+                <div className="rhAdm__chatVazio">Selecione uma conversa ao lado.</div>
+            ) : !detalhe ? (
+                <div className="rhAdm__chatVazio">Carregando conversa...</div>
+            ) : (
+                <>
+                    {!isMobile ? (
+                        <div className="rhAdm__chatHeader">
+                            <div>
+                                <div className="rhAdm__chatTitulo">{tituloHeader}</div>
+                                <div className="rhAdm__chatSub">{subtituloHeader}</div>
+                            </div>
+
+                            <div className="rhAdm__acoes">
+                                {(detalhe as any)?.conversation?.status === "PENDENTE" ? (
+                                    <button type="button" className="rhAdm__btnAceitar" onClick={aceitar}>
+                                        <CheckCircle2 size={16} /> Aceitar
+                                    </button>
+                                ) : null}
+
+                                {(detalhe as any)?.conversation?.status !== "FECHADA" ? (
+                                    <button type="button" className="rhAdm__btnFechar" onClick={fechar}>
+                                        <XCircle size={16} /> Encerrar
+                                    </button>
+                                ) : (
+                                    <div className="rhAdm__fechadaTag">Encerrada</div>
+                                )}
+                            </div>
+                        </div>
+                    ) : null}
+
+                    <div className="rhAdm__msgs" ref={msgsRef} onScroll={onScrollMsgs}>
+                        {hasMoreToRender ? <div className="rhAdm__loadMoreHint">Role para cima para ver mensagens anteriores</div> : null}
+
+                        {visibleMessages.length === 0 ? (
+                            <div className="rhAdm__chatVazio" style={{ minHeight: 120 }}>
+                                Nenhuma mensagem ainda.
+                            </div>
+                        ) : (
+                            visibleMessages.map((m: any) => (
+                                <div key={String(m.id)} className={`rhAdm__msg ${m.sender_role === "ADMIN" ? "eu" : "colab"}`}>
+                                    <div className="rhAdm__msgBolha">
+                                        <div className="rhAdm__msgTexto">{m.conteudo}</div>
+                                        <div className="rhAdm__msgMeta">
+                                            {m.sender_role === "ADMIN" ? "RH" : rotuloColaborador.nome} •{" "}
+                                            {String(m.created_at || "").slice(0, 19).replace("T", " ")}
+                                        </div>
+                                    </div>
+                                </div>
+                            ))
+                        )}
+                    </div>
+
+                    <div className="rhAdm__composer">
+                        <input
+                            value={msg}
+                            onChange={(e) => setMsg(e.target.value)}
+                            placeholder={
+                                podeResponder
+                                    ? "Digite sua resposta..."
+                                    : (detalhe as any).conversation?.status === "PENDENTE"
+                                        ? "Aceite a conversa para responder."
+                                        : "Conversa encerrada"
+                            }
+                            disabled={!podeResponder}
+                            onKeyDown={(e) => {
+                                if (e.key === "Enter") enviar();
+                            }}
+                        />
+                        <button type="button" onClick={enviar} disabled={!podeResponder || !msg.trim()}>
+                            <Send size={16} />
+                            Enviar
+                        </button>
+                    </div>
+                </>
+            )}
+        </section>
+    );
 
     return (
         <div className="paginaBase">
@@ -255,14 +520,12 @@ export function PaginaAdminFaleRh() {
                 estaLogado={Boolean(sessao?.token)}
                 role={sessao?.role}
                 aoClicarEntrar={() => navigate("/")}
-
                 aoAdminCriarComunicado={() => navigate("/admin/criar-comunicado")}
                 aoAdminDocumentos={() => navigate("/admin/documentos")}
                 aoAdminColaboradores={() => navigate("/admin/colaboradores")}
                 aoAdminFaq={() => navigate("/admin/faq")}
                 aoAdminFaleComRh={() => navigate("/admin/fale-com-rh")}
                 aoAdminRelatorios={() => navigate("/admin/relatorios")}
-
                 aoSair={() => {
                     disconnectSocket();
                     sair();
@@ -286,135 +549,12 @@ export function PaginaAdminFaleRh() {
                 ) : null}
 
                 <section className="rhAdm__layout">
-                    <aside className="card rhAdm__lista">
-                        <div className="rhAdm__listaTopo">
-                            <div className="rhAdm__listaTitulo">
-                                <Inbox size={18} /> Inbox — {tituloLateral}
-                            </div>
-
-                            <select
-                                value={status}
-                                onChange={(e) => {
-                                    setStatus(e.target.value as RhStatus);
-                                    setConversaId(null);
-                                    setDetalhe(null);
-                                }}
-                            >
-                                <option value="PENDENTE">Pendentes</option>
-                                <option value="ABERTA">Abertas</option>
-                                <option value="FECHADA">Fechadas</option>
-                            </select>
-                        </div>
-
-                        {estado === "carregando" ? <div className="rhAdm__placeholder">Carregando...</div> : null}
-                        {estado === "erro" ? <div className="rhAdm__placeholder">Falha ao carregar.</div> : null}
-
-                        {estado === "pronto" && conversas.length === 0 ? (
-                            <div className="rhAdm__placeholder">Nenhuma conversa nesta fila.</div>
-                        ) : null}
-
-                        {estado === "pronto" && conversas.length > 0 ? (
-                            <div className="rhAdm__listaItens">
-                                {conversas.map((c) => (
-                                    <button
-                                        key={c.id}
-                                        type="button"
-                                        className={`rhAdm__item ${c.id === conversaId ? "ativo" : ""}`}
-                                        onClick={() => abrirConversa(c.id)}
-                                    >
-                                        <div className="rhAdm__itemTopo">
-                                            <div className="rhAdm__badge">{String(c.categoria)}</div>
-                                            <div className={`rhAdm__status ${String(c.status).toLowerCase()}`}>{c.status}</div>
-                                        </div>
-                                        <div className="rhAdm__assunto">{c.assunto || "(Sem assunto)"}</div>
-                                        <div className="rhAdm__meta">
-                                            {c.colaborador_matricula ? `Matrícula: ${c.colaborador_matricula}` : "Colaborador"}
-                                            {c.colaborador_nome ? ` • ${c.colaborador_nome}` : ""}
-                                        </div>
-                                    </button>
-                                ))}
-                            </div>
-                        ) : null}
-                    </aside>
-
-                    <section className="card rhAdm__chat">
-                        {!conversaId ? (
-                            <div className="rhAdm__chatVazio">Selecione uma conversa ao lado.</div>
-                        ) : !detalhe ? (
-                            <div className="rhAdm__chatVazio">Carregando conversa...</div>
-                        ) : (
-                            <>
-                                <div className="rhAdm__chatHeader">
-                                    <div>
-                                        <div className="rhAdm__chatTitulo">{detalhe.conversation.assunto || "(Sem assunto)"}</div>
-                                        <div className="rhAdm__chatSub">
-                                            {String(detalhe.conversation.categoria)} • <strong>{detalhe.conversation.status}</strong>
-                                            {" • "}
-                                            <span>{rotuloColaborador}</span>
-                                        </div>
-                                    </div>
-
-                                    <div className="rhAdm__acoes">
-                                        {detalhe.conversation.status === "PENDENTE" ? (
-                                            <button type="button" className="rhAdm__btnAceitar" onClick={aceitar}>
-                                                <CheckCircle2 size={16} /> Aceitar
-                                            </button>
-                                        ) : null}
-
-                                        {detalhe.conversation.status !== "FECHADA" ? (
-                                            <button type="button" className="rhAdm__btnFechar" onClick={fechar}>
-                                                <XCircle size={16} /> Encerrar
-                                            </button>
-                                        ) : (
-                                            <div className="rhAdm__fechadaTag">Encerrada</div>
-                                        )}
-                                    </div>
-                                </div>
-
-                                <div className="rhAdm__msgs">
-                                    {(detalhe.messages || []).length === 0 ? (
-                                        <div className="rhAdm__chatVazio" style={{ minHeight: 120 }}>
-                                            Nenhuma mensagem ainda.
-                                        </div>
-                                    ) : (
-                                        (detalhe.messages || []).map((m: any) => (
-                                            <div key={m.id} className={`rhAdm__msg ${m.sender_role === "ADMIN" ? "eu" : "colab"}`}>
-                                                <div className="rhAdm__msgBolha">
-                                                    <div className="rhAdm__msgTexto">{m.conteudo}</div>
-                                                    <div className="rhAdm__msgMeta">
-                                                        {m.sender_role === "ADMIN" ? "RH" : rotuloColaborador} •{" "}
-                                                        {String(m.created_at || "").slice(0, 19).replace("T", " ")}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        ))
-                                    )}
-                                </div>
-
-                                <div className="rhAdm__composer">
-                                    <input
-                                        value={msg}
-                                        onChange={(e) => setMsg(e.target.value)}
-                                        placeholder={
-                                            podeResponder
-                                                ? "Digite sua resposta..."
-                                                : detalhe.conversation.status === "PENDENTE"
-                                                    ? "Aceite a conversa para responder."
-                                                    : "Conversa encerrada"
-                                        }
-                                        disabled={!podeResponder}
-                                        onKeyDown={(e) => {
-                                            if (e.key === "Enter") enviar();
-                                        }}
-                                    />
-                                    <button type="button" onClick={enviar} disabled={!podeResponder || !msg.trim()}>
-                                        <Send size={16} />
-                                        Enviar
-                                    </button>
-                                </div>
-                            </>
-                        )}
-                    </section>
+                    {isMobile ? (mobileView === "list" ? renderLista : renderChat) : (
+                        <>
+                            {renderLista}
+                            {renderChat}
+                        </>
+                    )}
                 </section>
             </main>
         </div>

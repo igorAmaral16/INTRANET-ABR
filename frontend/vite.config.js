@@ -30,6 +30,13 @@ export default defineConfig({
         target: `http://${BACKEND_HOST}:${BACKEND_PORT}`,
         changeOrigin: true,
       },
+
+      // >>> ADICIONADO: proxy do Socket.IO (WebSocket)
+      "/socket.io": {
+        target: `http://${BACKEND_HOST}:${BACKEND_PORT}`,
+        ws: true,
+        changeOrigin: true,
+      },
     },
   },
 });

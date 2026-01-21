@@ -19,10 +19,19 @@ export function normalizeMatricula(m) {
 
 export async function findAdminByUsername(username) {
     const [rows] = await pool.query(
-        `SELECT id, username, nome, nivel, password_hash, ativo
-     FROM Administracao
-     WHERE username = :username
-     LIMIT 1`,
+        `SELECT
+            id,
+            username,
+            nome,
+            nivel,
+            password_hash,
+            ativo,
+            DATE_FORMAT(last_login_at, '%Y-%m-%d %H:%i:%s') AS last_login_at,
+            DATE_FORMAT(created_at, '%Y-%m-%d %H:%i:%s') AS created_at,
+            DATE_FORMAT(updated_at, '%Y-%m-%d %H:%i:%s') AS updated_at
+        FROM Administracao
+        WHERE username = :username
+        LIMIT 1`,
         { username }
     );
     return rows?.[0] || null;
@@ -49,12 +58,26 @@ export async function findColaboradorByMatricula(matriculaRaw) {
     const matricula = normalizeMatricula(matriculaRaw);
 
     const [rows] = await pool.query(
-        `SELECT id, matricula, nome_completo, status, password_hash, must_change_password
-     FROM Colaboradores
-     WHERE UPPER(TRIM(matricula)) = :matricula
-     LIMIT 1`,
+        `SELECT
+            id,
+            matricula,
+            nome_completo,
+            DATE_FORMAT(data_nascimento, '%d/%m/%Y') AS data_nascimento,
+            DATE_FORMAT(data_nascimento, '%Y-%m-%d') AS data_nascimento_iso,
+            status,
+            password_hash,
+            must_change_password,
+            DATE_FORMAT(last_login_at, '%Y-%m-%d %H:%i:%s') AS last_login_at,
+            created_by_admin_id,
+            updated_by_admin_id,
+            DATE_FORMAT(created_at, '%Y-%m-%d %H:%i:%s') AS created_at,
+            DATE_FORMAT(updated_at, '%Y-%m-%d %H:%i:%s') AS updated_at
+        FROM Colaboradores
+        WHERE UPPER(TRIM(matricula)) = :matricula
+        LIMIT 1`,
         { matricula }
     );
+
     return rows?.[0] || null;
 }
 

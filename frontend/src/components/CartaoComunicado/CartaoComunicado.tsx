@@ -18,26 +18,37 @@ export function CartaoComunicado({ comunicado, aoAbrir }: Props) {
     return (
         <button
             type="button"
-            className={`cartaoComunicado ${classePorImportancia(comunicado.importancia)}`}
+            className={`cartaoComunicado ${classePorImportancia(comunicado.importancia)} ${fixado ? "cartaoComunicado--fixado" : ""
+                }`}
             onClick={() => aoAbrir(comunicado.id)}
             aria-label={`Abrir comunicado ${comunicado.titulo}`}
         >
-            <div className="cartaoComunicado__cabecalho">
-                <h2 className="cartaoComunicado__titulo">
-                    {comunicado.titulo}
-                </h2>
+            <div className="cartaoComunicado__accent" aria-hidden="true" />
 
-                {fixado && <span className="cartaoComunicado__badge">FIXADO</span>}
+            <div className="cartaoComunicado__conteudo">
+                <div className="cartaoComunicado__cabecalho">
+                    <h2 className="cartaoComunicado__titulo">{comunicado.titulo}</h2>
+                    {fixado ? <span className="cartaoComunicado__badge">Fixado</span> : null}
+                </div>
+
+                <div className="cartaoComunicado__meta">
+                    <span className="cartaoComunicado__chip">{comunicado.importancia}</span>
+                    {comunicado.expira_em ? (
+                        <span className="cartaoComunicado__expira">
+                            Expira: <strong>{comunicado.expira_em}</strong>
+                        </span>
+                    ) : (
+                        <span className="cartaoComunicado__expira cartaoComunicado__expira--ok">Sem data de expiração</span>
+                    )}
+                </div>
+
+                <div className="cartaoComunicado__rodape">
+                    <span className="cartaoComunicado__cta">Ver detalhes</span>
+                    <span className="cartaoComunicado__seta" aria-hidden="true">
+                        →
+                    </span>
+                </div>
             </div>
-
-            <div className="cartaoComunicado__meta">
-                <span className="cartaoComunicado__chip">{comunicado.importancia}</span>
-                {comunicado.expira_em ? <span className="cartaoComunicado__expira">Expira: {comunicado.expira_em}</span> : null}
-            </div>
-
-            <p className="cartaoComunicado__texto">
-                Clique para visualizar o comunicado completo.
-            </p>
         </button>
     );
 }

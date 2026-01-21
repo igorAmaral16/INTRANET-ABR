@@ -2,7 +2,11 @@ import { io, Socket } from "socket.io-client";
 
 let socket: Socket | null = null;
 
-const SOCKET_URL = import.meta?.env?.VITE_API_URL || "http://localhost:4000";
+// Em dev com Vite HTTPS + proxy, conecte no mesmo origin (5174)
+// Em produção, você pode definir VITE_SOCKET_URL se precisar apontar para outro host.
+const SOCKET_URL =
+    (import.meta as any)?.env?.VITE_SOCKET_URL ||
+    (typeof window !== "undefined" ? window.location.origin : "http://localhost:5174");
 
 export function connectSocket(token: string) {
     // Se já existe socket, apenas atualiza auth e conecta se necessário
@@ -13,7 +17,7 @@ export function connectSocket(token: string) {
     }
 
     socket = io(SOCKET_URL, {
-        // Evita falhas em ambientes onde websocket puro é bloqueado/intermitente
+        path: "/socket.io", // importante para funcionar com o proxy do Vite
         transports: ["websocket", "polling"],
         auth: { token },
         autoConnect: true,

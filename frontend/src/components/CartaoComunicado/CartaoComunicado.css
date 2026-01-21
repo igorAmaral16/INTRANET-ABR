@@ -2,17 +2,41 @@
     width: 100%;
     text-align: left;
     border-radius: 18px;
-    padding: 16px 16px;
-    border: 1px solid rgba(0, 0, 0, 0.08);
-    background: #fff;
-    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.08);
+    padding: 0;
+    border: 1px solid rgba(11, 18, 32, 0.12);
+    background: rgba(255, 255, 255, 0.94);
+    box-shadow: 0 10px 24px rgba(11, 18, 32, 0.06);
     cursor: pointer;
-    transition: transform 120ms ease, box-shadow 120ms ease;
+    transition: transform 120ms ease, box-shadow 120ms ease, border-color 120ms ease;
+    position: relative;
+    overflow: hidden;
 }
 
 .cartaoComunicado:hover {
     transform: translateY(-1px);
-    box-shadow: 0 16px 38px rgba(0, 0, 0, 0.10);
+    box-shadow: 0 16px 34px rgba(11, 18, 32, 0.10);
+}
+
+.cartaoComunicado:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.14), 0 16px 34px rgba(11, 18, 32, 0.10);
+    border-color: rgba(37, 99, 235, 0.35);
+}
+
+/* Faixa lateral (mais legível que gradiente em luz forte) */
+.cartaoComunicado__accent {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 10px;
+    background: rgba(11, 18, 32, 0.10);
+}
+
+.cartaoComunicado__conteudo {
+    padding: 16px 16px 14px 16px;
+    padding-left: 18px;
+    /* compensar a faixa */
 }
 
 .cartaoComunicado__cabecalho {
@@ -23,17 +47,29 @@
 }
 
 .cartaoComunicado__titulo {
-    font-size: 22px;
+    font-size: 16px;
     margin: 0;
-    line-height: 1.15;
+    line-height: 1.2;
+    font-weight: 950;
+    letter-spacing: -0.1px;
+    color: #0b1220;
+
+    /* Evitar “explodir” o layout */
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 
 .cartaoComunicado__badge {
     font-size: 12px;
-    font-weight: 800;
+    font-weight: 950;
     padding: 6px 10px;
     border-radius: 999px;
-    background: rgba(17, 24, 39, 0.08);
+    border: 1px solid rgba(11, 18, 32, 0.12);
+    background: rgba(11, 18, 32, 0.04);
+    color: #0b1220;
+    white-space: nowrap;
 }
 
 .cartaoComunicado__meta {
@@ -46,34 +82,87 @@
 
 .cartaoComunicado__chip {
     font-size: 12px;
-    font-weight: 800;
+    font-weight: 950;
     padding: 6px 10px;
     border-radius: 999px;
-    border: 1px solid rgba(0, 0, 0, 0.10);
+    border: 1px solid rgba(11, 18, 32, 0.12);
+    background: rgba(11, 18, 32, 0.04);
+    color: #0b1220;
 }
 
 .cartaoComunicado__expira {
     font-size: 12px;
-    opacity: 0.75;
+    opacity: 0.88;
+    color: rgba(11, 18, 32, 0.86);
 }
 
-.cartaoComunicado__texto {
-    margin: 12px 0 0 0;
-    opacity: 0.80;
-    line-height: 1.45;
+.cartaoComunicado__expira--ok {
+    opacity: 0.78;
 }
 
+/* Rodapé do card (CTA discreto e profissional) */
+.cartaoComunicado__rodape {
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(11, 18, 32, 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.cartaoComunicado__cta {
+    font-weight: 950;
+    font-size: 13px;
+    color: rgba(11, 18, 32, 0.92);
+}
+
+.cartaoComunicado__seta {
+    font-weight: 950;
+    font-size: 16px;
+    color: rgba(11, 18, 32, 0.55);
+}
+
+/* Estados por importância: altera a faixa + chip (sem degradê) */
 .cartaoComunicado--importante {
-    background: linear-gradient(180deg, rgba(239, 68, 68, 0.18), rgba(255, 255, 255, 1));
-    border-color: rgba(239, 68, 68, 0.40);
+    border-color: rgba(220, 38, 38, 0.22);
+}
+
+.cartaoComunicado--importante .cartaoComunicado__accent {
+    background: rgba(220, 38, 38, 0.85);
+}
+
+.cartaoComunicado--importante .cartaoComunicado__chip {
+    border-color: rgba(220, 38, 38, 0.25);
+    background: rgba(220, 38, 38, 0.10);
 }
 
 .cartaoComunicado--relevante {
-    background: linear-gradient(180deg, rgba(59, 130, 246, 0.16), rgba(255, 255, 255, 1));
-    border-color: rgba(59, 130, 246, 0.40);
+    border-color: rgba(37, 99, 235, 0.22);
+}
+
+.cartaoComunicado--relevante .cartaoComunicado__accent {
+    background: rgba(37, 99, 235, 0.85);
+}
+
+.cartaoComunicado--relevante .cartaoComunicado__chip {
+    border-color: rgba(37, 99, 235, 0.25);
+    background: rgba(37, 99, 235, 0.10);
 }
 
 .cartaoComunicado--pouco {
-    background: linear-gradient(180deg, rgba(16, 185, 129, 0.10), rgba(255, 255, 255, 1));
-    border-color: rgba(16, 185, 129, 0.28);
+    border-color: rgba(2, 132, 199, 0.18);
+}
+
+.cartaoComunicado--pouco .cartaoComunicado__accent {
+    background: rgba(2, 132, 199, 0.80);
+}
+
+.cartaoComunicado--pouco .cartaoComunicado__chip {
+    border-color: rgba(2, 132, 199, 0.22);
+    background: rgba(2, 132, 199, 0.08);
+}
+
+/* Fixado: reforço sutil (não “grita” em luz forte) */
+.cartaoComunicado--fixado {
+    box-shadow: 0 12px 30px rgba(11, 18, 32, 0.08);
 }

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, useCallback } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { ArrowLeft, MessageSquare, Send, XCircle, Plus, ShieldAlert } from "lucide-react";
 
@@ -14,10 +14,10 @@ import {
     colabFecharConversa,
     type RhCategoria,
     type RhConversationListItem,
-    type RhConversationDetail
+    type RhConversationDetail,
 } from "../api/faleRh.api";
 
-import { connectSocket, disconnectSocket, getSocket } from "../realtime/socketClient";
+import { connectSocket, getSocket } from "../realtime/socketClient";
 import { useNotificacoesRh } from "../contexts/NotificacoesRhContext";
 
 import "./PaginaFaleComRh.css";
@@ -33,8 +33,12 @@ const CATEGORIAS: { value: RhCategoria; label: string; sugestoes: string[] }[] =
     { value: "PONTO", label: "Ponto", sugestoes: ["Ajuste/abono", "Esquecimento de marcação", "Escala", "Outros"] },
     { value: "DOCUMENTOS", label: "Documentos", sugestoes: ["Declarações", "Holerite", "Comprovantes", "Outros"] },
     { value: "PAGAMENTO", label: "Pagamento", sugestoes: ["Data de pagamento", "Diferença", "Adiantamento", "Outros"] },
-    { value: "OUTROS", label: "Outros", sugestoes: ["Geral", "Dúvida diversa"] }
+    { value: "OUTROS", label: "Outros", sugestoes: ["Geral", "Dúvida diversa"] },
 ];
+
+const MSG_RENDER_INITIAL = 60;
+const MSG_RENDER_STEP = 40;
+const MOBILE_MAX_W = 980;
 
 export function PaginaFaleComRh() {
     const navigate = useNavigate();
@@ -58,8 +62,35 @@ export function PaginaFaleComRh() {
     const acListaRef = useRef<AbortController | null>(null);
     const acDetalheRef = useRef<AbortController | null>(null);
 
-    // Controle join/leave de rooms
     const joinedConversationRef = useRef<string | null>(null);
+
+    // Windowing + scroll
+    const msgsRef = useRef<HTMLDivElement | null>(null);
+    const [renderLimit, setRenderLimit] = useState(MSG_RENDER_INITIAL);
+    const pendingKeepScrollRef = useRef<{ prevHeight: number } | null>(null);
+
+    // Mobile navigation (list -> chat)
+    const [isMobile, setIsMobile] = useState<boolean>(() => {
+        if (typeof window === "undefined") return false;
+        return window.innerWidth <= MOBILE_MAX_W;
+    });
+    const [mobileView, setMobileView] = useState<"list" | "chat">("list");
+
+    useEffect(() => {
+        const onResize = () => {
+            const mobile = window.innerWidth <= MOBILE_MAX_W;
+            setIsMobile(mobile);
+            if (!mobile) setMobileView("list");
+        };
+        window.addEventListener("resize", onResize);
+        return () => window.removeEventListener("resize", onResize);
+    }, []);
+
+    const categoriaLabel = useCallback((cat: RhCategoria | string | undefined | null) => {
+        const v = String(cat || "");
+        const found = CATEGORIAS.find((c) => String(c.value) === v);
+        return found?.label || v || "Categoria";
+    }, []);
 
     useEffect(() => {
         if (!estaLogadoColab || !sessao?.token) {
@@ -68,7 +99,6 @@ export function PaginaFaleComRh() {
         }
     }, [estaLogadoColab, sessao?.token, navigate]);
 
-    // GARANTE socket conectado (essencial para realtime + notificações)
     useEffect(() => {
         if (!sessao?.token) return;
         connectSocket(sessao.token);
@@ -82,7 +112,7 @@ export function PaginaFaleComRh() {
 
         try {
             const data = await colabListarConversas({ token: sessao.token }, signal);
-            const items = Array.isArray(data?.items) ? data.items : [];
+            const items = Array.isArray((data as any)?.items) ? ((data as any).items as RhConversationListItem[]) : [];
             items.sort((a, b) => String(a.created_at || "").localeCompare(String(b.created_at || "")));
             setConversas(items);
             setEstado("pronto");
@@ -116,6 +146,19 @@ export function PaginaFaleComRh() {
         joinedConversationRef.current = conversationId;
     }
 
+    const scrollToBottom = useCallback(() => {
+        const el = msgsRef.current;
+        if (!el) return;
+        el.scrollTop = el.scrollHeight;
+    }, []);
+
+    const isNearBottom = useCallback(() => {
+        const el = msgsRef.current;
+        if (!el) return false;
+        const threshold = 140;
+        return el.scrollHeight - el.scrollTop - el.clientHeight < threshold;
+    }, []);
+
     async function abrirConversa(id: string) {
         if (!sessao?.token) return;
 
@@ -125,37 +168,37 @@ export function PaginaFaleComRh() {
 
         setConversaAbertaId(id);
         setDetalhe(null);
+        setRenderLimit(MSG_RENDER_INITIAL);
 
-        // remove notificações dessa conversa ao abrir
         removeConversation(id);
-
-        // entra no room da conversa (tempo real)
         joinConversationRoom(id);
+
+        if (isMobile) setMobileView("chat");
 
         try {
             const data = await colabObterConversa({ token: sessao.token, id }, ac.signal);
             setDetalhe(data);
+            setTimeout(() => scrollToBottom(), 0);
         } catch (e: any) {
             if (isAbortError(e)) return;
             const msgErr = e instanceof ErroHttp ? e.message : e?.message;
             alert(msgErr || "Não foi possível abrir a conversa.");
             setConversaAbertaId(null);
+            if (isMobile) setMobileView("list");
         }
     }
 
-    // Abrir conversa vinda do sino (navigate state)
+    // Abrir conversa vinda do sino
     useEffect(() => {
         const id = (location.state as any)?.openConversationId;
         if (!id) return;
 
         abrirConversa(String(id));
-
-        // limpa o state para não reabrir ao atualizar
         navigate("/fale-com-rh", { replace: true });
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [location.state]);
 
-    // Listeners de tempo real
+    // Realtime listeners
     useEffect(() => {
         const s = getSocket();
         if (!s) return;
@@ -163,21 +206,23 @@ export function PaginaFaleComRh() {
         const onMessage = (payload: any) => {
             const cid = String(payload?.conversationId ?? "");
             if (!cid) return;
+            if (cid !== conversaAbertaId) return;
 
-            // Se a conversa aberta é essa, append na tela
-            if (cid === conversaAbertaId) {
-                const message = payload?.message;
-                if (!message?.id) return;
+            const message = payload?.message;
+            if (!message?.id) return;
 
-                setDetalhe((prev) => {
-                    if (!prev) return prev;
+            const stick = isNearBottom();
 
-                    const exists = (prev.messages || []).some((m: any) => String(m.id) === String(message.id));
-                    if (exists) return prev;
+            setDetalhe((prev) => {
+                if (!prev) return prev;
 
-                    return { ...prev, messages: [...(prev.messages || []), message] };
-                });
-            }
+                const exists = (prev.messages || []).some((m: any) => String(m.id) === String(message.id));
+                if (exists) return prev;
+
+                return { ...prev, messages: [...(prev.messages || []), message] };
+            });
+
+            if (stick) setTimeout(() => scrollToBottom(), 0);
         };
 
         const onConvUpdate = (payload: any) => {
@@ -185,11 +230,8 @@ export function PaginaFaleComRh() {
             if (!cid) return;
 
             const patch = payload?.patch || {};
-            setConversas((prev) =>
-                prev.map((c) => (String(c.id) === cid ? ({ ...c, ...patch } as any) : c))
-            );
+            setConversas((prev) => prev.map((c) => (String(c.id) === cid ? ({ ...c, ...patch } as any) : c)));
 
-            // Se a conversa aberta é essa, atualiza status/last_message também no detalhe
             if (cid === conversaAbertaId) {
                 setDetalhe((prev) => {
                     if (!prev) return prev;
@@ -205,10 +247,54 @@ export function PaginaFaleComRh() {
             s.off("rh:message", onMessage);
             s.off("rh:conversation:update", onConvUpdate);
         };
-    }, [conversaAbertaId]);
+    }, [conversaAbertaId, isNearBottom, scrollToBottom]);
 
-    const conversaAtual = detalhe?.conversation;
+    // Windowing
+    const allMessages = detalhe?.messages || [];
+    const hasMoreToRender = allMessages.length > renderLimit;
+
+    const visibleMessages = useMemo(() => {
+        if (!allMessages.length) return [];
+        if (allMessages.length <= renderLimit) return allMessages;
+        return allMessages.slice(allMessages.length - renderLimit);
+    }, [allMessages, renderLimit]);
+
+    const onScrollMsgs = useCallback(() => {
+        const el = msgsRef.current;
+        if (!el) return;
+        if (!hasMoreToRender) return;
+
+        if (el.scrollTop <= 0) {
+            pendingKeepScrollRef.current = { prevHeight: el.scrollHeight };
+            setRenderLimit((v) => Math.min(allMessages.length, v + MSG_RENDER_STEP));
+        }
+    }, [hasMoreToRender, allMessages.length]);
+
+    useEffect(() => {
+        const keep = pendingKeepScrollRef.current;
+        const el = msgsRef.current;
+        if (!keep || !el) return;
+
+        const newHeight = el.scrollHeight;
+        const delta = newHeight - keep.prevHeight;
+        el.scrollTop = delta;
+        pendingKeepScrollRef.current = null;
+    }, [renderLimit]);
+
+    const conversaAtual = detalhe?.conversation as any;
     const podeEnviar = Boolean(conversaAtual && conversaAtual.status !== "FECHADA");
+
+    // COLAB: título deve ser a Categoria
+    const tituloHeader = useMemo(() => {
+        const cat = (detalhe as any)?.conversation?.categoria;
+        return categoriaLabel(cat);
+    }, [detalhe, categoriaLabel]);
+
+    const subtituloHeader = useMemo(() => {
+        const assuntoConv = String((detalhe as any)?.conversation?.assunto || "(Sem assunto)");
+        const st = String((detalhe as any)?.conversation?.status || "");
+        return `${assuntoConv} • ${st}`;
+    }, [detalhe]);
 
     const sugestoesAssunto = useMemo(() => {
         return CATEGORIAS.find((c) => c.value === categoria)?.sugestoes || [];
@@ -220,7 +306,7 @@ export function PaginaFaleComRh() {
         const body = {
             categoria,
             assunto: assunto.trim(),
-            mensagem: mensagemInicial.trim()
+            mensagem: mensagemInicial.trim(),
         };
 
         if (body.assunto.length < 3) {
@@ -241,8 +327,8 @@ export function PaginaFaleComRh() {
 
             await carregarLista();
 
-            const newId = resp?.conversation?.id;
-            if (newId) abrirConversa(newId);
+            const newId = (resp as any)?.conversation?.id;
+            if (newId) abrirConversa(String(newId));
         } catch (e: any) {
             const msgErr = e instanceof ErroHttp ? e.message : e?.message;
             setErro(msgErr || "Não foi possível criar a conversa.");
@@ -256,14 +342,14 @@ export function PaginaFaleComRh() {
 
         setMsg("");
         try {
-            // Envia para o backend
             await colabEnviarMensagem({ token: sessao.token, id: conversaAbertaId, body: { conteudo: texto } });
 
-            // Fallback de consistência (mantém seu comportamento atual)
+            // fallback
             const data = await colabObterConversa({ token: sessao.token, id: conversaAbertaId });
             setDetalhe(data);
 
             await carregarLista();
+            setTimeout(() => scrollToBottom(), 0);
         } catch (e: any) {
             const msgErr = e instanceof ErroHttp ? e.message : e?.message;
             alert(msgErr || "Não foi possível enviar a mensagem.");
@@ -289,6 +375,129 @@ export function PaginaFaleComRh() {
         }
     }
 
+    const renderLista = (
+        <aside className="card rh__lista">
+            <div className="rh__listaTopo">
+                <div className="rh__listaTitulo">
+                    <MessageSquare size={18} />
+                    Suas conversas
+                </div>
+                <button type="button" className="rh__btnNovo" onClick={() => setModalNova(true)}>
+                    <Plus size={18} /> Nova
+                </button>
+            </div>
+
+            {estado === "carregando" ? <div className="rh__placeholder">Carregando...</div> : null}
+            {estado === "erro" ? <div className="rh__placeholder">Não foi possível carregar.</div> : null}
+
+            {estado === "pronto" && conversas.length === 0 ? (
+                <div className="rh__placeholder">Nenhuma conversa ainda. Clique em “Nova” para iniciar.</div>
+            ) : null}
+
+            {estado === "pronto" && conversas.length > 0 ? (
+                <div className="rh__listaItens">
+                    {conversas.map((c) => (
+                        <button
+                            key={String(c.id)}
+                            type="button"
+                            className={`rh__item ${String(c.id) === String(conversaAbertaId) ? "ativo" : ""}`}
+                            onClick={() => abrirConversa(String(c.id))}
+                        >
+                            <div className="rh__itemTopo">
+                                <div className="rh__badge">{String((c as any).categoria)}</div>
+                                <div className={`rh__status ${String((c as any).status || "").toLowerCase()}`}>{(c as any).status}</div>
+                            </div>
+                            <div className="rh__assunto">{(c as any).assunto || "(Sem assunto)"}</div>
+                            <div className="rh__meta">
+                                Última atualização:{" "}
+                                {String((c as any).last_message_at || (c as any).created_at || "")
+                                    .slice(0, 19)
+                                    .replace("T", " ")}
+                            </div>
+                        </button>
+                    ))}
+                </div>
+            ) : null}
+        </aside>
+    );
+
+    const renderChat = (
+        <section className="card rh__chat">
+            {isMobile ? (
+                <div className="rh__chatMobileTopo">
+                    <button type="button" className="rh__chatMobileVoltar" onClick={() => setMobileView("list")}>
+                        <ArrowLeft size={18} /> Voltar
+                    </button>
+                    <div className="rh__chatMobileTitulo">{tituloHeader}</div>
+                    <div className="rh__chatMobileSpacer" />
+                </div>
+            ) : null}
+
+            {!conversaAbertaId ? (
+                <div className="rh__chatVazio">Selecione uma conversa ao lado, ou crie uma nova.</div>
+            ) : !detalhe ? (
+                <div className="rh__chatVazio">Carregando conversa...</div>
+            ) : (
+                <>
+                    {!isMobile ? (
+                        <div className="rh__chatHeader">
+                            <div>
+                                <div className="rh__chatTitulo">{tituloHeader}</div>
+                                <div className="rh__chatSub">{subtituloHeader}</div>
+                            </div>
+
+                            {(detalhe as any).conversation?.status !== "FECHADA" ? (
+                                <button type="button" className="rh__btnFechar" onClick={fecharConversa}>
+                                    <XCircle size={16} /> Encerrar
+                                </button>
+                            ) : (
+                                <div className="rh__fechadaTag">Conversa encerrada</div>
+                            )}
+                        </div>
+                    ) : null}
+
+                    <div className="rh__msgs" ref={msgsRef} onScroll={onScrollMsgs}>
+                        {hasMoreToRender ? <div className="rh__loadMoreHint">Role para cima para ver mensagens anteriores</div> : null}
+
+                        {visibleMessages.length === 0 ? (
+                            <div className="rh__chatVazio" style={{ minHeight: 120 }}>
+                                Nenhuma mensagem ainda.
+                            </div>
+                        ) : (
+                            visibleMessages.map((m: any) => (
+                                <div key={String(m.id)} className={`rh__msg ${m.sender_role === "COLAB" ? "eu" : "rh"}`}>
+                                    <div className="rh__msgBolha">
+                                        <div className="rh__msgTexto">{m.conteudo}</div>
+                                        <div className="rh__msgMeta">
+                                            {m.sender_role === "COLAB" ? "Você" : "RH"} •{" "}
+                                            {String(m.created_at || "").slice(0, 19).replace("T", " ")}
+                                        </div>
+                                    </div>
+                                </div>
+                            ))
+                        )}
+                    </div>
+
+                    <div className="rh__composer">
+                        <input
+                            value={msg}
+                            onChange={(e) => setMsg(e.target.value)}
+                            placeholder={podeEnviar ? "Digite sua mensagem..." : "Conversa encerrada"}
+                            disabled={!podeEnviar}
+                            onKeyDown={(e) => {
+                                if (e.key === "Enter") enviarMensagem();
+                            }}
+                        />
+                        <button type="button" onClick={enviarMensagem} disabled={!podeEnviar || !msg.trim()}>
+                            <Send size={16} />
+                            Enviar
+                        </button>
+                    </div>
+                </>
+            )}
+        </section>
+    );
+
     return (
         <div className="paginaBase">
             <BarraTopo
@@ -296,19 +505,15 @@ export function PaginaFaleComRh() {
                 aoMudarBusca={() => { }}
                 mostrarBusca={false}
                 aoIrParaInicio={() => navigate("/")}
-
                 estaLogado={Boolean(estaLogadoColab)}
-                role={"COLAB"}  // ou role={sessao?.role} se você tiver aqui
-
+                role={"COLAB"}
                 aoClicarEntrar={() => navigate("/")}
-
                 aoMeuPerfil={() => navigate("/meu-perfil")}
                 aoVerDocumentos={() => navigate("/documentos")}
                 aoFaq={() => navigate("/faq")}
                 aoFaleComRh={() => navigate("/fale-com-rh")}
                 aoSair={sair}
             />
-
 
             <main className="paginaBase__conteudo">
                 <div className="paginaBase__topoInterno">
@@ -326,109 +531,12 @@ export function PaginaFaleComRh() {
                 ) : null}
 
                 <section className="rh__layout">
-                    <aside className="card rh__lista">
-                        <div className="rh__listaTopo">
-                            <div className="rh__listaTitulo">
-                                <MessageSquare size={18} />
-                                Suas conversas
-                            </div>
-                            <button type="button" className="rh__btnNovo" onClick={() => setModalNova(true)}>
-                                <Plus size={18} /> Nova
-                            </button>
-                        </div>
-
-                        {estado === "carregando" ? <div className="rh__placeholder">Carregando...</div> : null}
-                        {estado === "erro" ? <div className="rh__placeholder">Não foi possível carregar.</div> : null}
-
-                        {estado === "pronto" && conversas.length === 0 ? (
-                            <div className="rh__placeholder">Nenhuma conversa ainda. Clique em “Nova” para iniciar.</div>
-                        ) : null}
-
-                        {estado === "pronto" && conversas.length > 0 ? (
-                            <div className="rh__listaItens">
-                                {conversas.map((c) => (
-                                    <button
-                                        key={c.id}
-                                        type="button"
-                                        className={`rh__item ${c.id === conversaAbertaId ? "ativo" : ""}`}
-                                        onClick={() => abrirConversa(c.id)}
-                                    >
-                                        <div className="rh__itemTopo">
-                                            <div className="rh__badge">{String(c.categoria)}</div>
-                                            <div className={`rh__status ${String(c.status || "").toLowerCase()}`}>{c.status}</div>
-                                        </div>
-                                        <div className="rh__assunto">{c.assunto || "(Sem assunto)"}</div>
-                                        <div className="rh__meta">
-                                            Última atualização: {String((c as any).last_message_at || c.created_at || "").slice(0, 19).replace("T", " ")}
-                                        </div>
-                                    </button>
-                                ))}
-                            </div>
-                        ) : null}
-                    </aside>
-
-                    <section className="card rh__chat">
-                        {!conversaAbertaId ? (
-                            <div className="rh__chatVazio">Selecione uma conversa ao lado, ou crie uma nova.</div>
-                        ) : !detalhe ? (
-                            <div className="rh__chatVazio">Carregando conversa...</div>
-                        ) : (
-                            <>
-                                <div className="rh__chatHeader">
-                                    <div>
-                                        <div className="rh__chatTitulo">{detalhe.conversation.assunto || "(Sem assunto)"}</div>
-                                        <div className="rh__chatSub">
-                                            {String(detalhe.conversation.categoria)} • <strong>{detalhe.conversation.status}</strong>
-                                        </div>
-                                    </div>
-
-                                    {detalhe.conversation.status !== "FECHADA" ? (
-                                        <button type="button" className="rh__btnFechar" onClick={fecharConversa}>
-                                            <XCircle size={16} /> Encerrar
-                                        </button>
-                                    ) : (
-                                        <div className="rh__fechadaTag">Conversa encerrada</div>
-                                    )}
-                                </div>
-
-                                <div className="rh__msgs">
-                                    {(detalhe.messages || []).length === 0 ? (
-                                        <div className="rh__chatVazio" style={{ minHeight: 120 }}>
-                                            Nenhuma mensagem ainda.
-                                        </div>
-                                    ) : (
-                                        (detalhe.messages || []).map((m: any) => (
-                                            <div key={m.id} className={`rh__msg ${m.sender_role === "COLAB" ? "eu" : "rh"}`}>
-                                                <div className="rh__msgBolha">
-                                                    <div className="rh__msgTexto">{m.conteudo}</div>
-                                                    <div className="rh__msgMeta">
-                                                        {m.sender_role === "COLAB" ? "Você" : "RH"} •{" "}
-                                                        {String(m.created_at || "").slice(0, 19).replace("T", " ")}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        ))
-                                    )}
-                                </div>
-
-                                <div className="rh__composer">
-                                    <input
-                                        value={msg}
-                                        onChange={(e) => setMsg(e.target.value)}
-                                        placeholder={podeEnviar ? "Digite sua mensagem..." : "Conversa encerrada"}
-                                        disabled={!podeEnviar}
-                                        onKeyDown={(e) => {
-                                            if (e.key === "Enter") enviarMensagem();
-                                        }}
-                                    />
-                                    <button type="button" onClick={enviarMensagem} disabled={!podeEnviar || !msg.trim()}>
-                                        <Send size={16} />
-                                        Enviar
-                                    </button>
-                                </div>
-                            </>
-                        )}
-                    </section>
+                    {isMobile ? (mobileView === "list" ? renderLista : renderChat) : (
+                        <>
+                            {renderLista}
+                            {renderChat}
+                        </>
+                    )}
                 </section>
             </main>
 

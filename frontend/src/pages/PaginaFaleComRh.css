@@ -337,3 +337,56 @@
     color: #b42318;
     font-weight: 900;
 }
+
+/* =========================
+   ADICIONADO (windowing + topo mobile)
+========================= */
+
+.rh__loadMoreHint {
+    text-align: center;
+    font-size: 12px;
+    opacity: 0.75;
+    padding: 6px 0 2px 0;
+}
+
+/* Topo no mobile quando a conversa está aberta */
+.rh__chatMobileTopo {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 12px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+    background: #fff;
+}
+
+.rh__chatMobileVoltar {
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 900;
+}
+
+.rh__chatMobileTitulo {
+    flex: 1;
+    text-align: center;
+    font-weight: 900;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.rh__chatMobileSpacer {
+    width: 72px;
+    /* equilibra o espaço do botão */
+}
+
+/* Em mobile, aumenta a “sensação de tela” pro chat */
+@media (max-width: 980px) {
+    .rh__chat {
+        min-height: calc(100vh - 220px);
+    }
+}

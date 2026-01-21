@@ -18,27 +18,44 @@ type Ctx = {
 
 const NotifCtx = createContext<Ctx | null>(null);
 
+// Normaliza role no FRONT igual ao que você já faz no backend
+const ROLE_ALIASES = {
+    ADMIN: new Set(["ADMIN", "ADMINISTRACAO", "ADMINISTRATIVO"]),
+    COLAB: new Set(["COLAB", "COLABORADOR", "COLABORADORES"]),
+};
+
+function normalizeRole(roleRaw?: string | null): "COLAB" | "ADMIN" | null {
+    const r = String(roleRaw || "").toUpperCase();
+    if (ROLE_ALIASES.ADMIN.has(r)) return "ADMIN";
+    if (ROLE_ALIASES.COLAB.has(r)) return "COLAB";
+    return null;
+}
+
 export function NotificacoesRhProvider({
     children,
     role,
     token,
 }: {
     children: React.ReactNode;
-    role?: "COLAB" | "ADMIN" | null;
+    role?: string | null; // <- aceitar string para não travar em literal
     token?: string | null;
 }) {
     const [items, setItems] = useState<RhNotif[]>([]);
+    const roleNorm = normalizeRole(role);
 
-    // Se token vier do App root, garante socket ativo mesmo fora da página do chat
+    // garante socket ativo quando tiver token
     useEffect(() => {
         if (!token) return;
         connectSocket(token);
     }, [token]);
 
     useEffect(() => {
-        if (role !== "COLAB") return;
+        // Somente COLAB recebe notificação (como você definiu)
+        if (roleNorm !== "COLAB") return;
+        if (!token) return;
 
-        const s = getSocket();
+        // garante que existe socket mesmo se ele ainda não existia
+        const s = getSocket() || connectSocket(token);
         if (!s) return;
 
         const onNotify = (p: any) => {
@@ -57,7 +74,7 @@ export function NotificacoesRhProvider({
         return () => {
             s.off("rh:notify", onNotify);
         };
-    }, [role]);
+    }, [roleNorm, token]);
 
     const value = useMemo<Ctx>(() => {
         return {

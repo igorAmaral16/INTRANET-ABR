@@ -1,5 +1,5 @@
 import { BrowserRouter, Route, Routes, useNavigate } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 
 import { PaginaComunicados } from "./pages/PaginaComunicados";
 import { PaginaMeuPerfil } from "./pages/PaginaMeuPerfil";
@@ -19,6 +19,13 @@ import { useSessaoAuth } from "./hooks/useSessaoAuth";
 import { useSocketAuth } from "./hooks/useSocketAuth";
 import { NotificacoesRhProvider } from "./contexts/NotificacoesRhContext";
 
+function normalizeRole(roleRaw) {
+  const r = String(roleRaw || "").toUpperCase();
+  if (["ADMIN", "ADMINISTRACAO", "ADMINISTRATIVO"].includes(r)) return "ADMIN";
+  if (["COLAB", "COLABORADOR", "COLABORADORES"].includes(r)) return "COLAB";
+  return null;
+}
+
 function AuthListener() {
   const { sair } = useSessaoAuth();
   const navigate = useNavigate();
@@ -27,7 +34,9 @@ function AuthListener() {
     const onLogout = (ev) => {
       sair();
       navigate("/", { replace: true });
-      const msg = ev?.detail?.message || "Sua sessão expirou. Faça login novamente para continuar.";
+      const msg =
+        ev?.detail?.message ||
+        "Sua sessão expirou. Faça login novamente para continuar.";
       alert(msg);
     };
 
@@ -41,11 +50,13 @@ function AuthListener() {
 function AppInner() {
   const { sessao } = useSessaoAuth();
 
+  const roleNormalizada = useMemo(() => normalizeRole(sessao?.role), [sessao?.role]);
+
   // Conecta/desconecta o socket conforme o token
   useSocketAuth(sessao?.token);
 
   return (
-    <NotificacoesRhProvider role={sessao?.role}>
+    <NotificacoesRhProvider role={roleNormalizada} token={sessao?.token}>
       <AuthListener />
       <Routes>
         {/* COLAB */}
