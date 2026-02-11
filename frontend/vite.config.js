@@ -7,15 +7,14 @@ const certDir = path.resolve(__dirname, "certs");
 const keyPath = path.join(certDir, "lan-key.pem");
 const certPath = path.join(certDir, "lan.pem");
 
-// ajuste se seu IP mudar
 const BACKEND_HOST = "10.0.0.48";
-const BACKEND_PORT = 5051;
+const BACKEND_PORT = 5053;
 
 export default defineConfig({
   plugins: [react()],
   server: {
     host: true,
-    port: 5174,
+    port: 5175,
     strictPort: true,
     https: {
       key: fs.readFileSync(keyPath),

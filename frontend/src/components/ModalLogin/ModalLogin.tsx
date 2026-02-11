@@ -93,7 +93,7 @@ export function ModalLogin({ aberto, tipo, aoFechar, aoSucesso, aoEsqueciSenha }
                         <input
                             value={usuario}
                             onChange={(e) => setUsuario(e.target.value)}
-                            placeholder="Ex.: MaraRH"
+                            placeholder="Ex.: Admin"
                             autoComplete="username"
                         />
                     </label>

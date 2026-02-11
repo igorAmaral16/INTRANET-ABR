@@ -108,14 +108,14 @@ export async function fetchRelatorioData({ fromYmd, toYmd }) {
     );
     const totalConfirmacoesCriticosPeriod = Number(totalConfirmacoesCriticosRows?.[0]?.total || 0);
 
-    // 4) Temas mais frequentes no “Fale com o RH”
+    // 4) Categorias mais frequentes no "Fale com o RH"
     let temasRows = [];
     try {
         const [rows] = await pool.query(
-            `SELECT tema, COUNT(*) AS total
-       FROM FaleComRhMensagens
+            `SELECT categoria AS tema, COUNT(*) AS total
+       FROM rh_conversations
        WHERE DATE(created_at) BETWEEN :from AND :to
-       GROUP BY tema
+       GROUP BY categoria
        ORDER BY total DESC
        LIMIT 10`,
             { from: fromYmd, to: toYmd }

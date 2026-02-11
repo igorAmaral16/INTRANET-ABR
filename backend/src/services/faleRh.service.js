@@ -29,7 +29,6 @@ function toLimitOffset(page, pageSize) {
 }
 
 function newUuid() {
-    // Node 18+ possui crypto.randomUUID
     return crypto.randomUUID();
 }
 
