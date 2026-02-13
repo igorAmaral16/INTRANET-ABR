@@ -10,6 +10,7 @@ ehthumbs.db
 Thumbs.db
 banco_intranet.sql
 uploads/
+scripts/
 
 # Editor / IDE
 .vscode/*
