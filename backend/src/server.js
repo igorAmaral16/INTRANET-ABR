@@ -15,7 +15,7 @@ async function start() {
     initSocket(server);
 
     const HOST = env.HOST || "0.0.0.0";
-    const PORT = Number(env.PORT) || 5051;
+    const PORT = Number(env.PORT) || 5053;
 
     server.listen(PORT, HOST, () => {
         logger.info({ host: HOST, port: PORT, nodeEnv: env.NODE_ENV }, "API listening");
