@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Inbox, Send, ShieldAlert, CheckCircle2, XCircle } from "lucide-react";
 
@@ -49,6 +49,13 @@ type RealtimeConvUpdatePayload = {
 function isAbortError(e: unknown): boolean {
     const err = e as any;
     return err?.name === "AbortError" || String(err?.message || "").toLowerCase().includes("abort");
+}
+
+function formatDateShort(d?: string | null) {
+    if (!d) return "";
+    const date = new Date(d);
+    if (Number.isNaN(date.getTime())) return String(d).slice(0, 19).replace("T", " ");
+    return date.toLocaleString(undefined, { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" });
 }
 
 export function PaginaAdminFaleRh() {
@@ -102,6 +109,7 @@ export function PaginaAdminFaleRh() {
     useEffect(() => {
         if (!sessao?.token) return;
         connectSocket(sessao.token);
+        // disconnect on unmount handled elsewhere or by logout
     }, [sessao?.token]);
 
     const carregarLista = useCallback(
@@ -114,7 +122,12 @@ export function PaginaAdminFaleRh() {
             try {
                 const data = await adminListarConversas({ token: sessao.token, status }, signal);
                 const items = Array.isArray((data as any)?.items) ? ((data as any).items as RhConversationListItem[]) : [];
-                items.sort((a, b) => String(a.created_at || "").localeCompare(String(b.created_at || "")));
+                // ordena por última atualização (mais recente primeiro)
+                items.sort((a, b) => {
+                    const aTime = String(a.last_message_at || a.created_at || "");
+                    const bTime = String(b.last_message_at || b.created_at || "");
+                    return bTime.localeCompare(aTime);
+                });
                 setConversas(items);
                 setEstado("pronto");
             } catch (e: unknown) {
@@ -365,150 +378,20 @@ export function PaginaAdminFaleRh() {
         return "Fechadas";
     }, [status]);
 
-    const renderLista = (
-        <aside className="card rhAdm__lista">
-            <div className="rhAdm__listaTopo">
-                <div className="rhAdm__listaTitulo">
-                    <Inbox size={18} /> Inbox — {tituloLateral}
-                </div>
+    const handleLogout = () => {
+        // Desconectar socket e sair
+        disconnectSocket();
+        sair();
+        navigate("/", { replace: true });
+    };
 
-                <select
-                    value={status}
-                    onChange={(e) => {
-                        setStatus(e.target.value as RhStatus);
-                        setConversaId(null);
-                        setDetalhe(null);
-                        setMobileView("list");
-                    }}
-                >
-                    <option value="PENDENTE">Pendentes</option>
-                    <option value="ABERTA">Abertas</option>
-                    <option value="FECHADA">Fechadas</option>
-                </select>
-            </div>
-
-            {estado === "carregando" ? <div className="rhAdm__placeholder">Carregando...</div> : null}
-            {estado === "erro" ? <div className="rhAdm__placeholder">Falha ao carregar.</div> : null}
-
-            {estado === "pronto" && conversas.length === 0 ? (
-                <div className="rhAdm__placeholder">Nenhuma conversa nesta fila.</div>
-            ) : null}
-
-            {estado === "pronto" && conversas.length > 0 ? (
-                <div className="rhAdm__listaItens">
-                    {conversas.map((c) => (
-                        <button
-                            key={String(c.id)}
-                            type="button"
-                            className={`rhAdm__item ${String(c.id) === String(conversaId) ? "ativo" : ""}`}
-                            onClick={() => abrirConversa(String(c.id))}
-                        >
-                            <div className="rhAdm__itemTopo">
-                                <div className="rhAdm__badge">{String((c as any).categoria)}</div>
-                                <div className={`rhAdm__status ${String((c as any).status).toLowerCase()}`}>{(c as any).status}</div>
-                            </div>
-                            <div className="rhAdm__assunto">{(c as any).assunto || "(Sem assunto)"}</div>
-                            <div className="rhAdm__meta">
-                                {(c as any).colaborador_matricula ? `Matrícula: ${(c as any).colaborador_matricula}` : "Colaborador"}
-                                {(c as any).colaborador_nome ? ` • ${(c as any).colaborador_nome}` : ""}
-                            </div>
-                        </button>
-                    ))}
-                </div>
-            ) : null}
-        </aside>
-    );
-
-    const renderChat = (
-        <section className="card rhAdm__chat">
-            {isMobile ? (
-                <div className="rhAdm__chatMobileTopo">
-                    <button type="button" className="rhAdm__chatMobileVoltar" onClick={() => setMobileView("list")}>
-                        <ArrowLeft size={18} /> Voltar
-                    </button>
-                    <div className="rhAdm__chatMobileTitulo">{tituloHeader}</div>
-                    <div className="rhAdm__chatMobileSpacer" />
-                </div>
-            ) : null}
-
-            {!conversaId ? (
-                <div className="rhAdm__chatVazio">Selecione uma conversa ao lado.</div>
-            ) : !detalhe ? (
-                <div className="rhAdm__chatVazio">Carregando conversa...</div>
-            ) : (
-                <>
-                    {!isMobile ? (
-                        <div className="rhAdm__chatHeader">
-                            <div>
-                                <div className="rhAdm__chatTitulo">{tituloHeader}</div>
-                                <div className="rhAdm__chatSub">{subtituloHeader}</div>
-                            </div>
-
-                            <div className="rhAdm__acoes">
-                                {(detalhe as any)?.conversation?.status === "PENDENTE" ? (
-                                    <button type="button" className="rhAdm__btnAceitar" onClick={aceitar}>
-                                        <CheckCircle2 size={16} /> Aceitar
-                                    </button>
-                                ) : null}
-
-                                {(detalhe as any)?.conversation?.status !== "FECHADA" ? (
-                                    <button type="button" className="rhAdm__btnFechar" onClick={fechar}>
-                                        <XCircle size={16} /> Encerrar
-                                    </button>
-                                ) : (
-                                    <div className="rhAdm__fechadaTag">Encerrada</div>
-                                )}
-                            </div>
-                        </div>
-                    ) : null}
-
-                    <div className="rhAdm__msgs" ref={msgsRef} onScroll={onScrollMsgs}>
-                        {hasMoreToRender ? <div className="rhAdm__loadMoreHint">Role para cima para ver mensagens anteriores</div> : null}
-
-                        {visibleMessages.length === 0 ? (
-                            <div className="rhAdm__chatVazio" style={{ minHeight: 120 }}>
-                                Nenhuma mensagem ainda.
-                            </div>
-                        ) : (
-                            visibleMessages.map((m: any) => (
-                                <div key={String(m.id)} className={`rhAdm__msg ${m.sender_role === "ADMIN" ? "eu" : "colab"}`}>
-                                    <div className="rhAdm__msgBolha">
-                                        <div className="rhAdm__msgTexto">{m.conteudo}</div>
-                                        <div className="rhAdm__msgMeta">
-                                            {m.sender_role === "ADMIN" ? "RH" : rotuloColaborador.nome} •{" "}
-                                            {String(m.created_at || "").slice(0, 19).replace("T", " ")}
-                                        </div>
-                                    </div>
-                                </div>
-                            ))
-                        )}
-                    </div>
-
-                    <div className="rhAdm__composer">
-                        <input
-                            value={msg}
-                            onChange={(e) => setMsg(e.target.value)}
-                            placeholder={
-                                podeResponder
-                                    ? "Digite sua resposta..."
-                                    : (detalhe as any).conversation?.status === "PENDENTE"
-                                        ? "Aceite a conversa para responder."
-                                        : "Conversa encerrada"
-                            }
-                            disabled={!podeResponder}
-                            onKeyDown={(e) => {
-                                if (e.key === "Enter") enviar();
-                            }}
-                        />
-                        <button type="button" onClick={enviar} disabled={!podeResponder || !msg.trim()}>
-                            <Send size={16} />
-                            Enviar
-                        </button>
-                    </div>
-                </>
-            )}
-        </section>
-    );
+    // keyboard shortcuts: Enter envia; Shift+Enter nova linha
+    const onComposerKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === "Enter" && !e.shiftKey) {
+            e.preventDefault();
+            enviar();
+        }
+    };
 
     return (
         <div className="paginaBase">
@@ -526,11 +409,7 @@ export function PaginaAdminFaleRh() {
                 aoAdminFaq={() => navigate("/admin/faq")}
                 aoAdminFaleComRh={() => navigate("/admin/fale-com-rh")}
                 aoAdminRelatorios={() => navigate("/admin/relatorios")}
-                aoSair={() => {
-                    disconnectSocket();
-                    sair();
-                    navigate("/", { replace: true });
-                }}
+                aoSair={handleLogout}
             />
 
             <main className="paginaBase__conteudo">
@@ -542,17 +421,276 @@ export function PaginaAdminFaleRh() {
                 </div>
 
                 {erro ? (
-                    <div className="rhAdm__alert card cardErro">
+                    <div className="rhAdm__alert card cardErro" role="alert">
                         <ShieldAlert size={18} />
                         <div>{erro}</div>
                     </div>
                 ) : null}
 
                 <section className="rhAdm__layout">
-                    {isMobile ? (mobileView === "list" ? renderLista : renderChat) : (
+                    {isMobile ? (mobileView === "list" ? (
+                        // Lista mobile
+                        <aside className="card rhAdm__lista">
+                            <div className="rhAdm__listaTopo">
+                                <div className="rhAdm__listaTitulo"><Inbox size={18} /> Inbox — {tituloLateral}</div>
+                                <select
+                                    value={status}
+                                    onChange={(e) => {
+                                        setStatus(e.target.value as RhStatus);
+                                        setConversaId(null);
+                                        setDetalhe(null);
+                                        setMobileView("list");
+                                    }}
+                                >
+                                    <option value="PENDENTE">Pendentes</option>
+                                    <option value="ABERTA">Abertas</option>
+                                    <option value="FECHADA">Fechadas</option>
+                                </select>
+                            </div>
+
+                            {estado === "carregando" ? <div className="rhAdm__placeholder">Carregando...</div> : null}
+                            {estado === "erro" ? <div className="rhAdm__placeholder">Falha ao carregar.</div> : null}
+
+                            {estado === "pronto" && conversas.length === 0 ? (
+                                <div className="rhAdm__placeholder">Nenhuma conversa nesta fila.</div>
+                            ) : null}
+
+                            {estado === "pronto" && conversas.length > 0 ? (
+                                <div className="rhAdm__listaItens">
+                                    {conversas.map((c) => (
+                                        <button
+                                            key={String(c.id)}
+                                            type="button"
+                                            className={`rhAdm__item ${String(c.id) === String(conversaId) ? "ativo" : ""}`}
+                                            onClick={() => abrirConversa(String(c.id))}
+                                        >
+                                            <div className="rhAdm__itemTopo">
+                                                <div className="rhAdm__badge">{String((c as any).categoria)}</div>
+                                                <div className={`rhAdm__status ${String((c as any).status).toLowerCase()}`}>{(c as any).status}</div>
+                                            </div>
+                                            <div className="rhAdm__assunto">{(c as any).assunto || "(Sem assunto)"}</div>
+                                            <div className="rhAdm__meta">
+                                                {(c as any).colaborador_matricula ? `Matrícula: ${(c as any).colaborador_matricula}` : "Colaborador"}
+                                                {(c as any).colaborador_nome ? ` • ${(c as any).colaborador_nome}` : ""}
+                                            </div>
+                                        </button>
+                                    ))}
+                                </div>
+                            ) : null}
+                        </aside>
+                    ) : (
+                        // Chat mobile (quando aberto)
+                        <section className="card rhAdm__chat">
+                            <div className="rhAdm__chatMobileTopo">
+                                <button type="button" className="rhAdm__chatMobileVoltar" onClick={() => setMobileView("list")}>
+                                    <ArrowLeft size={18} /> Voltar
+                                </button>
+                                <div className="rhAdm__chatMobileTitulo">{tituloHeader}</div>
+                                <div className="rhAdm__chatMobileSpacer" />
+                            </div>
+
+                            {!conversaId ? (
+                                <div className="rhAdm__chatVazio">Selecione uma conversa ao lado.</div>
+                            ) : !detalhe ? (
+                                <div className="rhAdm__chatVazio">Carregando conversa...</div>
+                            ) : (
+                                <>
+                                    {!isMobile ? null : (
+                                        <div className="rhAdm__chatHeader">
+                                            <div>
+                                                <div className="rhAdm__chatTitulo">{tituloHeader}</div>
+                                                <div className="rhAdm__chatSub">{subtituloHeader}</div>
+                                            </div>
+                                            <div className="rhAdm__acoes">
+                                                {(detalhe as any)?.conversation?.status === "PENDENTE" ? (
+                                                    <button type="button" className="rhAdm__btnAceitar" onClick={aceitar}>
+                                                        <CheckCircle2 size={16} /> Aceitar
+                                                    </button>
+                                                ) : null}
+
+                                                {(detalhe as any)?.conversation?.status !== "FECHADA" ? (
+                                                    <button type="button" className="rhAdm__btnFechar" onClick={fechar}>
+                                                        <XCircle size={16} /> Encerrar
+                                                    </button>
+                                                ) : (
+                                                    <div className="rhAdm__fechadaTag">Encerrada</div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    <div className="rhAdm__msgs" ref={msgsRef} onScroll={onScrollMsgs}>
+                                        {hasMoreToRender ? <div className="rhAdm__loadMoreHint">Role para cima para ver mensagens anteriores</div> : null}
+
+                                        {visibleMessages.length === 0 ? (
+                                            <div className="rhAdm__chatVazio" style={{ minHeight: 120 }}>
+                                                Nenhuma mensagem ainda.
+                                            </div>
+                                        ) : (
+                                            visibleMessages.map((m: any) => (
+                                                <div key={String(m.id)} className={`rhAdm__msg ${m.sender_role === "ADMIN" ? "eu" : "colab"}`}>
+                                                    <div className="rhAdm__msgAvatar"><div className="rhAdm__avatarCircle">{m.sender_role === "ADMIN" ? "RH" : "C"}</div></div>
+                                                    <div className="rhAdm__msgBolha">
+                                                        <div className="rhAdm__msgTexto">{m.conteudo}</div>
+                                                        <div className="rhAdm__msgMeta">
+                                                            {m.sender_role === "ADMIN" ? "RH" : rotuloColaborador.nome} • {formatDateShort(m.created_at)}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            ))
+                                        )}
+                                    </div>
+
+                                    <div className="rhAdm__composer">
+                                        <input
+                                            value={msg}
+                                            onChange={(e) => setMsg(e.target.value)}
+                                            placeholder={
+                                                podeResponder
+                                                    ? "Digite sua resposta..."
+                                                    : (detalhe as any).conversation?.status === "PENDENTE"
+                                                        ? "Aceite a conversa para responder."
+                                                        : "Conversa encerrada"
+                                            }
+                                            disabled={!podeResponder}
+                                            onKeyDown={onComposerKeyDown}
+                                        />
+                                        <button type="button" onClick={enviar} disabled={!podeResponder || !msg.trim()}>
+                                            <Send size={16} /> Enviar
+                                        </button>
+                                    </div>
+                                </>
+                            )}
+                        </section>
+                    )) : (
+                        // Desktop: lista + chat lado a lado
                         <>
-                            {renderLista}
-                            {renderChat}
+                            {/* Lateral */}
+                            <aside className="card rhAdm__lista">
+                                <div className="rhAdm__listaTopo">
+                                    <div className="rhAdm__listaTitulo"><Inbox size={18} /> Inbox — {tituloLateral}</div>
+
+                                    <select
+                                        value={status}
+                                        onChange={(e) => {
+                                            setStatus(e.target.value as RhStatus);
+                                            setConversaId(null);
+                                            setDetalhe(null);
+                                            setMobileView("list");
+                                        }}
+                                    >
+                                        <option value="PENDENTE">Pendentes</option>
+                                        <option value="ABERTA">Abertas</option>
+                                        <option value="FECHADA">Fechadas</option>
+                                    </select>
+                                </div>
+
+                                {estado === "carregando" ? <div className="rhAdm__placeholder">Carregando...</div> : null}
+                                {estado === "erro" ? <div className="rhAdm__placeholder">Falha ao carregar.</div> : null}
+
+                                {estado === "pronto" && conversas.length === 0 ? (
+                                    <div className="rhAdm__placeholder">Nenhuma conversa nesta fila.</div>
+                                ) : null}
+
+                                {estado === "pronto" && conversas.length > 0 ? (
+                                    <div className="rhAdm__listaItens">
+                                        {conversas.map((c) => (
+                                            <button
+                                                key={String(c.id)}
+                                                type="button"
+                                                className={`rhAdm__item ${String(c.id) === String(conversaId) ? "ativo" : ""}`}
+                                                onClick={() => abrirConversa(String(c.id))}
+                                            >
+                                                <div className="rhAdm__itemTopo">
+                                                    <div className="rhAdm__badge">{String((c as any).categoria)}</div>
+                                                    <div className={`rhAdm__status ${String((c as any).status).toLowerCase()}`}>{(c as any).status}</div>
+                                                </div>
+                                                <div className="rhAdm__assunto">{(c as any).assunto || "(Sem assunto)"}</div>
+                                                <div className="rhAdm__meta">
+                                                    {(c as any).colaborador_matricula ? `Matrícula: ${(c as any).colaborador_matricula}` : "Colaborador"}
+                                                    {(c as any).colaborador_nome ? ` • ${(c as any).colaborador_nome}` : ""}
+                                                </div>
+                                            </button>
+                                        ))}
+                                    </div>
+                                ) : null}
+                            </aside>
+
+                            {/* Chat */}
+                            <section className="card rhAdm__chat">
+                                {!conversaId ? (
+                                    <div className="rhAdm__chatVazio">Selecione uma conversa ao lado.</div>
+                                ) : !detalhe ? (
+                                    <div className="rhAdm__chatVazio">Carregando conversa...</div>
+                                ) : (
+                                    <>
+                                        <div className="rhAdm__chatHeader">
+                                            <div>
+                                                <div className="rhAdm__chatTitulo">{tituloHeader}</div>
+                                                <div className="rhAdm__chatSub">{subtituloHeader}</div>
+                                            </div>
+
+                                            <div className="rhAdm__acoes">
+                                                {(detalhe as any)?.conversation?.status === "PENDENTE" ? (
+                                                    <button type="button" className="rhAdm__btnAceitar" onClick={aceitar}>
+                                                        <CheckCircle2 size={16} /> Aceitar
+                                                    </button>
+                                                ) : null}
+
+                                                {(detalhe as any)?.conversation?.status !== "FECHADA" ? (
+                                                    <button type="button" className="rhAdm__btnFechar" onClick={fechar}>
+                                                        <XCircle size={16} /> Encerrar
+                                                    </button>
+                                                ) : (
+                                                    <div className="rhAdm__fechadaTag">Encerrada</div>
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        <div className="rhAdm__msgs" ref={msgsRef} onScroll={onScrollMsgs}>
+                                            {hasMoreToRender ? <div className="rhAdm__loadMoreHint">Role para cima para ver mensagens anteriores</div> : null}
+
+                                            {visibleMessages.length === 0 ? (
+                                                <div className="rhAdm__chatVazio" style={{ minHeight: 120 }}>
+                                                    Nenhuma mensagem ainda.
+                                                </div>
+                                            ) : (
+                                                visibleMessages.map((m: any) => (
+                                                    <div key={String(m.id)} className={`rhAdm__msg ${m.sender_role === "ADMIN" ? "eu" : "colab"}`}>
+                                                        <div className="rhAdm__msgAvatar"><div className="rhAdm__avatarCircle">{m.sender_role === "ADMIN" ? "RH" : "C"}</div></div>
+                                                        <div className="rhAdm__msgBolha">
+                                                            <div className="rhAdm__msgTexto">{m.conteudo}</div>
+                                                            <div className="rhAdm__msgMeta">
+                                                                {m.sender_role === "ADMIN" ? "RH" : rotuloColaborador.nome} • {formatDateShort(m.created_at)}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                ))
+                                            )}
+                                        </div>
+
+                                        <div className="rhAdm__composer">
+                                            <input
+                                                value={msg}
+                                                onChange={(e) => setMsg(e.target.value)}
+                                                placeholder={
+                                                    podeResponder
+                                                        ? "Digite sua resposta..."
+                                                        : (detalhe as any).conversation?.status === "PENDENTE"
+                                                            ? "Aceite a conversa para responder."
+                                                            : "Conversa encerrada"
+                                                }
+                                                disabled={!podeResponder}
+                                                onKeyDown={onComposerKeyDown}
+                                            />
+                                            <button type="button" onClick={enviar} disabled={!podeResponder || !msg.trim()}>
+                                                <Send size={16} />
+                                                Enviar
+                                            </button>
+                                        </div>
+                                    </>
+                                )}
+                            </section>
                         </>
                     )}
                 </section>

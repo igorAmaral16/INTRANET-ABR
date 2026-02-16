@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, useCallback } from "react";
+import React, { useEffect, useMemo, useRef, useState, useCallback } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { ArrowLeft, MessageSquare, Send, XCircle, Plus, ShieldAlert } from "lucide-react";
 
@@ -39,6 +39,14 @@ const CATEGORIAS: { value: RhCategoria; label: string; sugestoes: string[] }[] =
 const MSG_RENDER_INITIAL = 60;
 const MSG_RENDER_STEP = 40;
 const MOBILE_MAX_W = 980;
+
+function formatDateShort(d?: string | null) {
+    if (!d) return "";
+    const date = new Date(d);
+    if (Number.isNaN(date.getTime())) return String(d).slice(0, 19).replace("T", " ");
+    // exemplo: 12/02 14:32
+    return date.toLocaleString(undefined, { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" });
+}
 
 export function PaginaFaleComRh() {
     const navigate = useNavigate();
@@ -113,7 +121,12 @@ export function PaginaFaleComRh() {
         try {
             const data = await colabListarConversas({ token: sessao.token }, signal);
             const items = Array.isArray((data as any)?.items) ? ((data as any).items as RhConversationListItem[]) : [];
-            items.sort((a, b) => String(a.created_at || "").localeCompare(String(b.created_at || "")));
+            // ordena pela última atualização (mais recente por cima)
+            items.sort((a, b) => {
+                const aTime = String(a.last_message_at || a.created_at || "");
+                const bTime = String(b.last_message_at || b.created_at || "");
+                return bTime.localeCompare(aTime);
+            });
             setConversas(items);
             setEstado("pronto");
         } catch (e: any) {
@@ -240,12 +253,22 @@ export function PaginaFaleComRh() {
             }
         };
 
+        const onTyping = (payload: any) => {
+            // Exemplo: payload = { conversationId, typing: boolean }
+            const cid = String(payload?.conversationId ?? "");
+            if (!cid || cid !== conversaAbertaId) return;
+            // poderia setar um estado typingIndicator aqui; por simplicidade deixamos um pequeno efeito visual
+            // (uma melhoria possível: setTyping(true) e limpar após timeout)
+        };
+
         s.on("rh:message", onMessage);
         s.on("rh:conversation:update", onConvUpdate);
+        s.on("rh:typing", onTyping);
 
         return () => {
             s.off("rh:message", onMessage);
             s.off("rh:conversation:update", onConvUpdate);
+            s.off("rh:typing", onTyping);
         };
     }, [conversaAbertaId, isNearBottom, scrollToBottom]);
 
@@ -344,7 +367,7 @@ export function PaginaFaleComRh() {
         try {
             await colabEnviarMensagem({ token: sessao.token, id: conversaAbertaId, body: { conteudo: texto } });
 
-            // fallback
+            // fallback: recarrega detalhe (mantém consistência)
             const data = await colabObterConversa({ token: sessao.token, id: conversaAbertaId });
             setDetalhe(data);
 
@@ -375,14 +398,42 @@ export function PaginaFaleComRh() {
         }
     }
 
+    // handlers tipados (corrige erro TS "implicit any")
+    const handleAssuntoChange = (e: React.ChangeEvent<HTMLInputElement>) => setAssunto(e.target.value);
+    const handleCategoriaChange = (e: React.ChangeEvent<HTMLSelectElement>) => setCategoria(e.target.value as RhCategoria);
+    const handleMensagemInicialChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => setMensagemInicial(e.target.value);
+    const handleMsgChange = (e: React.ChangeEvent<HTMLInputElement>) => setMsg(e.target.value);
+
+    const onComposerKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        // Enter envia; Shift+Enter cria nova linha
+        if (e.key === "Enter" && !e.shiftKey) {
+            e.preventDefault();
+            enviarMensagem();
+        }
+    };
+
+    const onNovaKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+        if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
+            // Ctrl/Cmd + Enter cria conversa
+            e.preventDefault();
+            criarConversa();
+        }
+    };
+
+    // Render lateral (lista)
     const renderLista = (
-        <aside className="card rh__lista">
+        <aside className="card rh__lista" aria-label="Lista de conversas">
             <div className="rh__listaTopo">
                 <div className="rh__listaTitulo">
                     <MessageSquare size={18} />
                     Suas conversas
                 </div>
-                <button type="button" className="rh__btnNovo" onClick={() => setModalNova(true)}>
+                <button
+                    type="button"
+                    className="rh__btnNovo"
+                    onClick={() => setModalNova(true)}
+                    aria-label="Nova conversa"
+                >
                     <Plus size={18} /> Nova
                 </button>
             </div>
@@ -396,33 +447,35 @@ export function PaginaFaleComRh() {
 
             {estado === "pronto" && conversas.length > 0 ? (
                 <div className="rh__listaItens">
-                    {conversas.map((c) => (
-                        <button
-                            key={String(c.id)}
-                            type="button"
-                            className={`rh__item ${String(c.id) === String(conversaAbertaId) ? "ativo" : ""}`}
-                            onClick={() => abrirConversa(String(c.id))}
-                        >
-                            <div className="rh__itemTopo">
-                                <div className="rh__badge">{String((c as any).categoria)}</div>
-                                <div className={`rh__status ${String((c as any).status || "").toLowerCase()}`}>{(c as any).status}</div>
-                            </div>
-                            <div className="rh__assunto">{(c as any).assunto || "(Sem assunto)"}</div>
-                            <div className="rh__meta">
-                                Última atualização:{" "}
-                                {String((c as any).last_message_at || (c as any).created_at || "")
-                                    .slice(0, 19)
-                                    .replace("T", " ")}
-                            </div>
-                        </button>
-                    ))}
+                    {conversas.map((c) => {
+                        const last = String((c as any).last_message_at || (c as any).created_at || "");
+                        return (
+                            <button
+                                key={String(c.id)}
+                                type="button"
+                                className={`rh__item ${String(c.id) === String(conversaAbertaId) ? "ativo" : ""}`}
+                                onClick={() => abrirConversa(String(c.id))}
+                                aria-current={String(c.id) === String(conversaAbertaId)}
+                            >
+                                <div className="rh__itemTopo">
+                                    <div className="rh__badge">{String((c as any).categoria)}</div>
+                                    <div className={`rh__status ${String((c as any).status || "").toLowerCase()}`}>{(c as any).status}</div>
+                                </div>
+                                <div className="rh__assunto">{(c as any).assunto || "(Sem assunto)"}</div>
+                                <div className="rh__meta">
+                                    Última: {formatDateShort(last)}
+                                </div>
+                            </button>
+                        );
+                    })}
                 </div>
             ) : null}
         </aside>
     );
 
+    // Render do chat (mensagens)
     const renderChat = (
-        <section className="card rh__chat">
+        <section className="card rh__chat" aria-live="polite">
             {isMobile ? (
                 <div className="rh__chatMobileTopo">
                     <button type="button" className="rh__chatMobileVoltar" onClick={() => setMobileView("list")}>
@@ -440,23 +493,25 @@ export function PaginaFaleComRh() {
             ) : (
                 <>
                     {!isMobile ? (
-                        <div className="rh__chatHeader">
+                        <div className="rh__chatHeader" role="region" aria-label="header da conversa">
                             <div>
                                 <div className="rh__chatTitulo">{tituloHeader}</div>
                                 <div className="rh__chatSub">{subtituloHeader}</div>
                             </div>
 
                             {(detalhe as any).conversation?.status !== "FECHADA" ? (
-                                <button type="button" className="rh__btnFechar" onClick={fecharConversa}>
-                                    <XCircle size={16} /> Encerrar
-                                </button>
+                                <div className="rh__headerAcoes">
+                                    <button type="button" className="rh__btnFechar" onClick={fecharConversa}>
+                                        <XCircle size={16} /> Encerrar
+                                    </button>
+                                </div>
                             ) : (
                                 <div className="rh__fechadaTag">Conversa encerrada</div>
                             )}
                         </div>
                     ) : null}
 
-                    <div className="rh__msgs" ref={msgsRef} onScroll={onScrollMsgs}>
+                    <div className="rh__msgs" ref={msgsRef} onScroll={onScrollMsgs} role="log" aria-live="polite">
                         {hasMoreToRender ? <div className="rh__loadMoreHint">Role para cima para ver mensagens anteriores</div> : null}
 
                         {visibleMessages.length === 0 ? (
@@ -464,33 +519,55 @@ export function PaginaFaleComRh() {
                                 Nenhuma mensagem ainda.
                             </div>
                         ) : (
-                            visibleMessages.map((m: any) => (
-                                <div key={String(m.id)} className={`rh__msg ${m.sender_role === "COLAB" ? "eu" : "rh"}`}>
-                                    <div className="rh__msgBolha">
-                                        <div className="rh__msgTexto">{m.conteudo}</div>
-                                        <div className="rh__msgMeta">
-                                            {m.sender_role === "COLAB" ? "Você" : "RH"} •{" "}
-                                            {String(m.created_at || "").slice(0, 19).replace("T", " ")}
+                            visibleMessages.map((m: any) => {
+                                const mine = m.sender_role === "COLAB";
+                                return (
+                                    <div key={String(m.id)} className={`rh__msg ${mine ? "eu" : "rh"}`}>
+                                        <div className="rh__msgAvatar" aria-hidden>
+                                            {/* Avatar com iniciais */}
+                                            <div className="rh__avatarCircle">{mine ? "V" : "RH"}</div>
+                                        </div>
+
+                                        <div className="rh__msgBolhaWrapper">
+                                            <div className="rh__msgBolha">
+                                                <div className="rh__msgTexto">{m.conteudo}</div>
+                                                <div className="rh__msgMeta">
+                                                    <span className="rh__metaSender">{mine ? "Você" : "RH"}</span>
+                                                    <span className="rh__metaDot">•</span>
+                                                    <time dateTime={String(m.created_at || "")} title={String(m.created_at || "")}>
+                                                        {formatDateShort(m.created_at)}
+                                                    </time>
+                                                    {/* Se quiser, aqui poderia entrar um ícone de status de leitura */}
+                                                    {mine && (detalhe as any)?.conversation?.status !== "FECHADA" ? (
+                                                        <span className="rh__readStatus" aria-hidden> • Enviada</span>
+                                                    ) : null}
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            ))
+                                );
+                            })
                         )}
                     </div>
 
                     <div className="rh__composer">
                         <input
                             value={msg}
-                            onChange={(e) => setMsg(e.target.value)}
-                            placeholder={podeEnviar ? "Digite sua mensagem..." : "Conversa encerrada"}
+                            onChange={handleMsgChange}
+                            placeholder={podeEnviar ? "Digite sua mensagem... (Enter para enviar)" : "Conversa encerrada"}
                             disabled={!podeEnviar}
-                            onKeyDown={(e) => {
-                                if (e.key === "Enter") enviarMensagem();
-                            }}
+                            onKeyDown={onComposerKeyDown}
+                            aria-label="Escreva sua mensagem"
+                            maxLength={4000}
                         />
-                        <button type="button" onClick={enviarMensagem} disabled={!podeEnviar || !msg.trim()}>
+                        <button
+                            type="button"
+                            onClick={enviarMensagem}
+                            disabled={!podeEnviar || !msg.trim()}
+                            aria-label="Enviar mensagem"
+                        >
                             <Send size={16} />
-                            Enviar
+                            <span className="rh__btnText">Enviar</span>
                         </button>
                     </div>
                 </>
@@ -524,7 +601,7 @@ export function PaginaFaleComRh() {
                 </div>
 
                 {erro ? (
-                    <div className="rh__alert card cardErro">
+                    <div className="rh__alert card cardErro" role="alert">
                         <ShieldAlert size={18} />
                         <div>{erro}</div>
                     </div>
@@ -540,10 +617,10 @@ export function PaginaFaleComRh() {
                 </section>
             </main>
 
-            <Modal aberto={modalNova} titulo="Nova conversa com o RH" aoFechar={() => setModalNova(false)}>
+            <Modal aberto={modalNova} titulo="Nova conversa com o RH" aoFechar={() => { setModalNova(false); setErro(null); }}>
                 <div className="rh__modalGrid">
                     {erro ? (
-                        <div className="rh__modalErro">
+                        <div className="rh__modalErro" role="alert">
                             <ShieldAlert size={16} />
                             <div>{erro}</div>
                         </div>
@@ -551,7 +628,7 @@ export function PaginaFaleComRh() {
 
                     <label className="rh__campo">
                         <span>Categoria</span>
-                        <select value={categoria} onChange={(e) => setCategoria(e.target.value as any)}>
+                        <select value={categoria} onChange={handleCategoriaChange} aria-label="Categoria">
                             {CATEGORIAS.map((c) => (
                                 <option key={c.value} value={c.value}>
                                     {c.label}
@@ -564,12 +641,13 @@ export function PaginaFaleComRh() {
                         <span>Assunto</span>
                         <input
                             value={assunto}
-                            onChange={(e) => setAssunto(e.target.value)}
+                            onChange={handleAssuntoChange}
                             placeholder="Digite ou selecione uma sugestão abaixo"
+                            aria-label="Assunto"
                         />
                     </label>
 
-                    <div className="rh__sugestoes">
+                    <div className="rh__sugestoes" aria-hidden>
                         {sugestoesAssunto.map((s) => (
                             <button key={s} type="button" className="rh__chip" onClick={() => setAssunto(s)}>
                                 {s}
@@ -581,17 +659,19 @@ export function PaginaFaleComRh() {
                         <span>Mensagem</span>
                         <textarea
                             value={mensagemInicial}
-                            onChange={(e) => setMensagemInicial(e.target.value)}
+                            onChange={handleMensagemInicialChange}
                             rows={6}
-                            placeholder="Descreva sua solicitação com detalhes."
+                            placeholder="Descreva sua solicitação com detalhes. (Ctrl/Cmd + Enter para enviar)"
+                            onKeyDown={onNovaKeyDown}
+                            aria-label="Mensagem inicial"
                         />
                     </label>
 
                     <div className="rh__modalAcoes">
-                        <button type="button" onClick={criarConversa} className="rh__btnPrimario">
+                        <button type="button" onClick={criarConversa} className="rh__btnPrimario" aria-label="Criar conversa">
                             Criar conversa
                         </button>
-                        <button type="button" onClick={() => setModalNova(false)} className="rh__btnGhost">
+                        <button type="button" onClick={() => setModalNova(false)} className="rh__btnGhost" aria-label="Cancelar">
                             Cancelar
                         </button>
                     </div>
