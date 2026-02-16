@@ -82,12 +82,10 @@ export function useComunicados(token?: string) {
             const data = token
                 ? await obterComunicadoColab({ token, id }, ac.signal)
                 : await obterComunicado(id, ac.signal);
-            console.log("[DEBUG] Detalhe do comunicado carregado:", data);
             setDetalheAberto(data);
             setDetalheEstado("pronto");
         } catch (e: any) {
             if (e?.name === "AbortError") return;
-            console.error("[DEBUG] Erro ao carregar detalhe:", e);
             setDetalheErro(e?.message || "Falha ao abrir comunicado.");
             setDetalheEstado("erro");
         }

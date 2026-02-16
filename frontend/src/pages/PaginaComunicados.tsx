@@ -163,9 +163,7 @@ export function PaginaComunicados() {
                                             disabled={Boolean(detalheAberto.confirmed_by_me)}
                                             onClick={async () => {
                                                 try {
-                                                    console.log("[DEBUG] Confirmando leitura do comunicado ID:", detalheAberto.id);
                                                     await confirmarLeituraColab({ token: sessao!.token, id: detalheAberto.id });
-                                                    console.log("[DEBUG] Confirmação enviada com sucesso");
                                                     // refresh detalhe from server (authenticated)
                                                     await abrirDetalhe(detalheAberto.id);
                                                 } catch (err: any) {
