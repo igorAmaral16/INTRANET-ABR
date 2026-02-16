@@ -58,7 +58,7 @@ export function initSocket(httpServer) {
                 role, // "ADMIN" | "COLAB"
                 nivel: Number(decoded?.nivel || 0),
                 matricula: decoded?.matricula || null,
-                nome: decoded?.nome_completo || decoded?.username || null,
+                nome: decoded?.nome_completo || null,
             };
 
             socket.user = user;

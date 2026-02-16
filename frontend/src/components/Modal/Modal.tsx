@@ -20,7 +20,7 @@ export function Modal({ aberto, titulo, children, aoFechar }: Props) {
         };
 
         window.addEventListener("keydown", onKey);
-        
+
         return () => {
             window.removeEventListener("keydown", onKey);
             document.body.style.overflow = "";

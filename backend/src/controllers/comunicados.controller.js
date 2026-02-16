@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { pool } from "../config/db.js";
 import { parseDdMmYyyyToDate } from "../utils/date.js";
 import {
     createComunicado,
@@ -208,6 +209,35 @@ export async function criar(req, res) {
     const expira_ymd = ensureExpiryValidOrThrow(body);
     const anexo = normalizeAnexo(body);
 
+    // Obter nome do publicador a partir da tabela Administracao quando possível
+    const rawAdminId = req.user?.id ?? req.user?.sub;
+    const adminId = Number(rawAdminId);
+    let nome_completo = "Administrador";
+    if (Number.isFinite(adminId) && adminId > 0) {
+        try {
+            const [rows] = await pool.query(
+                `SELECT nome FROM Administracao WHERE id = :id LIMIT 1`,
+                { id: adminId }
+            );
+            if (rows && rows[0] && rows[0].nome) {
+                nome_completo = String(rows[0].nome);
+            } else if (req.user?.nome) {
+                nome_completo = String(req.user.nome);
+            } else if (req.user?.nome_completo) {
+                nome_completo = String(req.user.nome_completo);
+            } else if (req.user?.username) {
+                nome_completo = String(req.user.username);
+            }
+        } catch (err) {
+            req.log?.warn({ err, adminId }, "Failed to fetch admin name from Administracao");
+            if (req.user?.nome) nome_completo = String(req.user.nome);
+        }
+    } else {
+        if (req.user?.nome) nome_completo = String(req.user.nome);
+        else if (req.user?.nome_completo) nome_completo = String(req.user.nome_completo);
+        else if (req.user?.username) nome_completo = String(req.user.username);
+    }
+
     const created = await createComunicado({
         titulo: body.titulo.trim(),
         descricao: body.descricao.trim(),
@@ -222,7 +252,7 @@ export async function criar(req, res) {
         ...anexo,
 
         publicado_por_admin_id: Number(req.user.id),
-        publicado_por_nome: req.user.username
+        publicado_por_nome: nome_completo
     });
 
     res.status(201).json(created);
@@ -234,6 +264,35 @@ export async function atualizar(req, res) {
 
     const expira_ymd = ensureExpiryValidOrThrow(body);
     const anexo = normalizeAnexo(body);
+
+    // Obter nome do publicador a partir da tabela Administracao quando possível
+    const rawAdminId2 = req.user?.id ?? req.user?.sub;
+    const adminId2 = Number(rawAdminId2);
+    let nome_completo = "Administrador";
+    if (Number.isFinite(adminId2) && adminId2 > 0) {
+        try {
+            const [rows] = await pool.query(
+                `SELECT nome FROM Administracao WHERE id = :id LIMIT 1`,
+                { id: adminId2 }
+            );
+            if (rows && rows[0] && rows[0].nome) {
+                nome_completo = String(rows[0].nome);
+            } else if (req.user?.nome) {
+                nome_completo = String(req.user.nome);
+            } else if (req.user?.nome_completo) {
+                nome_completo = String(req.user.nome_completo);
+            } else if (req.user?.username) {
+                nome_completo = String(req.user.username);
+            }
+        } catch (err) {
+            req.log?.warn({ err, adminId: adminId2 }, "Failed to fetch admin name from Administracao");
+            if (req.user?.nome) nome_completo = String(req.user.nome);
+        }
+    } else {
+        if (req.user?.nome) nome_completo = String(req.user.nome);
+        else if (req.user?.nome_completo) nome_completo = String(req.user.nome_completo);
+        else if (req.user?.username) nome_completo = String(req.user.username);
+    }
 
     const updated = await updateComunicado(id, {
         titulo: body.titulo.trim(),
@@ -249,7 +308,7 @@ export async function atualizar(req, res) {
         ...anexo,
 
         publicado_por_admin_id: Number(req.user.id),
-        publicado_por_nome: req.user.username
+        publicado_por_nome: nome_completo
     });
 
     if (!updated) {

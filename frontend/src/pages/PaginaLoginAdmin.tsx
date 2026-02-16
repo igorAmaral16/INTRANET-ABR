@@ -99,6 +99,11 @@ export function PaginaLoginAdmin() {
                             <input
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
+                                onKeyDown={(e) => {
+                                    if (e.key === "Enter" && username.trim() && password.trim() && !carregando) {
+                                        entrar(e as any);
+                                    }
+                                }}
                                 autoComplete="current-password"
                                 placeholder="••••••••"
                                 type="password"

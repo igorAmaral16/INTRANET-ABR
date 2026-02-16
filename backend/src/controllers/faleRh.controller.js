@@ -51,7 +51,7 @@ export async function colabCriarConversa(req, res) {
 
     const colaboradorId = Number(req.user?.id);
     const matricula = String(req.user?.matricula || "");
-    const nome = String(req.user?.nome_completo || req.user?.username || "");
+    const nome = String(req.user?.nome_completo || "");
 
     if (!colaboradorId || !matricula) {
         return res.status(401).json({

@@ -107,6 +107,7 @@ export function issueJwtAdmin(admin) {
         sub: String(admin.id),
         role: "ADMIN",
         username: admin.username,
+        nome_completo: admin.nome,
         nivel: admin.nivel,
         jti: randomUUID(),
         iat: now
@@ -127,6 +128,7 @@ export function issueJwtColaborador(colab) {
         sub: String(colab.id),
         role: "COLAB",
         matricula: normalizeMatricula(colab.matricula),
+        nome_completo: colab.nome_completo,
         jti: randomUUID(),
         iat: now
     };

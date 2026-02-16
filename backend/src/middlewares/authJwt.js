@@ -23,6 +23,7 @@ export function authJwt(req, res, next) {
             id: decoded.sub,
             role: decoded.role,
             username: decoded.username,
+            nome_completo: decoded.nome_completo,
             matricula: decoded.matricula,
             nivel: decoded.nivel,
             jti: decoded.jti

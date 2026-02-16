@@ -104,6 +104,11 @@ export function ModalLogin({ aberto, tipo, aoFechar, aoSucesso, aoEsqueciSenha }
                     <input
                         value={senha}
                         onChange={(e) => setSenha(e.target.value)}
+                        onKeyDown={(e) => {
+                            if (e.key === "Enter" && podeEnviar) {
+                                submeter();
+                            }
+                        }}
                         placeholder="Digite sua senha"
                         type="password"
                         autoComplete="current-password"

@@ -148,7 +148,7 @@ export function PaginaComunicados() {
                             <p className="paginaComunicados__detalheTexto">{detalheAberto.descricao}</p>
                         </div>
 
-                        {detalheAberto.requer_confirmacao && (
+                        {detalheAberto.requer_confirmacao === 1 || detalheAberto.requer_confirmacao === true ? (
                             <div className="paginaComunicados__detalheConfirmacoes">
                                 <div className="paginaComunicados__confirmacoesTopo">
                                     <div className="paginaComunicados__confirmacoesBadge">
@@ -189,7 +189,7 @@ export function PaginaComunicados() {
                                     )}
                                 </div>
                             </div>
-                        )}
+                        ) : null}
 
                         {detalheAberto.anexo_url
                             ? (() => {
