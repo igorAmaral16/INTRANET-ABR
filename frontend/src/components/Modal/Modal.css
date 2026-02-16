@@ -10,10 +10,13 @@
 
 .modal__conteudo {
     width: min(720px, 100%);
+    max-height: 90vh;
     background: #fff;
     border-radius: 18px;
     border: 1px solid rgba(0, 0, 0, 0.10);
     box-shadow: 0 24px 80px rgba(0, 0, 0, 0.25);
+    display: flex;
+    flex-direction: column;
     overflow: hidden;
 }
 
@@ -46,4 +49,8 @@
 
 .modal__corpo {
     padding: 16px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    flex: 1;
+    -webkit-overflow-scrolling: touch;
 }

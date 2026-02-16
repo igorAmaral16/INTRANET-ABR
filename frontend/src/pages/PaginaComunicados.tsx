@@ -11,9 +11,12 @@ import { ModalInfo } from "../components/ModalInfo/ModalInfo";
 import { useSessaoAuth } from "../hooks/useSessaoAuth";
 import { inferirTipoAnexoPorUrl, resolverUrlApi } from "../utils/urlApi";
 import { useNavigate } from "react-router-dom";
+import { confirmarLeituraColab } from "../api/comunicados.api";
 import React from "react";
 
 export function PaginaComunicados() {
+    const { sessao, definirSessao, sair } = useSessaoAuth();
+
     const {
         estado,
         erro,
@@ -28,9 +31,7 @@ export function PaginaComunicados() {
         detalheErro,
         abrirDetalhe,
         fecharDetalhe,
-    } = useComunicados();
-
-    const { sessao, definirSessao, sair } = useSessaoAuth();
+    } = useComunicados(sessao?.token);
 
     const [loginColabAberto, setLoginColabAberto] = React.useState(false);
     const [loginAdminAberto, setLoginAdminAberto] = React.useState(false);
@@ -146,6 +147,49 @@ export function PaginaComunicados() {
                         <div className="paginaComunicados__detalheTextoWrap">
                             <p className="paginaComunicados__detalheTexto">{detalheAberto.descricao}</p>
                         </div>
+
+                        {detalheAberto.requer_confirmacao && (
+                            <div className="paginaComunicados__detalheConfirmacoes">
+                                <div className="paginaComunicados__confirmacoesTopo">
+                                    <div className="paginaComunicados__confirmacoesBadge">
+                                        <span className="paginaComunicados__confirmacoeCount">{detalheAberto.confirmacoes_count || 0}</span>
+                                        <span className="paginaComunicados__confirmacoeLabel">confirmação{(detalheAberto.confirmacoes_count || 0) !== 1 ? 'ões' : ''}</span>
+                                    </div>
+
+                                    {estaLogado && role === "COLAB" ? (
+                                        <button
+                                            type="button"
+                                            className={`paginaComunicados__btnConfirmar ${detalheAberto.confirmed_by_me ? 'paginaComunicados__btnConfirmar--confirmado' : ''}`}
+                                            disabled={Boolean(detalheAberto.confirmed_by_me)}
+                                            onClick={async () => {
+                                                try {
+                                                    console.log("[DEBUG] Confirmando leitura do comunicado ID:", detalheAberto.id);
+                                                    await confirmarLeituraColab({ token: sessao!.token, id: detalheAberto.id });
+                                                    console.log("[DEBUG] Confirmação enviada com sucesso");
+                                                    // refresh detalhe from server (authenticated)
+                                                    await abrirDetalhe(detalheAberto.id);
+                                                } catch (err: any) {
+                                                    console.error("[ERRO] Falha ao confirmar leitura:", err);
+                                                    alert(`Erro ao confirmar leitura: ${err?.message || 'Tente novamente'}`);
+                                                }
+                                            }}
+                                        >
+                                            {detalheAberto.confirmed_by_me ? (
+                                                <>
+                                                    <span>✓</span> Confirmado
+                                                </>
+                                            ) : (
+                                                "Confirmar leitura"
+                                            )}
+                                        </button>
+                                    ) : estaLogado ? (
+                                        <div className="paginaComunicados__aviso">Apenas colaboradores podem confirmar</div>
+                                    ) : (
+                                        <div className="paginaComunicados__aviso">Faça login para confirmar a leitura</div>
+                                    )}
+                                </div>
+                            </div>
+                        )}
 
                         {detalheAberto.anexo_url
                             ? (() => {

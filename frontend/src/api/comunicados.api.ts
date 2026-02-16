@@ -17,11 +17,19 @@ export function obterComunicado(id: number, signal?: AbortSignal) {
     return httpGet<ComunicadoDetalhe>(`/comunicados/${id}`, { signal });
 }
 
+// Autenticado (COLAB): retorna detalhe incluindo `confirmed_by_me` quando aplicável
+export function obterComunicadoColab(params: { token: string; id: number }, signal?: AbortSignal) {
+    return httpGet<ComunicadoDetalhe>(`/colaborador/comunicados/${params.id}`, {
+        signal,
+        headers: bearerHeaders(params.token)
+    });
+}
+
 /* =========================
    ADMIN
 ========================= */
 
-export type ComunicadoAdminItem = {
+export type CommunicadoAdminItem = {
     id: number;
     titulo: string;
     descricao: string;
@@ -29,12 +37,14 @@ export type ComunicadoAdminItem = {
     status: "RASCUNHO" | "PUBLICADO";
     expira_em?: string | null;
     fixado_topo?: number | boolean;
+    requer_confirmacao?: number | boolean;
     anexo_url?: string | null;
     anexo_tipo?: "NENHUM" | "IMAGEM" | "DOCUMENTO";
+    confirmacoes_count?: number;
 };
 
 export type ListaComunicadosAdminResponse = {
-    items: ComunicadoAdminItem[];
+    items: CommunicadoAdminItem[];
     total?: number;
     page?: number;
     pageSize?: number;
@@ -47,6 +57,7 @@ export type ComunicadoAdminPayload = {
     fixado_topo?: boolean;
     status: "RASCUNHO" | "PUBLICADO";
     expira_em?: string; // dd/mm/aaaa (obrigatório se PUBLICADO)
+    requer_confirmacao?: boolean;
     anexo_url?: string; // /uploads/... ou URL
     anexo_tipo?: "NENHUM" | "IMAGEM" | "DOCUMENTO";
 };
@@ -93,6 +104,20 @@ export function atualizarComunicadoAdmin(
 
 export function excluirComunicadoAdmin(params: { token: string; id: number }, signal?: AbortSignal) {
     return httpDelete<null>(`/admin/comunicados/${params.id}`, {
+        signal,
+        headers: bearerHeaders(params.token)
+    });
+}
+
+export function confirmarLeituraColab(params: { token: string; id: number }, signal?: AbortSignal) {
+    return httpPost<null>(`/colaborador/comunicados/${params.id}/confirmar-leitura`, {}, {
+        signal,
+        headers: bearerHeaders(params.token)
+    });
+}
+
+export function obterConfirmacoesComunicadoAdmin(params: { token: string; id: number }, signal?: AbortSignal) {
+    return httpGet<{ items: any[] }>(`/admin/comunicados/${params.id}/confirmacoes`, {
         signal,
         headers: bearerHeaders(params.token)
     });

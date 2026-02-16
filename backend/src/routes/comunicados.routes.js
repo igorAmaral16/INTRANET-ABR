@@ -9,6 +9,8 @@ import {
     obterPublico,
     listarAdmin,
     obterAdmin,
+    obterParaColaborador,
+    listarConfirmacoesAdmin,
     criar,
     atualizar,
     excluir
@@ -37,6 +39,14 @@ comunicadosRouter.get(
     asyncHandler(obterAdmin)
 );
 
+// Colaborador: detalhe autenticado com informação se já confirmou
+comunicadosRouter.get(
+    "/colaborador/comunicados/:id",
+    authJwt,
+    requireRole("COLAB"),
+    asyncHandler(obterParaColaborador)
+);
+
 comunicadosRouter.post(
     "/admin/comunicados",
     authJwt,
@@ -59,4 +69,12 @@ comunicadosRouter.delete(
     requireRole("ADMIN"),
     requireNivel(1),
     asyncHandler(excluir)
+);
+
+// Admin: listar confirmações (todos níveis ADMIN podem ver)
+comunicadosRouter.get(
+    "/admin/comunicados/:id/confirmacoes",
+    authJwt,
+    requireRole("ADMIN"),
+    asyncHandler(listarConfirmacoesAdmin)
 );

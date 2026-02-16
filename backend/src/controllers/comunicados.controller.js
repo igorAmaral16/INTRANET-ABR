@@ -8,6 +8,8 @@ import {
     listPublicComunicados,
     listAdminComunicados
 } from "../services/comunicados.service.js";
+import { hasConfirmed } from "../services/comunicadoReads.service.js";
+import { listComunicadoConfirmacoes } from "../services/comunicados.service.js";
 import { incrementAcessoHoje, incrementComunicadoViewHoje } from "../services/metrics.service.js";
 
 const ImportanciaEnum = z.enum(["POUCO_RELEVANTE", "RELEVANTE", "IMPORTANTE"]);
@@ -49,6 +51,7 @@ const CreateUpdateSchema = z.object({
     status: StatusEnum,
 
     expira_em: z.string().min(10).max(10).optional(),
+    requer_confirmacao: z.boolean().optional().default(false),
 
     anexo_url: AnexoUrlSchema.optional(),
     anexo_tipo: AnexoTipoEnum.optional().default("NENHUM")
@@ -171,6 +174,34 @@ export async function obterAdmin(req, res) {
     res.json(item);
 }
 
+export async function obterParaColaborador(req, res) {
+    const id = z.coerce.number().int().positive().parse(req.params.id);
+
+    const colaboradorId = Number(req.user?.id);
+    if (!colaboradorId) {
+        return res.status(401).json({ error: { message: "Não autenticado.", requestId: req.id } });
+    }
+
+    const item = await getComunicadoById(id, { includeRascunho: false });
+    if (!item) {
+        return res.status(404).json({ error: { message: "Comunicado não encontrado.", requestId: req.id } });
+    }
+
+    const confirmed = await hasConfirmed({ comunicadoId: id, colaboradorId });
+
+    // Attach boolean flag
+    item.confirmed_by_me = Boolean(confirmed);
+
+    return res.json(item);
+}
+
+export async function listarConfirmacoesAdmin(req, res) {
+    const id = z.coerce.number().int().positive().parse(req.params.id);
+
+    const rows = await listComunicadoConfirmacoes(id);
+    return res.json({ items: rows });
+}
+
 export async function criar(req, res) {
     const body = CreateUpdateSchema.parse(req.body);
 
@@ -187,6 +218,7 @@ export async function criar(req, res) {
             body.status === "PUBLICADO"
                 ? expira_ymd
                 : (body.expira_em ? parseDdMmYyyyToDate(body.expira_em) : null),
+        requer_confirmacao: body.requer_confirmacao ? 1 : 0,
         ...anexo,
 
         publicado_por_admin_id: Number(req.user.id),
@@ -213,6 +245,7 @@ export async function atualizar(req, res) {
             body.status === "PUBLICADO"
                 ? expira_ymd
                 : (body.expira_em ? parseDdMmYyyyToDate(body.expira_em) : null),
+        requer_confirmacao: body.requer_confirmacao ? 1 : 0,
         ...anexo,
 
         publicado_por_admin_id: Number(req.user.id),

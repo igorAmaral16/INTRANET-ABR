@@ -252,3 +252,96 @@
     width: 100%;
     height: auto;
 }
+
+/* Confirmações de leitura */
+.paginaComunicados__detalheConfirmacoes {
+    border-radius: 14px;
+    border: 2px solid rgba(37, 99, 235, 0.25);
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.08), rgba(2, 132, 199, 0.06));
+    padding: 16px;
+    display: grid;
+    gap: 12px;
+}
+
+.paginaComunicados__confirmacoesTopo {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+.paginaComunicados__confirmacoesBadge {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: 999px;
+    background: rgba(37, 99, 235, 0.12);
+    border: 1px solid rgba(37, 99, 235, 0.25);
+}
+
+.paginaComunicados__confirmacoeCount {
+    font-weight: 950;
+    font-size: 18px;
+    color: #2563eb;
+}
+
+.paginaComunicados__confirmacoeLabel {
+    font-size: 13px;
+    font-weight: 700;
+    color: #0b1220;
+    opacity: 0.75;
+}
+
+.paginaComunicados__btnConfirmar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 16px;
+    height: auto;
+    min-height: 44px;
+    border-radius: 14px;
+    border: 2px solid rgba(37, 99, 235, 0.5);
+    background: linear-gradient(135deg, #2563eb, #1e40af);
+    color: #ffffff;
+    font-weight: 950;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+}
+
+.paginaComunicados__btnConfirmar:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(37, 99, 235, 0.3);
+    border-color: rgba(37, 99, 235, 0.8);
+}
+
+.paginaComunicados__btnConfirmar:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+.paginaComunicados__btnConfirmar:disabled,
+.paginaComunicados__btnConfirmar--confirmado {
+    background: linear-gradient(135deg, rgba(34, 197, 94, 0.3), rgba(22, 163, 74, 0.3));
+    border-color: rgba(34, 197, 94, 0.5);
+    color: rgba(21, 128, 61, 0.9);
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+.paginaComunicados__btnConfirmar--confirmado span {
+    font-size: 16px;
+}
+
+.paginaComunicados__aviso {
+    padding: 8px 12px;
+    border-radius: 8px;
+    background: rgba(107, 114, 128, 0.08);
+    border: 1px solid rgba(107, 114, 128, 0.2);
+    font-size: 13px;
+    color: rgba(11, 18, 32, 0.7);
+    font-weight: 600;
+}

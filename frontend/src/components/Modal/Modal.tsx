@@ -12,12 +12,19 @@ export function Modal({ aberto, titulo, children, aoFechar }: Props) {
     useEffect(() => {
         if (!aberto) return;
 
+        // Travar scroll do body quando modal está aberto
+        document.body.style.overflow = "hidden";
+
         const onKey = (e: KeyboardEvent) => {
             if (e.key === "Escape") aoFechar();
         };
 
         window.addEventListener("keydown", onKey);
-        return () => window.removeEventListener("keydown", onKey);
+        
+        return () => {
+            window.removeEventListener("keydown", onKey);
+            document.body.style.overflow = "";
+        };
     }, [aberto, aoFechar]);
 
     if (!aberto) return null;
@@ -31,7 +38,7 @@ export function Modal({ aberto, titulo, children, aoFechar }: Props) {
                         ✕
                     </button>
                 </div>
-                <div className="modal__corpo">{children}</div>
+                <div className="modal__corpo" ref={(el) => el && (el.scrollTop = 0)}>{children}</div>
             </div>
         </div>
     );

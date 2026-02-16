@@ -3,7 +3,7 @@ import { pool } from "../config/db.js";
 export async function confirmRead({ comunicadoId, colaboradorId }) {
     // Valida: comunicado existe, é PUBLICADO, não expirou e é crítico (IMPORTANTE)
     const [rows] = await pool.query(
-        `SELECT id, status, importancia, expira_em
+        `SELECT id, status, requer_confirmacao, expira_em
      FROM Comunicados
      WHERE id = :id
      LIMIT 1`,
@@ -30,9 +30,8 @@ export async function confirmRead({ comunicadoId, colaboradorId }) {
         throw e;
     }
 
-    // Só críticos
-    if (c.importancia !== "IMPORTANTE") {
-        const e = new Error("Confirmação de leitura disponível apenas para comunicados críticos.");
+    if (!c.requer_confirmacao) {
+        const e = new Error("Confirmação de leitura não é solicitada para este comunicado.");
         e.statusCode = 400;
         throw e;
     }
@@ -64,4 +63,17 @@ export async function confirmRead({ comunicadoId, colaboradorId }) {
     // result.affectedRows em MySQL pode ser 1 (insert) ou 2 (update no duplicate),
     // então retornamos boolean “ok” sempre.
     return true;
+}
+
+export async function hasConfirmed({ comunicadoId, colaboradorId }) {
+    const [rows] = await pool.query(
+        `SELECT 1 AS ok
+     FROM ComunicadoReadConfirmations
+     WHERE comunicado_id = :comunicadoId
+       AND colaborador_id = :colaboradorId
+     LIMIT 1`,
+        { comunicadoId, colaboradorId }
+    );
+
+    return Boolean(rows?.[0]);
 }

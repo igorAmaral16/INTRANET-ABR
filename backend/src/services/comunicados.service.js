@@ -10,6 +10,7 @@ export async function createComunicado(data) {
         expira_em,
         anexo_url,
         anexo_tipo,
+        requer_confirmacao,
         publicado_por_admin_id,
         publicado_por_nome
     } = data;
@@ -17,10 +18,10 @@ export async function createComunicado(data) {
     const [result] = await pool.query(
         `INSERT INTO Comunicados
       (titulo, descricao, importancia, fixado_topo, status, expira_em,
-       anexo_url, anexo_tipo, publicado_por_admin_id, publicado_por_nome)
+       anexo_url, anexo_tipo, requer_confirmacao, publicado_por_admin_id, publicado_por_nome)
      VALUES
       (:titulo, :descricao, :importancia, :fixado_topo, :status, :expira_em,
-       :anexo_url, :anexo_tipo, :publicado_por_admin_id, :publicado_por_nome)`,
+       :anexo_url, :anexo_tipo, :requer_confirmacao, :publicado_por_admin_id, :publicado_por_nome)`,
         {
             titulo,
             descricao,
@@ -30,6 +31,7 @@ export async function createComunicado(data) {
             expira_em,
             anexo_url,
             anexo_tipo,
+            requer_confirmacao,
             publicado_por_admin_id,
             publicado_por_nome
         }
@@ -48,6 +50,7 @@ export async function updateComunicado(id, data) {
         expira_em,
         anexo_url,
         anexo_tipo,
+        requer_confirmacao,
         publicado_por_admin_id,
         publicado_por_nome
     } = data;
@@ -62,6 +65,7 @@ export async function updateComunicado(id, data) {
          expira_em = :expira_em,
          anexo_url = :anexo_url,
          anexo_tipo = :anexo_tipo,
+         requer_confirmacao = :requer_confirmacao,
          publicado_por_admin_id = :publicado_por_admin_id,
          publicado_por_nome = :publicado_por_nome
      WHERE id = :id`,
@@ -75,6 +79,7 @@ export async function updateComunicado(id, data) {
             expira_em,
             anexo_url,
             anexo_tipo,
+            requer_confirmacao,
             publicado_por_admin_id,
             publicado_por_nome
         }
@@ -98,13 +103,28 @@ export async function getComunicadoById(id, { includeRascunho } = { includeRascu
     const [rows] = await pool.query(
         `SELECT id, titulo, descricao, importancia, fixado_topo, status,
             DATE_FORMAT(expira_em, '%d/%m/%Y') AS expira_em,
-            anexo_url, anexo_tipo, publicado_por_nome, created_at, updated_at
+            anexo_url, anexo_tipo, requer_confirmacao, publicado_por_nome, created_at, updated_at,
+            (SELECT COUNT(1) FROM ComunicadoReadConfirmations r WHERE r.comunicado_id = Comunicados.id) AS confirmacoes_count
      FROM Comunicados
      WHERE ${where}
      LIMIT 1`,
         { id }
     );
     return rows?.[0] || null;
+}
+
+export async function listComunicadoConfirmacoes(comunicadoId) {
+    const [rows] = await pool.query(
+        `SELECT r.id AS id, r.comunicado_id AS comunicado_id, r.colaborador_id AS colaborador_id,
+            r.confirmed_at AS confirmed_at, c.nome_completo AS colaborador_nome
+     FROM ComunicadoReadConfirmations r
+     JOIN Colaboradores c ON c.id = r.colaborador_id
+     WHERE r.comunicado_id = :comunicadoId
+     ORDER BY r.confirmed_at DESC`,
+        { comunicadoId }
+    );
+
+    return rows || [];
 }
 
 export async function listPublicComunicados({ page, pageSize }) {
@@ -121,9 +141,10 @@ export async function listPublicComunicados({ page, pageSize }) {
     const total = Number(countRows?.[0]?.total || 0);
 
     const [rows] = await pool.query(
-        `SELECT id, titulo, importancia, fixado_topo,
+        `SELECT id, titulo, importancia, fixado_topo, requer_confirmacao,
             DATE_FORMAT(expira_em, '%d/%m/%Y') AS expira_em,
-            anexo_url, anexo_tipo, publicado_por_nome, created_at, updated_at
+            anexo_url, anexo_tipo, publicado_por_nome, created_at, updated_at,
+            (SELECT COUNT(1) FROM ComunicadoReadConfirmations r WHERE r.comunicado_id = Comunicados.id) AS confirmacoes_count
      FROM Comunicados
      WHERE status = 'PUBLICADO'
        AND expira_em >= CURDATE()
@@ -150,9 +171,10 @@ export async function listAdminComunicados({ status, page, pageSize }) {
     const total = Number(countRows?.[0]?.total || 0);
 
     const [rows] = await pool.query(
-        `SELECT id, titulo, importancia, fixado_topo, status,
+        `SELECT id, titulo, importancia, fixado_topo, status, requer_confirmacao,
             DATE_FORMAT(expira_em, '%d/%m/%Y') AS expira_em,
-            anexo_url, anexo_tipo, publicado_por_nome, created_at, updated_at
+            anexo_url, anexo_tipo, publicado_por_nome, created_at, updated_at,
+            (SELECT COUNT(1) FROM ComunicadoReadConfirmations r WHERE r.comunicado_id = Comunicados.id) AS confirmacoes_count
      FROM Comunicados
      ${where}
      ORDER BY updated_at DESC

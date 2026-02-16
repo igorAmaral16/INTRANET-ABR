@@ -20,6 +20,8 @@ import {
     obterComunicadoAdmin,
     type ComunicadoAdminPayload
 } from "../../api/comunicados.api";
+import { obterConfirmacoesComunicadoAdmin } from "../../api/comunicados.api";
+import type { ConfirmacaoComunicado } from "../../tipos/comunicados";
 
 import "../../pages/PaginaBase.css";
 import "./PaginaAdminCriarComunicado.css";
@@ -61,11 +63,13 @@ export function PaginaAdminCriarComunicado() {
 
     const [carregando, setCarregando] = useState(false);
     const [erro, setErro] = useState<string | null>(null);
+    const [confirmacoes, setConfirmacoes] = useState<ConfirmacaoComunicado[]>([]);
 
     const [titulo, setTitulo] = useState("");
     const [descricao, setDescricao] = useState("");
     const [importancia, setImportancia] = useState<ComunicadoAdminPayload["importancia"]>("RELEVANTE");
     const [fixadoTopo, setFixadoTopo] = useState(false);
+    const [requerConfirmacao, setRequerConfirmacao] = useState(false);
     const [expiraEm, setExpiraEm] = useState(hojeMaisDias(7));
 
     // anexo
@@ -98,6 +102,7 @@ export function PaginaAdminCriarComunicado() {
                 setDescricao(String(data?.descricao || ""));
                 setImportancia(data?.importancia || "RELEVANTE");
                 setFixadoTopo(Boolean(data?.fixado_topo));
+                setRequerConfirmacao(Boolean(data?.requer_confirmacao));
                 setExpiraEm(String(data?.expira_em || hojeMaisDias(7)));
 
                 const anexo_url = data?.anexo_url ? String(data.anexo_url) : "";
@@ -115,6 +120,12 @@ export function PaginaAdminCriarComunicado() {
             } finally {
                 setCarregando(false);
             }
+
+            // buscar lista de confirmações (apenas para editar)
+            try {
+                const resp: any = await obterConfirmacoesComunicadoAdmin({ token: sessao.token, id: comunicadoId });
+                setConfirmacoes(resp.items || []);
+            } catch (e: any) { }
         })();
 
         return () => ac.abort();
@@ -127,10 +138,11 @@ export function PaginaAdminCriarComunicado() {
             importancia,
             fixado_topo: fixadoTopo,
             expira_em: expiraEm.trim(),
+            requer_confirmacao: requerConfirmacao,
             anexo_url: anexo?.url || undefined,
             anexo_tipo: anexo?.tipo && anexo.tipo !== "NENHUM" ? anexo.tipo : "NENHUM"
         };
-    }, [titulo, descricao, importancia, fixadoTopo, expiraEm, anexo]);
+    }, [titulo, descricao, importancia, fixadoTopo, requerConfirmacao, expiraEm, anexo]);
 
     async function enviarAnexo() {
         if (!sessao?.token) return;
@@ -295,6 +307,11 @@ export function PaginaAdminCriarComunicado() {
                             <input type="checkbox" checked={fixadoTopo} onChange={(e) => setFixadoTopo(e.target.checked)} />
                             <span>Fixar no topo</span>
                         </label>
+
+                        <label className="admCriar__check">
+                            <input type="checkbox" checked={requerConfirmacao} onChange={(e) => setRequerConfirmacao(e.target.checked)} />
+                            <span>Requer confirmação de leitura</span>
+                        </label>
                     </div>
 
                     <aside className="card admCriar__anexo">
@@ -380,6 +397,21 @@ export function PaginaAdminCriarComunicado() {
 
                     {carregando ? <div className="admCriar__status">Processando...</div> : null}
                 </section>
+                {comunicadoId ? (
+                    <section className="card admCriar__confirmacoes">
+                        <h3>Confirmações de leitura</h3>
+                        <div>Total: <strong>{confirmacoes.length}</strong></div>
+                        {confirmacoes.length === 0 ? (
+                            <div>Nenhuma confirmação ainda.</div>
+                        ) : (
+                            <ul className="admCriar__confirmList">
+                                {confirmacoes.map((c) => (
+                                    <li key={c.id}>{c.colaborador_nome} — {new Date(c.confirmed_at).toLocaleString()}</li>
+                                ))}
+                            </ul>
+                        )}
+                    </section>
+                ) : null}
             </main>
         </div>
     );

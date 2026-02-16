@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { ComunicadoDetalhe, ComunicadoResumo, Importancia } from "../tipos/comunicados";
-import { listarComunicados, obterComunicado } from "../api/comunicados.api";
+import { listarComunicados, obterComunicado, obterComunicadoColab } from "../api/comunicados.api";
 
 type Estado = "ocioso" | "carregando" | "erro" | "pronto";
 
@@ -8,7 +8,7 @@ function normalizarTexto(v: string) {
     return v.trim().toLowerCase();
 }
 
-export function useComunicados() {
+export function useComunicados(token?: string) {
     const [estado, setEstado] = useState<Estado>("carregando");
     const [erro, setErro] = useState<string | null>(null);
 
@@ -79,15 +79,19 @@ export function useComunicados() {
         setDetalheErro(null);
 
         try {
-            const data = await obterComunicado(id, ac.signal);
+            const data = token
+                ? await obterComunicadoColab({ token, id }, ac.signal)
+                : await obterComunicado(id, ac.signal);
+            console.log("[DEBUG] Detalhe do comunicado carregado:", data);
             setDetalheAberto(data);
             setDetalheEstado("pronto");
         } catch (e: any) {
             if (e?.name === "AbortError") return;
+            console.error("[DEBUG] Erro ao carregar detalhe:", e);
             setDetalheErro(e?.message || "Falha ao abrir comunicado.");
             setDetalheEstado("erro");
         }
-    }, []);
+    }, [token]);
 
     const fecharDetalhe = useCallback(() => {
         abortDetalheRef.current?.abort();
