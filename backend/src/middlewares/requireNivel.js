@@ -6,12 +6,8 @@ export function requireNivel(minNivel) {
             });
         }
 
-        if (req.user?.role !== "ADMIN") {
-            return res.status(403).json({
-                error: { message: "Acesso negado.", requestId: req.id }
-            });
-        }
-
+        // Permitir acesso com base no nível (`nivel`) do usuário.
+        // Não exige papel `ADMIN` — qualquer usuário com `nivel` >= minNivel terá acesso.
         const nivel = Number(req.user?.nivel);
         if (!Number.isFinite(nivel) || nivel < minNivel) {
             return res.status(403).json({

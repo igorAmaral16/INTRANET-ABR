@@ -6,6 +6,7 @@ import {
     SquarePen as IconPenSquare,
     FolderOpen as IconFolder,
     Users as IconUsers,
+    Calendar as IconCalendar,
     HelpCircle as IconHelp,
     FileDown as IconReport,
     MessageSquare as IconMessage, // NOVO
@@ -17,6 +18,7 @@ type Props = {
     aoCriarComunicado: () => void;
     aoDocumentos: () => void;
     aoColaboradores: () => void;
+    aoCalendario?: () => void;
     aoFaq: () => void;
     aoRelatorios: () => void;
     aoFaleComRh: () => void; // NOVO
@@ -39,6 +41,7 @@ export function MenuAdmin({
     aoCriarComunicado,
     aoDocumentos,
     aoColaboradores,
+    aoCalendario,
     aoFaq,
     aoRelatorios,
     aoFaleComRh,
@@ -48,6 +51,7 @@ export function MenuAdmin({
 
     const itens: Item[] = useMemo(
         () => [
+            { id: "calendario", titulo: "Calendário", icon: <IconCalendar size={18} />, onClick: aoCalendario || (() => { window.location.href = '/admin/calendario'; }) },
             { id: "criar", titulo: "Criar comunicado", icon: <IconPenSquare size={18} />, onClick: aoCriarComunicado },
             { id: "docs", titulo: "Documentos", icon: <IconFolder size={18} />, onClick: aoDocumentos },
             { id: "colabs", titulo: "Colaboradores", icon: <IconUsers size={18} />, onClick: aoColaboradores },

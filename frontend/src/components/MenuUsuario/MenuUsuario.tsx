@@ -5,6 +5,7 @@ import {
     X as IconX,
     User as IconUser,
     FolderOpen as IconFolder,
+    Calendar as IconCalendar,
     HelpCircle as IconHelp,
     MessageSquare as IconMessage,
     LogOut as IconLogout,
@@ -14,6 +15,7 @@ import "./MenuUsuario.css";
 type Props = {
     aoMeuPerfil: () => void;
     aoVerDocumentos: () => void;
+    aoCalendario?: () => void;
     aoFaq: () => void;
     aoFaleComRh: () => void;
     aoSair: () => void;
@@ -34,6 +36,7 @@ function Portal({ children }: { children: ReactNode }) {
 export function MenuUsuario({
     aoMeuPerfil,
     aoVerDocumentos,
+    aoCalendario,
     aoFaq,
     aoFaleComRh,
     aoSair,
@@ -42,6 +45,7 @@ export function MenuUsuario({
 
     const itens: Item[] = useMemo(
         () => [
+            { id: "calendario", titulo: "Calendário", icon: <IconCalendar size={18} />, onClick: aoCalendario || (() => { window.location.href = '/calendario'; }) },
             { id: "perfil", titulo: "Meu Perfil", icon: <IconUser size={18} />, onClick: aoMeuPerfil },
             { id: "docs", titulo: "Ver Documentos", icon: <IconFolder size={18} />, onClick: aoVerDocumentos },
             { id: "faq", titulo: "Dúvidas Frequentes (FAQ)", icon: <IconHelp size={18} />, onClick: aoFaq },

@@ -6,6 +6,7 @@ import { PaginaMeuPerfil } from "./pages/PaginaMeuPerfil";
 import { PaginaDocumentos } from "./pages/PaginaDocumentos";
 import { PaginaFaq } from "./pages/PaginaFaq";
 import { PaginaFaleComRh } from "./pages/PaginaFaleComRh";
+import { PaginaCalendario } from "./pages/PaginaCalendario";
 
 import { PaginaAdminComunicados } from "./pages/admin/PaginaAdminComunicados";
 import { PaginaAdminCriarComunicado } from "./pages/admin/PaginaAdminCriarComunicado";
@@ -14,6 +15,7 @@ import { PaginaAdminColaboradores } from "./pages/admin/PaginaAdminColaboradores
 import { PaginaAdminFaq } from "./pages/admin/PaginaAdminFaq";
 import { PaginaAdminRelatorios } from "./pages/admin/PaginaAdminRelatorios";
 import { PaginaAdminFaleRh } from "./pages/admin/PaginaAdminFaleRh";
+import { PaginaAdminCalendario } from "./pages/admin/PaginaAdminCalendario";
 
 import { useSessaoAuth } from "./hooks/useSessaoAuth";
 import { useSocketAuth } from "./hooks/useSocketAuth";
@@ -65,6 +67,7 @@ function AppInner() {
         <Route path="/documentos" element={<PaginaDocumentos />} />
         <Route path="/faq" element={<PaginaFaq />} />
         <Route path="/fale-com-rh" element={<PaginaFaleComRh />} />
+        <Route path="/calendario" element={<PaginaCalendario />} />
 
         {/* ADMIN */}
         <Route path="/admin" element={<PaginaAdminComunicados />} />
@@ -75,6 +78,7 @@ function AppInner() {
         <Route path="/admin/faq" element={<PaginaAdminFaq />} />
         <Route path="/admin/relatorios" element={<PaginaAdminRelatorios />} />
         <Route path="/admin/fale-com-rh" element={<PaginaAdminFaleRh />} />
+        <Route path="/admin/calendario" element={<PaginaAdminCalendario />} />
       </Routes>
     </NotificacoesRhProvider>
   );
