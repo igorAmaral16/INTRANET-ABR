@@ -162,10 +162,11 @@
 }
 
 .admDocs__rowLeft {
-    display: inline-flex;
+    display: flex;
     align-items: center;
     gap: 10px;
     min-width: 0;
+    flex: 1;
 }
 
 .admDocs__name {
@@ -198,6 +199,7 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    flex-shrink: 0;
 }
 
 .admDocs__toggle:hover {
@@ -226,6 +228,7 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    flex-shrink: 0;
 }
 
 .admDocs__menuBtn:hover {

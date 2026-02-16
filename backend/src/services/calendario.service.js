@@ -148,6 +148,14 @@ export async function getFeriadosByAno(ano) {
     `;
 
     const [rows] = await pool.query(sql, [ano]);
+
+    console.log(`\n📊 === FERIADOS DO ANO ${ano} ===`);
+    console.log(`Total: ${rows.length} feriado(s)`);
+    rows.forEach(f => {
+        console.log(`  📅 ${f.data} (${f.tipo}): ${f.nome} | Cor: ${f.cor_hex}`);
+    });
+    console.log(`=================================\n`);
+
     return rows;
 }
 
@@ -197,41 +205,56 @@ export async function getFeriadoById(id) {
 }
 
 export async function createFeriado(feriado) {
-    const { data, nome, descricao, tipo = 'CUSTOMIZADO', cor_hex = '#FF6B6B', adminId, anoFeriado } = feriado;
+    const { data, nome, descricao, tipo = 'CUSTOMIZADO', cor_hex, adminId, anoFeriado } = feriado;
 
-    const sql = `
+    // Garantir que cor_hex é sempre válida
+    const corValida = cor_hex && /^#[0-9A-F]{6}$/i.test(cor_hex) ? cor_hex : '#FF6B6B';
+
+    console.log('🔧 createFeriado recebeu:', {
+        data, nome, tipo, corValida, anoFeriado
+    });
+
+    // Inserir feriado
+    const sqlInsert = `
         INSERT INTO CalendarioFeriados 
         (ano_feriado, data, nome, descricao, tipo, cor_hex, created_by_admin_id, updated_by_admin_id)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
-    const [result] = await pool.query(sql, [
+    const [resultInsert] = await pool.query(sqlInsert, [
         anoFeriado,
         data,
         nome,
         descricao || null,
         tipo,
-        cor_hex,
+        corValida,
         tipo === 'NACIONAL' ? null : adminId,
         tipo === 'NACIONAL' ? null : adminId
     ]);
 
-    return {
-        id: result.insertId,
-        ano_feriado: anoFeriado,
-        data,
-        nome,
-        descricao,
-        tipo,
-        cor_hex,
-        created_by_admin_id: tipo === 'NACIONAL' ? null : adminId
-    };
+    const novoId = resultInsert.insertId;
+    console.log('✅ Feriado inserido com ID:', novoId);
+
+    // Recuperar imediatamente o feriado criado
+    const feriadoCriado = await getFeriadoById(novoId);
+
+    console.log('📤 Feriado recuperado para retorno:', feriadoCriado);
+
+    return feriadoCriado;
 }
 
 export async function updateFeriado(id, feriado, adminId, anoFeriado = null) {
     const { data, nome, descricao, cor_hex } = feriado;
 
-    const sql = `
+    // Garantir que cor_hex é sempre válida se for fornecida
+    const corValida = cor_hex && /^#[0-9A-F]{6}$/i.test(cor_hex) ? cor_hex : null;
+
+    console.log('🔧 updateFeriado recebido:', {
+        id, data, nome, corValida, anoFeriado
+    });
+
+    // Atualizar feriado
+    const sqlUpdate = `
         UPDATE CalendarioFeriados
         SET 
             ano_feriado = COALESCE(?, ano_feriado),
@@ -244,21 +267,28 @@ export async function updateFeriado(id, feriado, adminId, anoFeriado = null) {
         WHERE id = ? AND tipo = 'CUSTOMIZADO'
     `;
 
-    const [result] = await pool.query(sql, [
+    const [resultUpdate] = await pool.query(sqlUpdate, [
         anoFeriado,
         data || null,
         nome || null,
         descricao || null,
-        cor_hex || null,
+        corValida,
         adminId,
         id
     ]);
 
-    if (result.affectedRows === 0) {
+    console.log('✅ Feriado atualizado, linhas afetadas:', resultUpdate.affectedRows);
+
+    if (resultUpdate.affectedRows === 0) {
         return null;
     }
 
-    return await getFeriadoById(id);
+    // Recuperar imediatamente o feriado atualizado
+    const feriadoAtualizado = await getFeriadoById(id);
+
+    console.log('📤 Feriado recuperado para retorno:', feriadoAtualizado);
+
+    return feriadoAtualizado;
 }
 
 export async function deleteFeriado(id) {

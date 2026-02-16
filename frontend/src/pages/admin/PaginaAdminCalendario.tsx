@@ -88,6 +88,8 @@ export function PaginaAdminCalendario() {
             setCarregando(true);
             setErro(null);
 
+            console.log('🔄 Carregando configuração e feriados...');
+
             const confRes = await fetch('/api/calendario/configuracao');
             if (!confRes.ok) {
                 if (confRes.status === 404) {
@@ -101,6 +103,8 @@ export function PaginaAdminCalendario() {
             }
 
             const conf = await confRes.json();
+            console.log('✅ Configuração carregada:', conf);
+
             const feriadosRes = await fetch(`/api/calendario/feriados?ano=${conf.ano_vigencia}`);
 
             if (!feriadosRes.ok) {
@@ -108,6 +112,13 @@ export function PaginaAdminCalendario() {
             }
 
             const { feriados: feriadosData } = await feriadosRes.json();
+
+            console.log('✅ Feriados carregados:', feriadosData?.map((f: Feriado) => ({
+                id: f.id,
+                data: f.data,
+                nome: f.nome,
+                cor_hex: f.cor_hex
+            })));
 
             setConfiguracao(conf);
             setConfigForm({
@@ -121,8 +132,8 @@ export function PaginaAdminCalendario() {
             setFiltroAno(conf.ano_vigencia);
         } catch (err) {
             const message = err instanceof Error ? err.message : 'Erro ao carregar dados';
+            console.error('❌ Erro ao carregar dados:', message, err);
             setErro(message);
-            console.error('Erro:', err);
         } finally {
             setCarregando(false);
         }
@@ -187,6 +198,18 @@ export function PaginaAdminCalendario() {
                 return;
             }
 
+            // Garantir que a cor é válida
+            const corValida = feriadoForm.cor_hex && /^#[0-9A-F]{6}$/i.test(feriadoForm.cor_hex)
+                ? feriadoForm.cor_hex
+                : '#FF6B6B';
+
+            const dadosEnvio = {
+                ...feriadoForm,
+                cor_hex: corValida
+            };
+
+            console.log('📝 Enviando feriado:', dadosEnvio);
+
             const url = editandoFeriado
                 ? `/api/admin/calendario/feriados/${editandoFeriado.id}`
                 : '/api/admin/calendario/feriados';
@@ -196,7 +219,7 @@ export function PaginaAdminCalendario() {
             const res = await fetch(url, {
                 method,
                 headers: { 'Content-Type': 'application/json', ...(sessao?.token ? { Authorization: `Bearer ${sessao.token}` } : {}) },
-                body: JSON.stringify(feriadoForm)
+                body: JSON.stringify(dadosEnvio)
             });
 
             if (!res.ok) {
@@ -204,12 +227,21 @@ export function PaginaAdminCalendario() {
                 throw new Error((data.error?.message as string) || 'Erro ao salvar feriado');
             }
 
+            const resposta = await res.json();
+
+            console.log('✅ Resposta do servidor:', {
+                id: resposta.id,
+                data: resposta.data,
+                cor_hex: resposta.cor_hex,
+                nome: resposta.nome
+            });
+
             if (editandoFeriado) {
-                const atualizado = await res.json();
-                setFeriados(feriados.map(f => f.id === atualizado.id ? atualizado : f));
+                console.log('Atualizando feriado existente');
+                setFeriados(feriados.map(f => f.id === resposta.id ? resposta : f));
             } else {
-                const novo = await res.json();
-                setFeriados([...feriados, novo]);
+                console.log('Adicionando novo feriado');
+                setFeriados([...feriados, resposta]);
             }
 
             setShowFeriadoModal(false);
@@ -219,6 +251,7 @@ export function PaginaAdminCalendario() {
             setTimeout(() => setSucesso(null), 3000);
         } catch (err) {
             const message = err instanceof Error ? err.message : 'Erro desconhecido';
+            console.error('❌ Erro ao salvar feriado:', message);
             setErro(message);
         }
     };
@@ -259,7 +292,8 @@ export function PaginaAdminCalendario() {
 
     const feriadosFiltrados = feriados.filter(f => {
         if (!f.data) return false;
-        const partes = f.data.split('-');
+        // Normaliza antes de quebrar em partes (tolerante a "YYYY-MM-DDTHH:MM:SS")
+        const partes = String(f.data).slice(0, 10).split('-');
         if (partes.length < 3) return false;
         const ano = parseInt(partes[0], 10);
         const mes = parseInt(partes[1], 10);

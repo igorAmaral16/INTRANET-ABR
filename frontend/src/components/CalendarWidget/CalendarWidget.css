@@ -90,19 +90,23 @@
     font-size: 14px;
     font-weight: 500;
     color: #1a1a1a;
+    overflow: hidden;
+    min-height: 48px;
+    border: 1px solid transparent;
 }
 
-.day:not(.feriado) {
+/* Dias normais sem feriado */
+.day.active:not(.feriado) {
     background: #fafafa;
     border: 1px solid #e8e8e8;
 }
 
-.day .day-bg {
-    position: absolute;
-    inset: 0;
-    border-radius: 8px;
-    z-index: 0;
-    border: none;
+/* Dias com feriado - a cor vem do inline style */
+.day.feriado {
+    /* NÃO forçar background-color: inherit aqui, o componente aplica inline style */
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    font-weight: 700;
+    color: white !important;
 }
 
 .day.empty {
@@ -111,41 +115,39 @@
     cursor: default;
 }
 
-.day.active:hover {
+/* Hover para dias sem feriado */
+.day.active:hover:not(.feriado) {
     background: #f0f0f0;
     border-color: #d0d0d0;
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
 }
 
-.day.weekend {
+/* Hover para dias com feriado */
+.day.feriado:hover {
+    opacity: 0.85;
+}
+
+/* Fim de semana - apenas se não for feriado */
+.day.weekend:not(.feriado) {
     background: #f8f8f8;
     color: #666;
 }
 
-.day.feriado {
-    font-weight: 700;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-}
-
-.day.feriado:hover {
-    opacity: 0.9;
-    transform: scale(1.05);
-}
-
 .day-number {
     position: relative;
-    z-index: 1;
+    z-index: 2;
+    font-weight: inherit;
 }
 
-.feriado-dot {
+.feriado-indicator {
     position: absolute;
-    bottom: 3px;
-    width: 6px;
-    height: 6px;
+    bottom: 4px;
+    right: 4px;
+    width: 8px;
+    height: 8px;
     border-radius: 50%;
-    opacity: 0.9;
-    z-index: 1;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    z-index: 2;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 .calendar-legend {

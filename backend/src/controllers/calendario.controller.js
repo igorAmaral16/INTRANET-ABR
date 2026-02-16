@@ -138,14 +138,27 @@ export async function listarFeriadosPorAno(req, res) {
     try {
         const ano = z.coerce.number().int().min(2020).max(2100).parse(req.query.ano || new Date().getFullYear());
 
+        console.log('🔍 Buscando feriados para o ano:', ano);
+
         const feriados = await getFeriadosByAno(ano);
+
+        console.log('✅ Feriados encontrados:', feriados.map(f => ({
+            id: f.id,
+            data: f.data,
+            nome: f.nome,
+            cor_hex: f.cor_hex,
+            tipo: f.tipo
+        })));
+
         res.json({ feriados });
     } catch (err) {
         if (err instanceof z.ZodError) {
+            console.error('❌ Erro de validação:', err.errors[0]);
             return res.status(400).json({
                 error: { message: err.errors[0].message, requestId: req.id }
             });
         }
+        console.error('❌ Erro ao listar feriados:', err);
         res.status(500).json({
             error: { message: "Erro ao listar feriados.", requestId: req.id }
         });
@@ -203,18 +216,29 @@ export async function obterFeriado(req, res) {
 
 export async function criarFeriado(req, res) {
     try {
+        // Validar corpo da requisição
         const body = FeriadoSchema.parse(req.body);
+
+        console.log('📝 Recebido pedido para criar feriado:', {
+            data: body.data,
+            nome: body.nome,
+            cor_hex: body.cor_hex,
+            descricao: body.descricao
+        });
 
         // Extrair o ano da data (YYYY-MM-DD)
         const anoFeriado = parseInt(body.data.substring(0, 4), 10);
 
+        // Verificar se já existe feriado na mesma data
         const jaExiste = await isFeriado(anoFeriado, body.data);
         if (jaExiste) {
+            console.warn('⚠️  Feriado já existe na data:', body.data);
             return res.status(409).json({
                 error: { message: "Já existe um feriado nesta data.", requestId: req.id }
             });
         }
 
+        // Criar feriado com todas as informações
         const feriado = await createFeriado({
             ...body,
             anoFeriado,
@@ -222,13 +246,21 @@ export async function criarFeriado(req, res) {
             adminId: Number(req.user.id)
         });
 
+        console.log('✅ Feriado criado com sucesso na resposta:', {
+            id: feriado.id,
+            data: feriado.data,
+            cor_hex: feriado.cor_hex
+        });
+
         res.status(201).json(feriado);
     } catch (err) {
         if (err instanceof z.ZodError) {
+            console.error('❌ Erro de validação:', err.errors[0]);
             return res.status(400).json({
                 error: { message: err.errors[0].message, requestId: req.id }
             });
         }
+        console.error('❌ Erro ao criar feriado:', err);
         res.status(500).json({
             error: { message: "Erro ao criar feriado.", requestId: req.id }
         });
@@ -240,14 +272,23 @@ export async function atualizarFeriado(req, res) {
         const id = z.coerce.number().int().positive().parse(req.params.id);
         const body = FeriadoSchema.partial().parse(req.body);
 
+        console.log('📝 Recebido pedido para atualizar feriado:', {
+            id,
+            data: body.data,
+            nome: body.nome,
+            cor_hex: body.cor_hex
+        });
+
         const feriado = await getFeriadoById(id);
         if (!feriado) {
+            console.warn('⚠️  Feriado não encontrado:', id);
             return res.status(404).json({
                 error: { message: "Feriado não encontrado.", requestId: req.id }
             });
         }
 
         if (feriado.tipo === 'NACIONAL') {
+            console.warn('⚠️  Tentativa de editar feriado nacional:', id);
             return res.status(403).json({
                 error: { message: "Não é permitido editar feriados nacionais.", requestId: req.id }
             });
@@ -258,6 +299,7 @@ export async function atualizarFeriado(req, res) {
             const novoAno = parseInt(body.data.substring(0, 4), 10);
             const jaExiste = await isFeriado(novoAno, body.data);
             if (jaExiste) {
+                console.warn('⚠️  Feriado já existe na nova data:', body.data);
                 return res.status(409).json({
                     error: { message: "Já existe um feriado nesta data.", requestId: req.id }
                 });
@@ -266,18 +308,27 @@ export async function atualizarFeriado(req, res) {
 
         const updated = await updateFeriado(id, body, Number(req.user.id));
         if (!updated) {
+            console.error('❌ Falha ao atualizar feriado:', id);
             return res.status(400).json({
                 error: { message: "Falha ao atualizar feriado.", requestId: req.id }
             });
         }
 
+        console.log('✅ Feriado atualizado com sucesso na resposta:', {
+            id: updated.id,
+            data: updated.data,
+            cor_hex: updated.cor_hex
+        });
+
         res.json(updated);
     } catch (err) {
         if (err instanceof z.ZodError) {
+            console.error('❌ Erro de validação:', err.errors[0]);
             return res.status(400).json({
                 error: { message: err.errors[0].message, requestId: req.id }
             });
         }
+        console.error('❌ Erro ao atualizar feriado:', err);
         res.status(500).json({
             error: { message: "Erro ao atualizar feriado.", requestId: req.id }
         });
