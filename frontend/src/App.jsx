@@ -4,6 +4,7 @@ import { useEffect, useMemo } from "react";
 import { PaginaComunicados } from "./pages/PaginaComunicados";
 import { PaginaMeuPerfil } from "./pages/PaginaMeuPerfil";
 import { PaginaDocumentos } from "./pages/PaginaDocumentos";
+import { PaginaMeusDocumentos } from "./pages/PaginaMeusDocumentos";
 import { PaginaFaq } from "./pages/PaginaFaq";
 import { PaginaFaleComRh } from "./pages/PaginaFaleComRh";
 import { PaginaCalendario } from "./pages/PaginaCalendario";
@@ -65,6 +66,7 @@ function AppInner() {
         <Route path="/" element={<PaginaComunicados />} />
         <Route path="/meu-perfil" element={<PaginaMeuPerfil />} />
         <Route path="/documentos" element={<PaginaDocumentos />} />
+        <Route path="/meus-documentos" element={<PaginaMeusDocumentos />} />
         <Route path="/faq" element={<PaginaFaq />} />
         <Route path="/fale-com-rh" element={<PaginaFaleComRh />} />
         <Route path="/calendario" element={<PaginaCalendario />} />

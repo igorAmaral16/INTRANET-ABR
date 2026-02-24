@@ -11,9 +11,13 @@ import {
     deletePastaById,
     createDocumento,
     listDocumentosByPasta,
+    // private/collaborator helpers
+    listDocumentosByPastaForColab,
+    listArvoreForColab,
     getDocumentoById,
     deleteDocumentoById,
     listArvorePublica,
+    listArvoreAdmin,
     updatePastaById
 } from "../services/biblioteca.service.js";
 
@@ -21,10 +25,12 @@ import {
 import { normalizeFolderName, normalizeDocName, toSlug } from "../utils/normalize.js";
 
 const CreatePastaSchema = z.object({
-    nome: z.string().min(3).max(120)
+    nome: z.string().min(3).max(120),
+    is_private: z.boolean().optional()
 });
 const UpdatePastaSchema = z.object({
-    nome: z.string().min(3).max(120)
+    nome: z.string().min(3).max(120),
+    is_private: z.boolean().optional()
 });
 
 const PastaIdSchema = z.coerce.number().int().positive();
@@ -46,7 +52,8 @@ function sha256File(filePath) {
 }
 
 export async function listarPastasPublico(req, res) {
-    const items = await listPastas();
+    // only public folders should be visible here
+    const items = await listPastas({ publicOnly: true });
     res.json(items);
 }
 
@@ -67,13 +74,15 @@ export async function atualizarPasta(req, res) {
     }
 
     const slug = toSlug(normalized);
+    const isPrivate = body.is_private !== undefined ? Boolean(body.is_private) : undefined;
 
     try {
         const updated = await updatePastaById({
             pastaId,
             nome: normalized,
             slug,
-            adminId: Number(req.user.id)
+            adminId: Number(req.user.id),
+            isPrivate
         });
 
         if (!updated) {
@@ -84,7 +93,7 @@ export async function atualizarPasta(req, res) {
     } catch (err) {
         if (err?.code === "ER_DUP_ENTRY") {
             return res.status(409).json({
-                error: { message: "Nome de pasta já existe.", requestId: req.id }
+                error: { message: "Pasta não encontrada.", requestId: req.id }
             });
         }
         throw err;
@@ -117,12 +126,37 @@ export async function listarDocumentosPublico(req, res) {
     res.json({ pasta, items: docs });
 }
 
+// colaborador privado
+export async function listarDocumentosColab(req, res) {
+    const pastaId = PastaIdSchema.parse(req.params.pastaId);
+    const matricula = String(req.user.matricula);
+
+    const pasta = await getPastaById(pastaId);
+    if (!pasta) {
+        return res.status(404).json({ error: { message: "Pasta não encontrada.", requestId: req.id } });
+    }
+    const docs = await listDocumentosByPastaForColab(pastaId, matricula);
+    res.json({ pasta, items: docs });
+}
+
+export async function listarArvoreColab(req, res) {
+    const matricula = String(req.user.matricula);
+    const items = await listArvoreForColab(matricula);
+    return res.json({ items });
+}
+
 /* =========================
    PÚBLICO: árvore (pastas -> documentos)
    - 2 queries no service (leve/rápido)
 ========================= */
 export async function listarArvorePublico(req, res) {
     const items = await listArvorePublica();
+    return res.json({ items });
+}
+
+export async function listarArvoreAdmin(req, res) {
+    // only admins with nivel >=1 should reach here (middleware enforces it)
+    const items = await listArvoreAdmin();
     return res.json({ items });
 }
 
@@ -140,9 +174,10 @@ export async function criarPasta(req, res) {
     }
 
     const slug = toSlug(normalized);
+    const isPrivate = Boolean(body.is_private);
 
     try {
-        const pasta = await createPasta({ nome: normalized, slug, adminId: Number(req.user.id) });
+        const pasta = await createPasta({ nome: normalized, slug, adminId: Number(req.user.id), isPrivate });
         res.status(201).json(pasta);
     } catch (err) {
         if (err?.code === "ER_DUP_ENTRY") {
@@ -159,7 +194,9 @@ export async function criarPasta(req, res) {
 ========================= */
 export async function adicionarDocumento(req, res) {
     const pastaId = PastaIdSchema.parse(req.params.pastaId);
-    const body = CreateDocSchema.parse(req.body);
+    const body = CreateDocSchema.extend({
+        destinatario_matricula: z.string().trim().min(1).max(50).optional()
+    }).parse(req.body);
 
     const pasta = await getPastaById(pastaId);
     if (!pasta) {
@@ -171,6 +208,17 @@ export async function adicionarDocumento(req, res) {
         return res.status(400).json({
             error: { message: "Nome do documento inválido. Sem caracteres especiais.", requestId: req.id }
         });
+    }
+
+    // check permission for destinatário
+    let destMat = null;
+    if (body.destinatario_matricula) {
+        destMat = body.destinatario_matricula;
+        if (!(req.user?.nivel > 1)) {
+            return res.status(403).json({
+                error: { message: "Somente administradores nível >1 podem direcionar documentos.", requestId: req.id }
+            });
+        }
     }
 
     if (!req.file) {
@@ -210,7 +258,8 @@ export async function adicionarDocumento(req, res) {
             fileSize: req.file.size,
             fileHash,
             mimeType,
-            adminId: Number(req.user.id)
+            adminId: Number(req.user.id),
+            destinatarioMatricula: destMat
         });
 
         res.status(201).json(doc);
@@ -236,6 +285,15 @@ export async function downloadDocumentoPublico(req, res) {
 
     if (!doc) {
         return res.status(404).json({ error: { message: "Documento não encontrado.", requestId: req.id } });
+    }
+
+    // se o documento está destinado a alguém, só deixa esse colaborador ou admin visualizá-lo
+    if (doc.destinatario_matricula) {
+        const userMat = String(req.user?.matricula || "");
+        const isAdmin = req.user?.role === "ADMIN";
+        if (!isAdmin && userMat !== String(doc.destinatario_matricula)) {
+            return res.status(403).json({ error: { message: "Acesso negado.", requestId: req.id } });
+        }
     }
 
     // Defensivo: garante que arquivo existe

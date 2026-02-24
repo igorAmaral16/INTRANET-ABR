@@ -9,6 +9,7 @@ export type NoBiblioteca = {
     tipo: "PASTA" | "DOCUMENTO";
     url?: string | null;
     filhos?: NoBiblioteca[];
+    is_private?: boolean; // present for folders
 };
 
 function absolutizarUrl(u?: string | null) {
@@ -33,6 +34,10 @@ function normalizarArvore(data: any): NoBiblioteca[] {
         };
 
         if (tipo === "PASTA") {
+            // preserve private flag if present
+            if (n.is_private !== undefined) {
+                (node as any).is_private = Boolean(n.is_private);
+            }
             node.filhos = Array.isArray(filhosRaw) ? filhosRaw.map(mapear) : [];
         }
 
@@ -51,6 +56,24 @@ export async function obterArvoreBiblioteca(signal?: AbortSignal) {
     return normalizarArvore(data);
 }
 
+// collaborator-specific (must be logged in)
+export async function obterArvoreBibliotecaColab(params: { token: string }, signal?: AbortSignal) {
+    const data = await httpGet<any>("/biblioteca/arvore-colab", {
+        signal,
+        headers: bearerHeaders(params.token)
+    });
+    return normalizarArvore(data);
+}
+
+export async function obterArvoreBibliotecaAdmin(params: { token: string }, signal?: AbortSignal) {
+    const data = await httpGet<any>("/admin/biblioteca/arvore", {
+        signal,
+        headers: bearerHeaders(params.token)
+    });
+    return normalizarArvore(data);
+}
+
+
 /* =========================
    ADMIN
 ========================= */
@@ -59,10 +82,11 @@ export type PastaAdmin = {
     id: number;
     nome: string;
     slug: string;
+    is_private?: boolean;
 };
 
-export async function criarPastaAdmin(params: { token: string; nome: string }, signal?: AbortSignal) {
-    return httpPost<PastaAdmin>("/admin/biblioteca/pastas", { nome: params.nome }, {
+export async function criarPastaAdmin(params: { token: string; nome: string; isPrivate?: boolean }, signal?: AbortSignal) {
+    return httpPost<PastaAdmin>("/admin/biblioteca/pastas", { nome: params.nome, is_private: params.isPrivate }, {
         signal,
         headers: bearerHeaders(params.token)
     });
@@ -71,8 +95,8 @@ export async function criarPastaAdmin(params: { token: string; nome: string }, s
 // Estes 2 endpoints exigem que você tenha implementado no backend:
 // PUT /admin/biblioteca/pastas/:pastaId
 // DELETE /admin/biblioteca/pastas/:pastaId
-export async function atualizarPastaAdmin(params: { token: string; pastaId: number; nome: string }, signal?: AbortSignal) {
-    return httpPut<PastaAdmin>(`/admin/biblioteca/pastas/${params.pastaId}`, { nome: params.nome }, {
+export async function atualizarPastaAdmin(params: { token: string; pastaId: number; nome: string; isPrivate?: boolean }, signal?: AbortSignal) {
+    return httpPut<PastaAdmin>(`/admin/biblioteca/pastas/${params.pastaId}`, { nome: params.nome, is_private: params.isPrivate }, {
         signal,
         headers: bearerHeaders(params.token)
     });
@@ -85,10 +109,13 @@ export async function excluirPastaAdmin(params: { token: string; pastaId: number
     });
 }
 
-export async function adicionarDocumentoAdmin(params: { token: string; pastaId: number; nome: string; file: File }, signal?: AbortSignal) {
+export async function adicionarDocumentoAdmin(params: { token: string; pastaId: number; nome: string; file: File; destinatarioMatricula?: string }, signal?: AbortSignal) {
     const form = new FormData();
     form.append("nome", params.nome);
     form.append("file", params.file);
+    if (params.destinatarioMatricula) {
+        form.append("destinatario_matricula", params.destinatarioMatricula);
+    }
 
     return httpPostFormData<any>(`/admin/biblioteca/pastas/${params.pastaId}/documentos`, form, {
         signal,

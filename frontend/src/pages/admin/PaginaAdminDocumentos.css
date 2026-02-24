@@ -189,6 +189,12 @@
     opacity: 0.85;
 }
 
+.admDocs__badgePrivate {
+    background: rgba(255, 200, 200, 0.4);
+    border-color: rgba(255, 100, 100, 0.6);
+    color: #a00;
+}
+
 .admDocs__toggle {
     height: 34px;
     width: 34px;
@@ -357,6 +363,44 @@
     opacity: 0.6;
     cursor: not-allowed;
 }
+
+/* dest search helpers */
+.admDocs__destLoading {
+    font-size: 0.8rem;
+    color: #555;
+    margin-top: -4px;
+}
+
+.admDocs__destList {
+    list-style: none;
+    margin: 4px 0 0 0;
+    padding: 0;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    max-height: 150px;
+    overflow-y: auto;
+    background: #fff;
+}
+
+.admDocs__destList li button {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 6px 10px;
+    border: none;
+    background: none;
+    cursor: pointer;
+}
+
+.admDocs__destList li button:hover {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+.admDocs__destSelected {
+    font-size: 0.9rem;
+    margin-top: 4px;
+}
+
 
 .admDocs__ghost {
     background: #fff !important;

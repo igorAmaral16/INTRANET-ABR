@@ -36,6 +36,14 @@ VITE_API_BASE_URL=https://10.0.0.48:5443
 
 (macOS/Windows may require trusting the mkcert root certificate – refer to mkcert docs.)
 
+### New pages
+
+A new "Meus Documentos" view is available at `/meus-documentos` for authenticated
+collaborators. It shows only the files that were explicitly sent to the logged‑in
+user; public documents remain visible under the existing `/documentos` route.
+Administrators can assign a destinatário when uploading files via the admin panel
+(see `PaginaAdminDocumentos`).
+
 ## Expanding the ESLint configuration
 
 If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.

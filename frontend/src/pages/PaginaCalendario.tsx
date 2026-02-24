@@ -90,6 +90,7 @@ export function PaginaCalendario() {
 
                 aoMeuPerfil={() => navigate('/meu-perfil')}
                 aoVerDocumentos={() => navigate('/documentos')}
+                aoMeusDocumentos={() => navigate('/meus-documentos')}
                 aoCalendario={() => navigate('/calendario')}
                 aoFaq={() => navigate('/faq')}
                 aoFaleComRh={() => navigate('/fale-com-rh')}

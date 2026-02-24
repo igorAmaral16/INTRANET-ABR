@@ -15,6 +15,7 @@ import "./MenuUsuario.css";
 type Props = {
     aoMeuPerfil: () => void;
     aoVerDocumentos: () => void;
+    aoMeusDocumentos?: () => void;
     aoCalendario?: () => void;
     aoFaq: () => void;
     aoFaleComRh: () => void;
@@ -36,6 +37,7 @@ function Portal({ children }: { children: ReactNode }) {
 export function MenuUsuario({
     aoMeuPerfil,
     aoVerDocumentos,
+    aoMeusDocumentos,
     aoCalendario,
     aoFaq,
     aoFaleComRh,
@@ -44,14 +46,22 @@ export function MenuUsuario({
     const [abertoMobile, setAbertoMobile] = useState(false);
 
     const itens: Item[] = useMemo(
-        () => [
-            { id: "calendario", titulo: "Calendário", icon: <IconCalendar size={18} />, onClick: aoCalendario || (() => { window.location.href = '/calendario'; }) },
-            { id: "perfil", titulo: "Meu Perfil", icon: <IconUser size={18} />, onClick: aoMeuPerfil },
-            { id: "docs", titulo: "Ver Documentos", icon: <IconFolder size={18} />, onClick: aoVerDocumentos },
-            { id: "faq", titulo: "Dúvidas Frequentes (FAQ)", icon: <IconHelp size={18} />, onClick: aoFaq },
-            { id: "fale", titulo: "Fale com o RH", icon: <IconMessage size={18} />, onClick: aoFaleComRh },
-        ],
-        [aoMeuPerfil, aoVerDocumentos, aoFaq, aoFaleComRh]
+        () => {
+            const base: Item[] = [
+                { id: "calendario", titulo: "Calendário", icon: <IconCalendar size={18} />, onClick: aoCalendario || (() => { window.location.href = '/calendario'; }) },
+                { id: "perfil", titulo: "Meu Perfil", icon: <IconUser size={18} />, onClick: aoMeuPerfil },
+            ];
+
+            if (aoMeusDocumentos) {
+                base.push({ id: "meusDocs", titulo: "Meus Documentos", icon: <IconFolder size={18} />, onClick: aoMeusDocumentos });
+            }
+
+            base.push({ id: "docs", titulo: "Ver Documentos", icon: <IconFolder size={18} />, onClick: aoVerDocumentos });
+            base.push({ id: "faq", titulo: "Dúvidas Frequentes (FAQ)", icon: <IconHelp size={18} />, onClick: aoFaq });
+            base.push({ id: "fale", titulo: "Fale com o RH", icon: <IconMessage size={18} />, onClick: aoFaleComRh });
+            return base;
+        },
+        [aoMeuPerfil, aoVerDocumentos, aoMeusDocumentos, aoFaq, aoFaleComRh]
     );
 
     useEffect(() => {

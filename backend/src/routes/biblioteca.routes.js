@@ -14,8 +14,12 @@ import {
     adicionarDocumento,
     excluirDocumento,
     listarArvorePublico,
+    listarArvoreAdmin,
     atualizarPasta,
-    excluirPasta
+    excluirPasta,
+    // private
+    listarDocumentosColab,
+    listarArvoreColab
 } from "../controllers/biblioteca.controller.js";
 
 export const bibliotecaRouter = express.Router();
@@ -73,4 +77,27 @@ bibliotecaRouter.delete(
     asyncHandler(excluirPasta)
 );
 
+
+// public tree
 bibliotecaRouter.get("/biblioteca/arvore", asyncHandler(listarArvorePublico));
+
+// admin tree (includes private folders and all documents)
+bibliotecaRouter.get(
+    "/admin/biblioteca/arvore",
+    authJwt,
+    requireRole("ADMIN"),
+    requireNivel(1),
+    asyncHandler(listarArvoreAdmin)
+);
+
+// collaborator-specific endpoints (requires authentication)
+bibliotecaRouter.get(
+    "/biblioteca/pastas/:pastaId/documentos-colab",
+    authJwt,
+    asyncHandler(listarDocumentosColab)
+);
+bibliotecaRouter.get(
+    "/biblioteca/arvore-colab",
+    authJwt,
+    asyncHandler(listarArvoreColab)
+);

@@ -20,13 +20,14 @@ import { Modal } from "../../components/Modal/Modal";
 import { useSessaoAuth } from "../../hooks/useSessaoAuth";
 import {
     NoBiblioteca,
-    obterArvoreBiblioteca,
+    obterArvoreBibliotecaAdmin,
     criarPastaAdmin,
     atualizarPastaAdmin,
     excluirPastaAdmin,
     adicionarDocumentoAdmin,
     excluirDocumentoAdmin,
 } from "../../api/biblioteca.api";
+import { listarColaboradoresAdmin, type ColaboradorAdmin } from "../../api/colaborador.api";
 
 import { ErroHttp } from "../../api/clienteHttp";
 import "../../pages/PaginaBase.css";
@@ -37,7 +38,7 @@ function isAbortError(e: any) {
 }
 
 type MenuCtx =
-    | { tipo: "PASTA"; id: number; nome: string }
+    | { tipo: "PASTA"; id: number; nome: string; is_private?: boolean }
     | { tipo: "DOCUMENTO"; id: number; nome: string };
 
 function contarItens(arvore: NoBiblioteca[]) {
@@ -119,6 +120,7 @@ function NoArvoreAdmin({
                         {no.nome}
                     </span>
                     <span className="admDocs__badge">PASTA</span>
+                    {no.is_private ? <span className="admDocs__badge admDocs__badgePrivate">PRIVADA</span> : null}
                 </div>
 
                 <button
@@ -172,13 +174,20 @@ export function PaginaAdminDocumentos() {
 
     // modais
     const [modalNovaPasta, setModalNovaPasta] = useState(false);
-    const [modalEditarPasta, setModalEditarPasta] = useState<{ id: number; nome: string } | null>(null);
+    const [modalEditarPasta, setModalEditarPasta] = useState<{ id: number; nome: string; is_private?: boolean } | null>(null);
     const [modalUpload, setModalUpload] = useState<{ pastaId: number; pastaNome: string } | null>(null);
 
     const [nomePasta, setNomePasta] = useState("");
+    const [novaPastaPrivada, setNovaPastaPrivada] = useState(false);
 
     const [uploadNomeDoc, setUploadNomeDoc] = useState("");
     const [uploadFile, setUploadFile] = useState<File | null>(null);
+
+    // destinatário específico (só admins nivel >1)
+    const [destSearch, setDestSearch] = useState("");
+    const [destResults, setDestResults] = useState<ColaboradorAdmin[]>([]);
+    const [destSelecionado, setDestSelecionado] = useState<ColaboradorAdmin | null>(null);
+    const [destLoading, setDestLoading] = useState(false);
 
     const [processando, setProcessando] = useState(false);
 
@@ -186,6 +195,30 @@ export function PaginaAdminDocumentos() {
 
     const estaLogado = Boolean(sessao?.token);
     const role = sessao?.role;
+    const canAssignDest = Boolean(sessao?.user?.nivel > 1);
+
+    // fetch collaborators for autocomplete when search string changes
+    useEffect(() => {
+        const q = destSearch.trim();
+        if (!q || !sessao?.token) {
+            setDestResults([]);
+            setDestLoading(false);
+            return;
+        }
+
+        const ac = new AbortController();
+        setDestLoading(true);
+        listarColaboradoresAdmin({ token: sessao.token, page: 1, pageSize: 10, search: q }, ac.signal)
+            .then((r) => {
+                if (!ac.signal.aborted) setDestResults(r.items);
+            })
+            .catch(() => { })
+            .finally(() => {
+                if (!ac.signal.aborted) setDestLoading(false);
+            });
+
+        return () => ac.abort();
+    }, [destSearch, sessao?.token]);
 
     function fecharMenu() {
         setMenuAberto(null);
@@ -205,7 +238,8 @@ export function PaginaAdminDocumentos() {
             setEstado("carregando");
             setErro(null);
             try {
-                const data = await obterArvoreBiblioteca(ac.signal);
+                if (!sessao?.token) throw new Error("Sem token");
+                const data = await obterArvoreBibliotecaAdmin({ token: sessao.token }, ac.signal);
                 setArvore(data);
                 setEstado("pronto");
             } catch (e: any) {
@@ -248,7 +282,8 @@ export function PaginaAdminDocumentos() {
         setEstado("carregando");
         setErro(null);
         try {
-            const data = await obterArvoreBiblioteca(signal);
+            if (!sessao?.token) throw new Error("Sem token");
+            const data = await obterArvoreBibliotecaAdmin({ token: sessao.token }, signal);
             setArvore(data);
             setEstado("pronto");
         } catch (e: any) {
@@ -305,9 +340,10 @@ export function PaginaAdminDocumentos() {
 
         setProcessando(true);
         try {
-            await criarPastaAdmin({ token: sessao.token, nome });
+            await criarPastaAdmin({ token: sessao.token, nome, isPrivate: novaPastaPrivada });
             setModalNovaPasta(false);
             setNomePasta("");
+            setNovaPastaPrivada(false);
             await recarregar();
         } catch (e: any) {
             const msg = e instanceof ErroHttp ? e.message : e?.message;
@@ -327,7 +363,12 @@ export function PaginaAdminDocumentos() {
 
         setProcessando(true);
         try {
-            await atualizarPastaAdmin({ token: sessao.token, pastaId: modalEditarPasta.id, nome });
+            await atualizarPastaAdmin({
+                token: sessao.token,
+                pastaId: modalEditarPasta.id,
+                nome,
+                isPrivate: novaPastaPrivada
+            });
             setModalEditarPasta(null);
             setNomePasta("");
             await recarregar();
@@ -358,10 +399,14 @@ export function PaginaAdminDocumentos() {
                 pastaId: modalUpload.pastaId,
                 nome,
                 file: uploadFile,
+                destinatarioMatricula: destSelecionado?.matricula,
             });
             setModalUpload(null);
             setUploadNomeDoc("");
             setUploadFile(null);
+            setDestSearch("");
+            setDestResults([]);
+            setDestSelecionado(null);
             await recarregar();
         } catch (e: any) {
             const msg = e instanceof ErroHttp ? e.message : e?.message;
@@ -477,6 +522,7 @@ export function PaginaAdminDocumentos() {
                             className="admDocs__btn"
                             onClick={() => {
                                 setNomePasta("");
+                                setNovaPastaPrivada(false);
                                 setModalNovaPasta(true);
                             }}
                             disabled={processando}
@@ -522,7 +568,7 @@ export function PaginaAdminDocumentos() {
                         <div className="admDocs__emptyTitle">Biblioteca vazia</div>
                         <div className="admDocs__emptySub">Crie uma pasta para começar a organizar seus documentos.</div>
                         <div style={{ marginTop: 10 }}>
-                            <button type="button" onClick={() => setModalNovaPasta(true)}>
+                            <button type="button" onClick={() => { setNomePasta(""); setNovaPastaPrivada(false); setModalNovaPasta(true); }}>
                                 <Plus size={18} /> Nova pasta
                             </button>
                         </div>
@@ -590,8 +636,9 @@ export function PaginaAdminDocumentos() {
                                     type="button"
                                     className="admDocs__menuItem"
                                     onClick={() => {
-                                        setModalEditarPasta({ id: menuAberto.ctx.id, nome: menuAberto.ctx.nome });
+                                        setModalEditarPasta({ id: menuAberto.ctx.id, nome: menuAberto.ctx.nome, is_private: menuAberto.ctx.is_private });
                                         setNomePasta(menuAberto.ctx.nome);
+                                        setNovaPastaPrivada(!!menuAberto.ctx.is_private);
                                         fecharMenu();
                                     }}
                                     disabled={processando}
@@ -635,6 +682,14 @@ export function PaginaAdminDocumentos() {
                         <input value={nomePasta} onChange={(e) => setNomePasta(e.target.value)} placeholder="Ex: BENEFÍCIOS" />
                     </label>
 
+                    <label className="admDocs__campo">
+                        <span>Destino</span>
+                        <select value={novaPastaPrivada ? "private" : "public"} onChange={(e) => setNovaPastaPrivada(e.target.value === "private")}>
+                            <option value="public">Documentos públicos</option>
+                            <option value="private">Meus documentos (privada)</option>
+                        </select>
+                    </label>
+
                     <div className="admDocs__modalAcoes">
                         <button type="button" onClick={criarPasta} disabled={processando}>
                             {processando ? "Criando..." : "Criar pasta"}
@@ -647,18 +702,26 @@ export function PaginaAdminDocumentos() {
             </Modal>
 
             {/* Modal Editar Pasta */}
-            <Modal aberto={Boolean(modalEditarPasta)} titulo="Editar pasta" aoFechar={() => setModalEditarPasta(null)}>
+            <Modal aberto={Boolean(modalEditarPasta)} titulo="Editar pasta" aoFechar={() => { setModalEditarPasta(null); setNovaPastaPrivada(false); }}>
                 <div className="admDocs__modalGrid">
                     <label className="admDocs__campo">
                         <span>Novo nome</span>
                         <input value={nomePasta} onChange={(e) => setNomePasta(e.target.value)} placeholder="Nome da pasta" />
                     </label>
 
+                    <label className="admDocs__campo">
+                        <span>Destino</span>
+                        <select value={novaPastaPrivada ? "private" : "public"} onChange={(e) => setNovaPastaPrivada(e.target.value === "private")}>
+                            <option value="public">Documentos públicos</option>
+                            <option value="private">Meus documentos (privada)</option>
+                        </select>
+                    </label>
+
                     <div className="admDocs__modalAcoes">
                         <button type="button" onClick={salvarEdicaoPasta} disabled={processando}>
                             {processando ? "Salvando..." : "Salvar"}
                         </button>
-                        <button type="button" className="admDocs__ghost" onClick={() => setModalEditarPasta(null)} disabled={processando}>
+                        <button type="button" className="admDocs__ghost" onClick={() => { setModalEditarPasta(null); setNovaPastaPrivada(false); }} disabled={processando}>
                             Cancelar
                         </button>
                     </div>
@@ -673,7 +736,9 @@ export function PaginaAdminDocumentos() {
             >
                 <div className="admDocs__modalGrid">
                     <div className="admDocs__uploadHint">
-                        Selecione um PDF. O documento será exibido para colaboradores na biblioteca.
+                        Selecione um PDF. O documento será exibido para todos os colaboradores na
+                        biblioteca, a menos que você escolha um destinatário específico acima —
+                        nesse caso apenas o colaborador selecionado poderá visualizá-lo.
                     </div>
 
                     <label className="admDocs__campo">
@@ -694,6 +759,53 @@ export function PaginaAdminDocumentos() {
                         <div className="admDocs__fileInfo">
                             <div className="admDocs__fileName">{uploadFile.name}</div>
                             <div className="admDocs__fileMeta">{(uploadFile.size / 1024 / 1024).toFixed(2)} MB • application/pdf</div>
+                        </div>
+                    ) : null}
+
+                    {/* destinatário opcional (only level>1 admins) */}
+                    {canAssignDest ? (
+                        <div className="admDocs__campo">
+                            <span>Destinatário (opcional)</span>
+                            <input
+                                value={destSearch}
+                                onChange={(e) => {
+                                    setDestSearch(e.target.value);
+                                    setDestSelecionado(null);
+                                }}
+                                placeholder="Nome ou matrícula"
+                            />
+                            {destLoading ? <div className="admDocs__destLoading">carregando...</div> : null}
+                            {destResults.length > 0 && !destSelecionado ? (
+                                <ul className="admDocs__destList">
+                                    {destResults.map((c) => (
+                                        <li key={c.matricula}>
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    setDestSelecionado(c);
+                                                    setDestResults([]);
+                                                }}
+                                            >
+                                                {c.nome_completo} ({c.matricula})
+                                            </button>
+                                        </li>
+                                    ))}
+                                </ul>
+                            ) : null}
+                            {destSelecionado ? (
+                                <div className="admDocs__destSelected">
+                                    Selecionado: {destSelecionado.nome_completo} ({destSelecionado.matricula}){' '}
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            setDestSelecionado(null);
+                                            setDestSearch('');
+                                        }}
+                                    >
+                                        limpar
+                                    </button>
+                                </div>
+                            ) : null}
                         </div>
                     ) : null}
 

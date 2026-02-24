@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Folder, FileText, ChevronDown, ChevronRight } from "lucide-react";
 import { BarraTopo } from "../components/BarraTopo/BarraTopo";
 import { useSessaoAuth } from "../hooks/useSessaoAuth";
-import { obterArvoreBiblioteca, type NoBiblioteca } from "../api/biblioteca.api";
+import { obterArvoreBibliotecaColab, type NoBiblioteca } from "../api/biblioteca.api";
 import { resolverUrlApi } from "../utils/urlApi";
 import "./PaginaBase.css";
 import "./PaginaDocumentos.css";
@@ -53,9 +53,9 @@ function NoArvore({
     );
 }
 
-export function PaginaDocumentos() {
+export function PaginaMeusDocumentos() {
     const navigate = useNavigate();
-    const { estaLogadoColab, sair } = useSessaoAuth();
+    const { estaLogadoColab, sessao, sair } = useSessaoAuth();
 
     const [carregando, setCarregando] = useState(true);
     const [erro, setErro] = useState<string | null>(null);
@@ -64,6 +64,13 @@ export function PaginaDocumentos() {
     const [abertos, setAbertos] = useState<Set<string>>(() => new Set());
 
     useEffect(() => {
+        if (!estaLogadoColab || !sessao?.token) {
+            setErro("Faça login como colaborador para acessar seus documentos.");
+            setCarregando(false);
+            setArvore([]);
+            return;
+        }
+
         const ac = new AbortController();
 
         (async () => {
@@ -71,18 +78,18 @@ export function PaginaDocumentos() {
             setErro(null);
 
             try {
-                const data = await obterArvoreBiblioteca(ac.signal);
+                const data = await obterArvoreBibliotecaColab({ token: sessao.token }, ac.signal);
                 setArvore(data);
             } catch (e: any) {
-                if (isAbortError(e)) return; // não exibe abort como erro
-                setErro(e?.message || "Não foi possível carregar a biblioteca.");
+                if (isAbortError(e)) return;
+                setErro(e?.message || "Não foi possível carregar seus documentos.");
             } finally {
                 if (!ac.signal.aborted) setCarregando(false);
             }
         })();
 
         return () => ac.abort();
-    }, []);
+    }, [estaLogadoColab, sessao?.token]);
 
     const alternar = (id: string) => {
         setAbertos((prev) => {
@@ -125,12 +132,19 @@ export function PaginaDocumentos() {
                     <button className="botaoVoltar" type="button" onClick={() => navigate(-1)}>
                         <ArrowLeft size={18} /> Voltar
                     </button>
-                    <h1 className="paginaBase__titulo">Biblioteca de Documentos</h1>
+                    <h1 className="paginaBase__titulo">Meus Documentos</h1>
                 </div>
 
                 {carregando ? <div className="card">Carregando...</div> : null}
                 {!carregando && erro ? <div className="card cardErro">{erro}</div> : null}
-                {vazio ? <div className="card">Nenhum documento disponível.</div> : null}
+                {vazio ? (
+                    <div className="card">
+                        <div style={{ textAlign: "center", padding: "2rem 1rem" }}>
+                            <FileText size={48} />
+                            <p>Você ainda não tem documentos aqui.</p>
+                        </div>
+                    </div>
+                ) : null}
 
                 {!carregando && !erro && arvore.length > 0 ? (
                     <section className="arvore">

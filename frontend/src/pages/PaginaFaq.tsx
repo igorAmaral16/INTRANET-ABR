@@ -70,6 +70,7 @@ export function PaginaFaq() {
 
                 aoMeuPerfil={() => navigate("/meu-perfil")}
                 aoVerDocumentos={() => navigate("/documentos")}
+                aoMeusDocumentos={() => navigate("/meus-documentos")}
                 aoFaq={() => navigate("/faq")}
                 aoFaleComRh={() => navigate("/fale-com-rh")}
                 aoSair={sair}

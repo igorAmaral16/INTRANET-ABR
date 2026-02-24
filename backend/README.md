@@ -47,3 +47,25 @@ port being used.
 
 The logic of the system is unchanged; you can keep using plain HTTP in development
 and switch to HTTPS in production by setting the variables above.
+
+## New Biblioteca endpoints
+
+The library subsystem now supports documents targeted to a single collaborator:
+
+* `GET /biblioteca/arvore-colab` – returns the folder/document tree containing only
+  the documents addressed to the authenticated collaborator.  Requires a valid
+  bearer token (`authJwt` middleware).
+* `GET /biblioteca/pastas/:pastaId/documentos-colab` – lists documents within a
+  specific folder destined for the logged‑in user.  Also protected by JWT.
+
+The public endpoints (`/biblioteca/arvore`, `/biblioteca/pastas/:id/documentos`)
+continue to exclude targeted documents.  The `/biblioteca/documentos/:id/download`
+route has been tightened so that a document with a `destinatario_matricula`
+can be downloaded only by that collaborator or by an admin.
+
+Administrators with level >1 may now upload a document and specify a
+`destinatario_matricula` field; level‑1 admins are forbidden from doing so.
+
+> **Database update:** before deploying you must run the migration located at
+> `documentacao/BANCO/migration_add_destinatario_documentos.sql` to add the
+> new column and index to the `BibliotecaDocumentos` table.

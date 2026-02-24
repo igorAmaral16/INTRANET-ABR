@@ -21,6 +21,7 @@ type Props = {
     // COLAB
     aoMeuPerfil?: () => void;
     aoVerDocumentos?: () => void;
+    aoMeusDocumentos?: () => void; // added
     aoCalendario?: () => void;
     aoFaq?: () => void;
     aoFaleComRh?: () => void;
@@ -48,6 +49,7 @@ export function BarraTopo({
 
     aoMeuPerfil,
     aoVerDocumentos,
+    aoMeusDocumentos,
     aoFaq,
     aoFaleComRh,
 
@@ -109,6 +111,7 @@ export function BarraTopo({
                             <MenuUsuario
                                 aoMeuPerfil={aoMeuPerfil || (() => { })}
                                 aoVerDocumentos={aoVerDocumentos || (() => { })}
+                                aoMeusDocumentos={aoMeusDocumentos || (() => { })}
                                 aoCalendario={aoCalendario}
                                 aoFaq={aoFaq || (() => { })}
                                 aoFaleComRh={aoFaleComRh || (() => { })}
