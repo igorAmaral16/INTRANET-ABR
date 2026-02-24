@@ -22,8 +22,13 @@ export async function getCalendarioConfiguracao() {
         LIMIT 1
     `;
 
-    const [rows] = await pool.query(sql);
-    return rows.length > 0 ? rows[0] : null;
+    try {
+        const [rows] = await pool.query(sql);
+        return rows.length > 0 ? rows[0] : null;
+    } catch (err) {
+        console.error('❌ Erro SQL em getCalendarioConfiguracao:', { err, sql });
+        throw err;
+    }
 }
 
 export async function createCalendarioConfiguracao(config) {

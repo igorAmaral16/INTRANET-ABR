@@ -43,9 +43,13 @@ export function buildApp() {
     app.use(
         cors({
             origin: (origin, cb) => {
+                // requisições sem origin header (como de server-side) são permitidas
                 if (!origin) return cb(null, true);
+                // se nenhuma origem foi configurada, tudo é permitido (apenas para compatibilidade)
                 if (!corsOrigins.length) return cb(null, true);
+                // valida contra a lista de origens permitidas
                 if (corsOrigins.includes(origin)) return cb(null, true);
+                // rejeita qualquer origem não autorizada
                 return cb(new Error("CORS blocked"));
             },
             credentials: true,

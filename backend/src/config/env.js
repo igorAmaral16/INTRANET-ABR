@@ -19,7 +19,12 @@ const EnvSchema = z.object({
     JWT_ISSUER: z.string().min(1).default("intranet-rh"),
     JWT_AUDIENCE: z.string().min(1).default("intranet-colaboradores"),
     JWT_EXPIRES_IN: z.string().min(2).default("15m"),
-    CORS_ORIGINS: z.string().optional()  // Tornando opcional
+    CORS_ORIGINS: z.string().optional(),  // Tornando opcional
+
+    // habilita HTTPS se as duas variáveis abaixo estiverem presentes
+    SSL_KEY_PATH: z.string().min(1).optional(),
+    SSL_CERT_PATH: z.string().min(1).optional(),
+    HTTPS_PORT: z.coerce.number().int().positive().optional()
 });
 
 export const env = EnvSchema.parse(process.env);

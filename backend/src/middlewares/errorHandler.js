@@ -18,6 +18,12 @@ export function errorHandler(err, req, res, next) {
 
     const statusCode = Number.isInteger(err.statusCode) ? err.statusCode : 500;
 
+    // log detalhado para diagnosticar 500s no ambiente restrito
+    try {
+        console.error('❗ Request failed', { err: err && err.message, stack: err && err.stack, statusCode, path: req.path, method: req.method, requestId: req.id });
+    } catch (logErr) {
+        // ignore logging failures
+    }
     req.log?.error({ err, statusCode }, "Request failed");
 
     const payload = {

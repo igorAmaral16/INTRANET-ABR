@@ -1,4 +1,5 @@
-const BASE_URL = import.meta.env.VITE_API_BASE_URL?.trim() || "http://localhost:4000";
+// se a variável de ambiente não estiver presente usa a mesma origem da aplicação
+const BASE_URL = import.meta.env.VITE_API_BASE_URL?.trim() || window.location.origin;
 
 function montarUrl(caminho: string) {
     if (!caminho.startsWith("/")) return `${BASE_URL}/${caminho}`;

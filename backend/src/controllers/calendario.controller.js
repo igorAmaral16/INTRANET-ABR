@@ -53,6 +53,7 @@ const FeriadoSchema = z.object({
 
 export async function obterConfiguracao(req, res) {
     try {
+        console.log('🔍 Recebida requisição GET /api/calendario/configuracao', { requestId: req.id, ip: req.ip });
         const config = await getCalendarioConfiguracao();
         if (!config) {
             return res.status(404).json({
@@ -61,6 +62,7 @@ export async function obterConfiguracao(req, res) {
         }
         res.json(config);
     } catch (err) {
+        console.error('❌ Erro ao obter configuração do calendário:', err);
         res.status(500).json({
             error: { message: "Erro ao obter configuração.", requestId: req.id }
         });

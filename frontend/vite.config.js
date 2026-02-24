@@ -3,12 +3,12 @@ import react from "@vitejs/plugin-react";
 import fs from "fs";
 import path from "path";
 
-const certDir = path.resolve(__dirname, "certs");
-const keyPath = path.join(certDir, "lan-key.pem");
-const certPath = path.join(certDir, "lan.pem");
+const certDir = path.resolve(__dirname, "../backend/certs");
+const keyPath = path.join(certDir, "10.0.0.48+2-key.pem");
+const certPath = path.join(certDir, "10.0.0.48+2.pem");
 
 const BACKEND_HOST = "10.0.0.48";
-const BACKEND_PORT = 5053;
+const BACKEND_PORT = 5443;
 
 export default defineConfig({
   plugins: [react()],
@@ -22,19 +22,20 @@ export default defineConfig({
     },
     proxy: {
       "/api": {
-        target: `http://${BACKEND_HOST}:${BACKEND_PORT}`,
+        target: `https://${BACKEND_HOST}:${BACKEND_PORT}`,
         changeOrigin: true,
+        secure: false, // aceita certificados auto-assinados em dev
       },
       "/uploads": {
-        target: `http://${BACKEND_HOST}:${BACKEND_PORT}`,
+        target: `https://${BACKEND_HOST}:${BACKEND_PORT}`,
         changeOrigin: true,
+        secure: false,
       },
-
-      // >>> ADICIONADO: proxy do Socket.IO (WebSocket)
       "/socket.io": {
-        target: `http://${BACKEND_HOST}:${BACKEND_PORT}`,
+        target: `https://${BACKEND_HOST}:${BACKEND_PORT}`,
         ws: true,
         changeOrigin: true,
+        secure: false,
       },
     },
   },
