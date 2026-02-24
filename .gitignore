@@ -11,6 +11,7 @@ Thumbs.db
 banco_intranet.sql
 uploads/
 scripts/
+BANCO/
 
 # Editor / IDE
 .vscode/*
