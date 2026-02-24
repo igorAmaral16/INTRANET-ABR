@@ -1,0 +1,101 @@
+.arvore {
+    display: grid;
+    gap: 12px;
+}
+
+/* Pastas - Azul */
+.pasta {
+    border-radius: 16px;
+    border: 1px solid rgba(59, 130, 246, 0.25);
+    background: linear-gradient(135deg, rgba(219, 234, 254, 0.6) 0%, rgba(239, 246, 255, 0.6) 100%);
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(59, 130, 246, 0.08);
+}
+
+.pasta__topo {
+    width: calc(100% - var(--indent, 0px));
+    text-align: left;
+    height: 52px;
+    padding: 0 16px;
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-weight: 950;
+    color: #1e40af;
+    transition: all 0.2s ease;
+    font-size: 15px;
+    letter-spacing: 0.3px;
+}
+
+.pasta__topo:hover {
+    background: rgba(59, 130, 246, 0.12);
+    transform: translateX(4px);
+}
+
+.pasta__topo svg:first-child {
+    color: #3b82f6;
+    flex-shrink: 0;
+}
+
+.pasta__topo svg:nth-child(2) {
+    color: #2563eb;
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+}
+
+.pasta__nome {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex: 1;
+}
+
+.pasta__filhos {
+    padding: 12px 16px 16px 0;
+    display: grid;
+    gap: 10px;
+    border-top: 1px solid rgba(59, 130, 246, 0.15);
+    background: rgba(59, 130, 246, 0.03);
+}
+
+/* Documentos - Cinza/Índigo */
+.docItem {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    height: 48px;
+    padding: 0 16px;
+    border-radius: 12px;
+    border: 1px solid rgba(107, 114, 128, 0.25);
+    background: linear-gradient(135deg, rgba(249, 250, 251, 1) 0%, rgba(243, 244, 246, 1) 100%);
+    text-decoration: none;
+    color: #374151;
+    font-weight: 900;
+    transition: all 0.2s ease;
+    font-size: 14px;
+}
+
+.docItem:hover {
+    background: linear-gradient(135deg, rgba(229, 231, 235, 1) 0%, rgba(219, 222, 225, 1) 100%);
+    border-color: rgba(107, 114, 128, 0.4);
+    transform: translateX(4px);
+    box-shadow: 0 2px 6px rgba(107, 114, 128, 0.15);
+}
+
+.docItem svg {
+    color: #6366f1;
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+}
+
+.docItem span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex: 1;
+}

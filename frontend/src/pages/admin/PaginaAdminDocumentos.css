@@ -140,117 +140,170 @@
     gap: 6px;
 }
 
-/* Rows */
-.admDocs__row {
-    border: 1px solid rgba(0, 0, 0, 0.08);
-    background: #fff;
+/* Tree structure - matching collaborator design */
+.admDocs__pastaBlock {
     border-radius: 16px;
-    padding: 12px;
-    display: flex;
-    gap: 10px;
+    border: 1px solid rgba(59, 130, 246, 0.25);
+    background: linear-gradient(135deg, rgba(219, 234, 254, 0.6) 0%, rgba(239, 246, 255, 0.6) 100%);
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(59, 130, 246, 0.08);
+}
+
+.admDocs__folderBtn {
+    width: 100%;
+    text-align: left;
+    height: 52px;
+    padding: 0 16px;
+    display: inline-flex;
     align-items: center;
-    justify-content: space-between;
-    box-shadow: 0 10px 26px rgba(0, 0, 0, 0.05);
+    gap: 12px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-weight: 950;
+    color: #1e40af;
+    transition: all 0.2s ease;
+    font-size: 15px;
+    letter-spacing: 0.3px;
 }
 
-.admDocs__rowFolder {
-    background: rgba(0, 0, 0, 0.01);
+.admDocs__folderBtn:hover {
+    background: rgba(59, 130, 246, 0.12);
+    transform: translateX(4px);
 }
 
-.admDocs__row:hover {
-    background: rgba(0, 0, 0, 0.015);
+.admDocs__folderBtn svg:first-child {
+    color: #3b82f6;
+    flex-shrink: 0;
 }
 
-.admDocs__rowLeft {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    min-width: 0;
-    flex: 1;
+.admDocs__folderBtn svg:nth-child(2) {
+    color: #2563eb;
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
 }
 
-.admDocs__name {
-    font-weight: 900;
-    min-width: 0;
+.admDocs__folderName {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    max-width: 640px;
+    flex: 1;
 }
 
-.admDocs__badge {
-    margin-left: 8px;
-    padding: 6px 10px;
+.admDocs__privateBadge {
+    padding: 4px 8px;
     border-radius: 999px;
-    border: 1px solid rgba(0, 0, 0, 0.10);
-    background: rgba(0, 0, 0, 0.02);
+    border: 1px solid rgba(239, 68, 68, 0.35);
+    background: linear-gradient(135deg, rgba(254, 226, 226, 0.6) 0%, rgba(254, 240, 240, 0.6) 100%);
     font-weight: 900;
-    font-size: 12px;
-    opacity: 0.85;
+    font-size: 11px;
+    color: #991b1b;
+    margin-left: auto;
+    margin-right: 8px;
 }
 
-.admDocs__badgePrivate {
-    background: rgba(255, 200, 200, 0.4);
-    border-color: rgba(255, 100, 100, 0.6);
-    color: #a00;
+.admDocs__folderChildren {
+    padding: 12px 16px 16px 0;
+    display: grid;
+    gap: 10px;
+    border-top: 1px solid rgba(59, 130, 246, 0.15);
+    background: rgba(59, 130, 246, 0.03);
 }
 
-.admDocs__toggle {
-    height: 34px;
-    width: 34px;
+.admDocs__docItem {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    height: 48px;
+    padding: 0 16px;
     border-radius: 12px;
-    border: 1px solid rgba(0, 0, 0, 0.10);
-    background: #fff;
+    border: 1px solid rgba(107, 114, 128, 0.25);
+    background: linear-gradient(135deg, rgba(249, 250, 251, 1) 0%, rgba(243, 244, 246, 1) 100%);
+    text-decoration: none;
+    color: #374151;
+    font-weight: 900;
+    transition: all 0.2s ease;
+    font-size: 14px;
+}
+
+.admDocs__docItem:hover {
+    background: linear-gradient(135deg, rgba(229, 231, 235, 1) 0%, rgba(219, 222, 225, 1) 100%);
+    border-color: rgba(107, 114, 128, 0.4);
+    transform: translateX(4px);
+    box-shadow: 0 2px 6px rgba(107, 114, 128, 0.15);
+}
+
+.admDocs__docItem svg {
+    color: #6366f1;
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+}
+
+.admDocs__docName {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex: 1;
+}
+
+.admDocs__actionBtn {
+    height: 36px;
+    width: 36px;
+    border-radius: 10px;
+    border: none;
+    background: transparent;
     cursor: pointer;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
+    color: #6b7280;
+    transition: all 0.2s ease;
 }
 
-.admDocs__toggle:hover {
-    background: rgba(0, 0, 0, 0.02);
+.admDocs__actionBtn:hover {
+    background: rgba(0, 0, 0, 0.08);
+    color: #1f2937;
+}
+
+/* Legacy - hidden for refactored tree */
+.admDocs__rowLeft {
+    display: none;
+}
+
+.admDocs__name {
+    display: none;
+}
+
+.admDocs__badge {
+    display: none;
+}
+
+.admDocs__badgePrivate {
+    display: none;
+}
+
+.admDocs__toggle {
+    display: none;
 }
 
 .admDocs__iconFolder,
 .admDocs__iconDoc {
-    height: 32px;
-    width: 32px;
-    border-radius: 12px;
-    border: 1px solid rgba(0, 0, 0, 0.08);
-    background: rgba(17, 24, 39, 0.04);
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
+    display: none;
 }
 
 .admDocs__menuBtn {
-    height: 38px;
-    width: 38px;
-    border-radius: 12px;
-    border: 1px solid rgba(0, 0, 0, 0.10);
-    background: #fff;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
+    display: none;
 }
 
-.admDocs__menuBtn:hover {
-    background: rgba(0, 0, 0, 0.02);
-}
-
-/* Children */
 .admDocs__children {
-    display: grid;
-    gap: 6px;
-    margin-top: 6px;
+    display: none;
 }
 
 .admDocs__emptyChild {
-    opacity: 0.75;
-    font-size: 13px;
+    display: none;
 }
 
 /* No results */

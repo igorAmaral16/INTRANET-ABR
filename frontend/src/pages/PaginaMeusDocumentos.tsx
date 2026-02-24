@@ -6,7 +6,7 @@ import { useSessaoAuth } from "../hooks/useSessaoAuth";
 import { obterArvoreBibliotecaColab, type NoBiblioteca } from "../api/biblioteca.api";
 import { resolverUrlApi } from "../utils/urlApi";
 import "./PaginaBase.css";
-import "./PaginaDocumentos.css";
+import "./PaginaMeusDocumentos.css";
 
 function isAbortError(e: any) {
     return e?.name === "AbortError" || String(e?.message || "").toLowerCase().includes("aborted");
@@ -16,10 +16,12 @@ function NoArvore({
     no,
     abertos,
     alternar,
+    depth = 0,
 }: {
     no: NoBiblioteca;
     abertos: Set<string>;
     alternar: (id: string) => void;
+    depth?: number;
 }) {
     const id = String(no.id);
     const aberto = abertos.has(id);
@@ -27,7 +29,13 @@ function NoArvore({
     if (no.tipo === "DOCUMENTO") {
         const url = no.url ? resolverUrlApi(no.url) : "";
         return (
-            <a className="docItem" href={url || "#"} target={url ? "_blank" : undefined} rel="noreferrer">
+            <a
+                className="docItem"
+                style={{ marginLeft: `${depth * 20}px` }}
+                href={url || "#"}
+                target={url ? "_blank" : undefined}
+                rel="noreferrer"
+            >
                 <FileText size={16} />
                 <span>{no.nome}</span>
             </a>
@@ -36,7 +44,12 @@ function NoArvore({
 
     return (
         <div className="pasta">
-            <button className="pasta__topo" type="button" onClick={() => alternar(id)}>
+            <button
+                className="pasta__topo"
+                style={{ marginLeft: `${depth * 20}px` }}
+                type="button"
+                onClick={() => alternar(id)}
+            >
                 {aberto ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
                 <Folder size={16} />
                 <span className="pasta__nome">{no.nome}</span>
@@ -45,7 +58,7 @@ function NoArvore({
             {aberto && Array.isArray(no.filhos) && no.filhos.length > 0 ? (
                 <div className="pasta__filhos">
                     {no.filhos.map((f) => (
-                        <NoArvore key={String(f.id)} no={f} abertos={abertos} alternar={alternar} />
+                        <NoArvore key={String(f.id)} no={f} abertos={abertos} alternar={alternar} depth={depth + 1} />
                     ))}
                 </div>
             ) : null}

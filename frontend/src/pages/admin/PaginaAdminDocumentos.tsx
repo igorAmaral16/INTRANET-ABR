@@ -60,13 +60,13 @@ function contarItens(arvore: NoBiblioteca[]) {
 
 function NoArvoreAdmin({
     no,
-    depth,
+    depth = 0,
     abertos,
     alternar,
     onMenu,
 }: {
     no: NoBiblioteca;
-    depth: number;
+    depth?: number;
     abertos: Set<string>;
     alternar: (id: string) => void;
     onMenu: (ctx: MenuCtx, el: HTMLButtonElement) => void;
@@ -74,23 +74,18 @@ function NoArvoreAdmin({
     const id = String(no.id);
     const aberto = abertos.has(id);
 
-    const paddingLeft = 10 + depth * 14;
-
     if (no.tipo === "DOCUMENTO") {
         return (
-            <div className="admDocs__row" style={{ paddingLeft }} role="row">
-                <div className="admDocs__rowLeft">
-                    <span className="admDocs__iconDoc" aria-hidden="true">
-                        <FileText size={16} />
-                    </span>
-                    <span className="admDocs__name" title={no.nome}>
-                        {no.nome}
-                    </span>
-                </div>
-
+            <div
+                className="admDocs__docItem"
+                style={{ marginLeft: `${depth * 20}px` }}
+                role="row"
+            >
+                <FileText size={16} />
+                <span className="admDocs__docName">{no.nome}</span>
                 <button
                     type="button"
-                    className="admDocs__menuBtn"
+                    className="admDocs__actionBtn"
                     aria-label="Ações do documento"
                     onClick={(e) => onMenu({ tipo: "DOCUMENTO", id: Number(no.id), nome: no.nome }, e.currentTarget)}
                 >
@@ -101,56 +96,42 @@ function NoArvoreAdmin({
     }
 
     return (
-        <div className="admDocs__folderBlock" role="rowgroup">
-            <div className="admDocs__row admDocs__rowFolder" style={{ paddingLeft }} role="row">
-                <button
-                    className="admDocs__toggle"
-                    type="button"
-                    onClick={() => alternar(id)}
-                    aria-label={aberto ? "Recolher pasta" : "Expandir pasta"}
-                >
-                    {aberto ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
-                </button>
-
-                <div className="admDocs__rowLeft">
-                    <span className="admDocs__iconFolder" aria-hidden="true">
-                        <Folder size={16} />
-                    </span>
-                    <span className="admDocs__name" title={no.nome}>
-                        {no.nome}
-                    </span>
-                    <span className="admDocs__badge">PASTA</span>
-                    {no.is_private ? <span className="admDocs__badge admDocs__badgePrivate">PRIVADA</span> : null}
-                </div>
-
+        <div className="admDocs__pastaBlock" role="rowgroup">
+            <button
+                className="admDocs__folderBtn"
+                style={{ marginLeft: `${depth * 20}px` }}
+                type="button"
+                onClick={() => alternar(id)}
+            >
+                {aberto ? <ChevronDown size={20} /> : <ChevronRight size={20} />}
+                <Folder size={16} />
+                <span className="admDocs__folderName">{no.nome}</span>
+                {no.is_private ? <span className="admDocs__privateBadge">PRIVADA</span> : null}
                 <button
                     type="button"
-                    className="admDocs__menuBtn"
+                    className="admDocs__actionBtn"
                     aria-label="Ações da pasta"
-                    onClick={(e) => onMenu({ tipo: "PASTA", id: Number(no.id), nome: no.nome }, e.currentTarget)}
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        onMenu({ tipo: "PASTA", id: Number(no.id), nome: no.nome, is_private: (no as any).is_private }, e.currentTarget);
+                    }}
                 >
                     <MoreVertical size={18} />
                 </button>
-            </div>
+            </button>
 
-            {aberto ? (
-                <div className="admDocs__children" role="group">
-                    {(no.filhos || []).length ? (
-                        no.filhos!.map((f) => (
-                            <NoArvoreAdmin
-                                key={String(f.id)}
-                                no={f}
-                                depth={depth + 1}
-                                abertos={abertos}
-                                alternar={alternar}
-                                onMenu={onMenu}
-                            />
-                        ))
-                    ) : (
-                        <div className="admDocs__emptyChild" style={{ paddingLeft: paddingLeft + 36 }}>
-                            Pasta vazia.
-                        </div>
-                    )}
+            {aberto && Array.isArray(no.filhos) && no.filhos.length > 0 ? (
+                <div className="admDocs__folderChildren">
+                    {no.filhos.map((f) => (
+                        <NoArvoreAdmin
+                            key={String(f.id)}
+                            no={f}
+                            depth={depth + 1}
+                            abertos={abertos}
+                            alternar={alternar}
+                            onMenu={onMenu}
+                        />
+                    ))}
                 </div>
             ) : null}
         </div>
@@ -193,8 +174,6 @@ export function PaginaAdminDocumentos() {
 
     const acRef = useRef<AbortController | null>(null);
 
-    const estaLogado = Boolean(sessao?.token);
-    const role = sessao?.role;
     const canAssignDest = Boolean(sessao?.user?.nivel > 1);
 
     // fetch collaborators for autocomplete when search string changes
@@ -636,9 +615,11 @@ export function PaginaAdminDocumentos() {
                                     type="button"
                                     className="admDocs__menuItem"
                                     onClick={() => {
-                                        setModalEditarPasta({ id: menuAberto.ctx.id, nome: menuAberto.ctx.nome, is_private: menuAberto.ctx.is_private });
-                                        setNomePasta(menuAberto.ctx.nome);
-                                        setNovaPastaPrivada(!!menuAberto.ctx.is_private);
+                                        if (menuAberto.ctx.tipo === "PASTA") {
+                                            setModalEditarPasta({ id: menuAberto.ctx.id, nome: menuAberto.ctx.nome, is_private: menuAberto.ctx.is_private });
+                                            setNomePasta(menuAberto.ctx.nome);
+                                            setNovaPastaPrivada(!!menuAberto.ctx.is_private);
+                                        }
                                         fecharMenu();
                                     }}
                                     disabled={processando}
