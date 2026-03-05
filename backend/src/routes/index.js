@@ -12,6 +12,7 @@ import { faqRouter } from "./faq.routes.js";
 import { faleRhRouter } from "./faleRh.routes.js";                    // PUBLIC+ADMIN
 import { calendarioRouter } from "./calendario.routes.js";           // PUBLIC+ADMIN
 import { relatoriosRouter } from "./relatorios.routes.js";           // ADMIN nivel>=2
+import { tutorialsRouter } from "./tutorials.routes.js";           // PÚBLICO + ADMIN exemplos
 
 export const router = express.Router();
 
@@ -33,3 +34,6 @@ router.use(faleRhRouter);
 router.use(colaboradoresRouter);
 router.use(uploadsRouter);
 router.use(relatoriosRouter);
+
+// tutorials (public + admin)
+router.use(tutorialsRouter);

@@ -79,6 +79,25 @@
     flex-direction: column;
     gap: 10px;
     overflow: auto;
+    flex: 1;
+}
+
+.menuAdmin__submenu {
+    padding-left: 16px;
+    border-left: 2px solid #e0e0e0;
+}
+
+.menuAdmin__itemSair {
+    margin-top: auto;
+    background: rgba(239, 68, 68, 0.06);
+    border-color: rgba(239, 68, 68, 0.30);
+    font-weight: 600;
+    color: #b91c1c;
+}
+
+.menuAdmin__item.submenu {
+    font-size: 0.9rem;
+    padding-left: 20px;
 }
 
 .menuAdmin__item {

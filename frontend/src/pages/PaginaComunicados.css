@@ -60,6 +60,8 @@
     gap: 12px;
     align-items: center;
     flex-wrap: wrap;
+    margin: 12px 0 20px;
+    /* espaçamento extra agora que está fora do cabeçalho */
 }
 
 .paginaComunicados__label {

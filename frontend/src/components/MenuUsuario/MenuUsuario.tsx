@@ -56,7 +56,7 @@ export function MenuUsuario({
                 base.push({ id: "meusDocs", titulo: "Meus Documentos", icon: <IconFolder size={18} />, onClick: aoMeusDocumentos });
             }
 
-            base.push({ id: "docs", titulo: "Ver Documentos", icon: <IconFolder size={18} />, onClick: aoVerDocumentos });
+            base.push({ id: "docs", titulo: "Ver Meus Documentos", icon: <IconFolder size={18} />, onClick: aoVerDocumentos });
             base.push({ id: "faq", titulo: "Dúvidas Frequentes (FAQ)", icon: <IconHelp size={18} />, onClick: aoFaq });
             base.push({ id: "fale", titulo: "Fale com o RH", icon: <IconMessage size={18} />, onClick: aoFaleComRh });
             return base;

@@ -1,0 +1,136 @@
+.paginaAdminTutoriais {
+    padding: 16px;
+}
+
+/* use base layout for admin pages */
+.paginaAdminTutoriais.paginaBase {
+    background: none;
+}
+
+/* card style for form */
+.paginaAdminTutoriais .form {
+    max-width: 600px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    background: #fff;
+    padding: 16px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.paginaAdminTutoriais .field {
+    display: flex;
+    flex-direction: column;
+}
+
+.paginaAdminTutoriais label {
+    font-weight: bold;
+    margin-bottom: 4px;
+}
+
+.paginaAdminTutoriais button[type="submit"] {
+    align-self: start;
+}
+
+.paginaAdminTutoriais .lista {
+    margin-top: 24px;
+}
+
+.paginaAdminTutoriais .setores-lista {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 12px;
+}
+
+.paginaAdminTutoriais .setores-lista button {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background: #fafafa;
+    cursor: pointer;
+}
+
+.paginaAdminTutoriais .upload-progress {
+    margin-top: 12px;
+}
+
+.paginaAdminTutoriais .upload-progress progress {
+    width: 100%;
+    transition: width 0.3s ease;
+}
+
+.paginaAdminTutoriais .item {
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.error {
+    color: red;
+}
+
+.paginaAdminTutoriais .form {
+    max-width: 600px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.paginaAdminTutoriais .field {
+    display: flex;
+    flex-direction: column;
+}
+
+.paginaAdminTutoriais label {
+    font-weight: bold;
+    margin-bottom: 4px;
+}
+
+.paginaAdminTutoriais .lista {
+    margin-top: 24px;
+}
+
+.paginaAdminTutoriais .setores-lista {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 12px;
+}
+
+.paginaAdminTutoriais .setores-lista button {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background: #fafafa;
+    cursor: pointer;
+}
+
+.paginaAdminTutoriais .upload-progress {
+    margin-top: 12px;
+    background: #fff;
+    padding: 8px 12px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.paginaAdminTutoriais .upload-progress progress {
+    width: 100%;
+    transition: width 0.3s ease;
+}
+
+/* remove duplicate styles below */
+
+
+.error {
+    color: red;
+}

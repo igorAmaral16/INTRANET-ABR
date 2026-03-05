@@ -1,0 +1,47 @@
+.paginaTutoriais {
+    padding: 16px;
+}
+
+.paginaTutoriais__header {
+    margin-bottom: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.paginaTutoriais__setor {
+    font-weight: 600;
+}
+
+.paginaTutoriais__busca input {
+    width: 100%;
+    padding: 6px 8px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+}
+
+.paginaTutoriais__titulo {
+    margin: 0;
+    font-size: 1.5rem;
+}
+
+.paginaTutoriais__lista {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 16px;
+}
+
+.paginaTutoriais__lista .card {
+    padding: 12px;
+}
+
+.paginaTutoriais__data {
+    font-size: 0.85rem;
+    color: #666;
+    margin-top: 4px;
+    margin-bottom: 8px;
+}
+
+.error {
+    color: red;
+}

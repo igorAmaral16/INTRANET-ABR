@@ -38,7 +38,23 @@ export function useComunicados(token?: string) {
 
         try {
             const data = await listarComunicados({ page, pageSize }, ac.signal);
-            setItens(data.items || []);
+            let items: ComunicadoResumo[] = data.items || [];
+            // fetch descrição for each item if missing
+            await Promise.all(
+                items.map(async (item, idx) => {
+                    if (!item.descricao) {
+                        try {
+                            const det = await (token
+                                ? obterComunicadoColab({ token, id: item.id }, ac.signal)
+                                : obterComunicado(item.id, ac.signal));
+                            items[idx] = { ...item, descricao: det.descricao };
+                        } catch (err) {
+                            // ignore individual failures
+                        }
+                    }
+                })
+            );
+            setItens(items);
             setTotal(Number(data.total || 0));
             setEstado("pronto");
         } catch (e: any) {

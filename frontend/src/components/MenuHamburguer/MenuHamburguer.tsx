@@ -38,8 +38,8 @@ export function MenuHamburguer({ aberto, aoAbrir, aoFechar, aoSair }: Props) {
                     <button type="button" className="hamb__item" onClick={() => { aoFechar(); alert("Meu Perfil (próxima tela)"); }}>
                         Meu Perfil
                     </button>
-                    <button type="button" className="hamb__item" onClick={() => { aoFechar(); alert("Ver Documentos (próxima tela)"); }}>
-                        Ver Documentos
+                    <button type="button" className="hamb__item" onClick={() => { aoFechar(); alert("Ver MeusDocumentos (próxima tela)"); }}>
+                        Ver Meus Documentos
                     </button>
                     <button type="button" className="hamb__item" onClick={() => { aoFechar(); alert("Dúvidas Frequentes (FAQ)"); }}>
                         Dúvidas Frequentes (FAQ)

@@ -1,8 +1,9 @@
 import "./BarraTopo.css";
-import { MenuUsuario } from "../MenuUsuario/MenuUsuario";
+import { MenuPublic } from "../MenuPublic/MenuPublic";
 import { MenuAdmin } from "../MenuAdmin/MenuAdmin";
 import logo from "../../assets/logo.webp";
 import { NotificacoesRhBell } from "../NotificacoesRhBell/NotificacoesRhBell"; // NOVO
+import { useNavigate } from "react-router-dom";
 
 type Role = "COLAB" | "ADMIN" | null | undefined;
 
@@ -64,6 +65,16 @@ export function BarraTopo({
     aoCalendario,
     aoSair,
 }: Props) {
+    const navigate = useNavigate();
+
+    // default handlers for common actions, so admin pages don't need to pass them
+    const handleMeuPerfil = aoMeuPerfil || (() => navigate("/meu-perfil"));
+    const handleVerDocs = aoVerDocumentos || (() => navigate("/documentos"));
+    const handleMeusDocs = aoMeusDocumentos || (() => navigate("/meus-documentos"));
+    const handleCalendario = aoCalendario || (() => navigate("/calendario"));
+    const handleFaq = aoFaq || (() => navigate("/faq"));
+    const handleFale = aoFaleComRh || (() => navigate("/fale-com-rh"));
+
     return (
         <header className="barraTopo">
             <div className="barraTopo__conteudo">
@@ -90,34 +101,31 @@ export function BarraTopo({
                 )}
 
                 <div className="barraTopo__acoesDireita">
-                    {!estaLogado ? (
-                        <button className="barraTopo__botaoEntrar" onClick={aoClicarEntrar} type="button">
-                            Entrar
-                        </button>
-                    ) : role === "ADMIN" ? (
+                    <NotificacoesRhBell />
+                    {estaLogado && role === "ADMIN" ? (
                         <MenuAdmin
-                            aoCriarComunicado={aoAdminCriarComunicado || (() => { })}
-                            aoDocumentos={aoAdminDocumentos || (() => { })}
-                            aoColaboradores={aoAdminColaboradores || (() => { })}
-                            aoFaq={aoAdminFaq || (() => { })}
-                            aoRelatorios={aoAdminRelatorios || (() => { })}
-                            aoFaleComRh={aoAdminFaleComRh || (() => { })}
+                            aoCriarComunicado={aoAdminCriarComunicado}
+                            aoDocumentos={aoAdminDocumentos}
+                            aoColaboradores={aoAdminColaboradores}
+                            aoFaq={aoAdminFaq}
+                            aoRelatorios={aoAdminRelatorios}
+                            aoFaleComRh={aoAdminFaleComRh}
                             aoCalendario={aoAdminCalendario}
                             aoSair={aoSair}
                         />
                     ) : (
-                        <>
-                            <NotificacoesRhBell />
-                            <MenuUsuario
-                                aoMeuPerfil={aoMeuPerfil || (() => { })}
-                                aoVerDocumentos={aoVerDocumentos || (() => { })}
-                                aoMeusDocumentos={aoMeusDocumentos || (() => { })}
-                                aoCalendario={aoCalendario}
-                                aoFaq={aoFaq || (() => { })}
-                                aoFaleComRh={aoFaleComRh || (() => { })}
-                                aoSair={aoSair}
-                            />
-                        </>
+                        <MenuPublic
+                            estaLogado={estaLogado}
+                            role={role || null}
+                            aoClicarEntrar={aoClicarEntrar}
+                            aoMeuPerfil={handleMeuPerfil}
+                            aoVerDocumentos={handleVerDocs}
+                            aoMeusDocumentos={handleMeusDocs}
+                            aoCalendario={handleCalendario}
+                            aoFaq={handleFaq}
+                            aoFaleComRh={handleFale}
+                            aoSair={aoSair}
+                        />
                     )}
                 </div>
             </div>

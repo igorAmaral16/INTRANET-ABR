@@ -97,16 +97,24 @@ function NoArvoreAdmin({
 
     return (
         <div className="admDocs__pastaBlock" role="rowgroup">
-            <button
+            {/* root-level clickable element, not a button so we can nest the action button */}
+            <div
                 className="admDocs__folderBtn"
+                role="button"
+                tabIndex={0}
                 style={{ marginLeft: `${depth * 20}px` }}
-                type="button"
                 onClick={() => alternar(id)}
+                onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                        alternar(id);
+                    }
+                }}
             >
                 {aberto ? <ChevronDown size={20} /> : <ChevronRight size={20} />}
                 <Folder size={16} />
                 <span className="admDocs__folderName">{no.nome}</span>
                 {no.is_private ? <span className="admDocs__privateBadge">PRIVADA</span> : null}
+
                 <button
                     type="button"
                     className="admDocs__actionBtn"
@@ -118,7 +126,7 @@ function NoArvoreAdmin({
                 >
                     <MoreVertical size={18} />
                 </button>
-            </button>
+            </div>
 
             {aberto && Array.isArray(no.filhos) && no.filhos.length > 0 ? (
                 <div className="admDocs__folderChildren">

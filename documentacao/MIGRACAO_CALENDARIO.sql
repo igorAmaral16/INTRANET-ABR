@@ -1,6 +1,3 @@
--- Script de Migração: Adicionar coluna ano_feriado à tabela CalendarioFeriados
--- Use este script se você já tinha a tabela CalendarioFeriados criada
-
 -- 1. Adicionar coluna ano_feriado
 ALTER TABLE CalendarioFeriados 
 ADD COLUMN ano_feriado YEAR NOT NULL DEFAULT 2026 AFTER id;

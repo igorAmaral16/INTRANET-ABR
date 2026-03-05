@@ -1,5 +1,6 @@
 import "./PaginaComunicados.css";
 import { BarraTopo } from "../components/BarraTopo/BarraTopo";
+import { Carousel } from "../components/Carousel/Carousel";
 import { CartaoComunicado } from "../components/CartaoComunicado/CartaoComunicado";
 import { Modal } from "../components/Modal/Modal";
 import { EstadoCarregando } from "../components/Estados/EstadoCarregando";
@@ -60,27 +61,31 @@ export function PaginaComunicados() {
             />
 
             <main className="paginaComunicados__conteudo">
+                {/* carousel exibido abaixo do cabeçalho */}
+                <Carousel />
+
                 <section className="paginaComunicados__cabecalho card">
                     <div className="paginaComunicados__cabecalhoTextos">
                         <h1 className="paginaComunicados__titulo">Comunicados</h1>
                         <p className="paginaComunicados__subtitulo">Avisos e informações atualizadas do RH</p>
                     </div>
-
-                    <div className="paginaComunicados__filtros">
-                        <label className="paginaComunicados__label">
-                            FILTRAR COMUNICADOS:
-                            <select
-                                value={filtroImportancia}
-                                onChange={(e) => setFiltroImportancia(e.target.value as any)}
-                            >
-                                <option value="TODOS">Todos</option>
-                                <option value="IMPORTANTE">Importante</option>
-                                <option value="RELEVANTE">Relevante</option>
-                                <option value="POUCO_RELEVANTE">Pouco relevante</option>
-                            </select>
-                        </label>
-                    </div>
                 </section>
+
+                {/* filtro agora fica antes da lista */}
+                <div className="paginaComunicados__filtros">
+                    <label className="paginaComunicados__label">
+                        FILTRAR COMUNICADOS:
+                        <select
+                            value={filtroImportancia}
+                            onChange={(e) => setFiltroImportancia(e.target.value as any)}
+                        >
+                            <option value="TODOS">Todos</option>
+                            <option value="IMPORTANTE">Importante</option>
+                            <option value="RELEVANTE">Relevante</option>
+                            <option value="POUCO_RELEVANTE">Pouco relevante</option>
+                        </select>
+                    </label>
+                </div>
 
                 {estado === "carregando" && <EstadoCarregando />}
                 {estado === "erro" && (

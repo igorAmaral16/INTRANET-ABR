@@ -1,17 +1,20 @@
 import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { createPortal } from "react-dom";
 import {
     Menu as IconMenu,
     X as IconX,
-    SquarePen as IconPenSquare,
+    Pencil as IconPen,
     FolderOpen as IconFolder,
     Users as IconUsers,
     Calendar as IconCalendar,
     HelpCircle as IconHelp,
-    FileDown as IconReport,
+    FileText as IconReport,
     MessageSquare as IconMessage, // NOVO
+    Video as IconVideo,
     LogOut as IconLogout,
 } from "lucide-react";
+import { setores } from "../../utils/setores";
 import "./MenuAdmin.css";
 
 type Props = {
@@ -47,19 +50,23 @@ export function MenuAdmin({
     aoFaleComRh,
     aoSair,
 }: Props) {
+    const navigate = useNavigate();
     const [aberto, setAberto] = useState(false);
+
+    const [openTutoriais, setOpenTutoriais] = useState(false);
 
     const itens: Item[] = useMemo(
         () => [
             { id: "calendario", titulo: "Calendário", icon: <IconCalendar size={18} />, onClick: aoCalendario || (() => { window.location.href = '/admin/calendario'; }) },
-            { id: "criar", titulo: "Criar comunicado", icon: <IconPenSquare size={18} />, onClick: aoCriarComunicado },
+            // tutoriais is handled specially below to support a submenu
+            { id: "criar", titulo: "Criar comunicado", icon: <IconPen size={18} />, onClick: aoCriarComunicado },
             { id: "docs", titulo: "Documentos", icon: <IconFolder size={18} />, onClick: aoDocumentos },
             { id: "colabs", titulo: "Colaboradores", icon: <IconUsers size={18} />, onClick: aoColaboradores },
             { id: "faq", titulo: "FAQ", icon: <IconHelp size={18} />, onClick: aoFaq },
             { id: "fale", titulo: "Fale com o RH", icon: <IconMessage size={18} />, onClick: aoFaleComRh }, // NOVO
             { id: "rel", titulo: "Gerar relatórios", icon: <IconReport size={18} />, onClick: aoRelatorios },
         ],
-        [aoCriarComunicado, aoDocumentos, aoColaboradores, aoFaq, aoFaleComRh, aoRelatorios]
+        [aoCriarComunicado, aoDocumentos, aoColaboradores, aoFaq, aoFaleComRh, aoRelatorios, aoCalendario]
     );
 
     useEffect(() => {
@@ -127,6 +134,33 @@ export function MenuAdmin({
                             </div>
 
                             <div className="menuAdmin__drawerConteudo">
+                                {/* Tutoriais with toggle */}
+                                <button
+                                    type="button"
+                                    className="menuAdmin__item"
+                                    onClick={() => setOpenTutoriais((v) => !v)}
+                                >
+                                    <span className="menuAdmin__itemIcone"><IconVideo size={18} /></span>
+                                    <span className="menuAdmin__itemTexto">Tutoriais</span>
+                                </button>
+                                {openTutoriais && (
+                                    <div className="menuAdmin__submenu">
+                                        {setores.map((s) => (
+                                            <button
+                                                key={s}
+                                                type="button"
+                                                className="menuAdmin__item submenu"
+                                                onClick={() => {
+                                                    setAberto(false);
+                                                    navigate(`/admin/tutoriais/${s}`);
+                                                }}
+                                            >
+                                                <span className="menuAdmin__itemTexto">{s}</span>
+                                            </button>
+                                        ))}
+                                    </div>
+                                )}
+
                                 {itens.map((it) => (
                                     <button
                                         key={it.id}

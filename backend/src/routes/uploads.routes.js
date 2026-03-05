@@ -17,13 +17,17 @@ const __dirname = path.dirname(__filename);
 const uploadDir = path.join(__dirname, "..", "..", "uploads", "announcements");
 fs.mkdirSync(uploadDir, { recursive: true });
 
-const MAX_BYTES = 5 * 1024 * 1024; // 5MB (ajuste depois se precisar)
+const MAX_BYTES = 100 * 1024 * 1024; // 100MB (ajuste depois se precisar)
 
 const ALLOWED = new Set([
     "image/png",
     "image/jpeg",
     "image/webp",
-    "application/pdf"
+    "application/pdf",
+    // vídeo: adicionado para eventual suporte futuro (p.ex. anexos de comunicados)
+    "video/mp4",
+    "video/webm",
+    "video/ogg"
 ]);
 
 function inferType(mime) {

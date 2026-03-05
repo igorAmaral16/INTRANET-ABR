@@ -166,3 +166,32 @@
 .cartaoComunicado--fixado {
     box-shadow: 0 12px 30px rgba(11, 18, 32, 0.08);
 }
+
+/* Novos elementos */
+.cartaoComunicado__imagemWrap {
+    width: 100%;
+    max-height: 160px;
+    overflow: hidden;
+}
+
+.cartaoComunicado__imagem {
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: cover;
+}
+
+.cartaoComunicado__descricao {
+    margin-top: 8px;
+    color: #334155;
+    line-height: 1.4;
+    max-height: 4.2em;
+    overflow: hidden;
+    font-size: 14px;
+}
+
+.cartaoComunicado__confirmacoes {
+    font-size: 12px;
+    opacity: 0.85;
+    margin-left: 8px;
+}

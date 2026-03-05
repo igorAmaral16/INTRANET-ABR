@@ -3,6 +3,7 @@ export type Importancia = "POUCO_RELEVANTE" | "RELEVANTE" | "IMPORTANTE";
 export interface ComunicadoResumo {
     id: number;
     titulo: string;
+    descricao?: string;  // novo campo para renderizar resumo
     importancia: Importancia;
     fixado_topo: number | boolean;
     requer_confirmacao?: number | boolean;
