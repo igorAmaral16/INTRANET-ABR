@@ -12,6 +12,7 @@ import {
     FileText as IconReport,
     MessageSquare as IconMessage, // NOVO
     Video as IconVideo,
+    Image as IconImage,
     LogOut as IconLogout,
 } from "lucide-react";
 import { setores } from "../../utils/setores";
@@ -59,6 +60,7 @@ export function MenuAdmin({
         () => [
             { id: "calendario", titulo: "Calendário", icon: <IconCalendar size={18} />, onClick: aoCalendario || (() => { window.location.href = '/admin/calendario'; }) },
             // tutoriais is handled specially below to support a submenu
+            { id: "carousel", titulo: "Carrossel", icon: <IconImage size={18} />, onClick: () => navigate("/admin/carousel") },
             { id: "criar", titulo: "Criar comunicado", icon: <IconPen size={18} />, onClick: aoCriarComunicado },
             { id: "docs", titulo: "Documentos", icon: <IconFolder size={18} />, onClick: aoDocumentos },
             { id: "colabs", titulo: "Colaboradores", icon: <IconUsers size={18} />, onClick: aoColaboradores },
@@ -66,7 +68,7 @@ export function MenuAdmin({
             { id: "fale", titulo: "Fale com o RH", icon: <IconMessage size={18} />, onClick: aoFaleComRh }, // NOVO
             { id: "rel", titulo: "Gerar relatórios", icon: <IconReport size={18} />, onClick: aoRelatorios },
         ],
-        [aoCriarComunicado, aoDocumentos, aoColaboradores, aoFaq, aoFaleComRh, aoRelatorios, aoCalendario]
+        [aoCriarComunicado, aoDocumentos, aoColaboradores, aoFaq, aoFaleComRh, aoRelatorios, aoCalendario, navigate]
     );
 
     useEffect(() => {

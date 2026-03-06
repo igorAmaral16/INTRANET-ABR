@@ -42,3 +42,22 @@
     cursor: pointer;
     font-weight: 950;
 }
+
+/* generic primary button used by some pages without a dedicated
+   namespace (e.g. early admin forms).  New components should use
+   their own prefix instead of this global class. */
+.paginaBase__btnPrim {
+    height: 40px;
+    padding: 0 14px;
+    border-radius: 14px;
+    border: 1px solid rgba(0, 0, 0, 0.10);
+    font-weight: 900;
+    background: #111827;
+    color: #fff;
+    cursor: pointer;
+}
+
+.paginaBase__btnPrim:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}

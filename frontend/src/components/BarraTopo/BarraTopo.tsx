@@ -35,6 +35,7 @@ type Props = {
     aoAdminRelatorios?: () => void;
     aoAdminFaleComRh?: () => void;
     aoAdminCalendario?: () => void;
+    aoAdminCarousel?: () => void;
 
     aoSair: () => void;
 };

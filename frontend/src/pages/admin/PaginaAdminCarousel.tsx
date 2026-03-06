@@ -1,11 +1,15 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { MoreVertical, Pencil, Trash2 } from "lucide-react";
+import { MoreVertical, Pencil, Trash2, Plus } from "lucide-react";
 
 import { BarraTopo } from "../../components/BarraTopo/BarraTopo";
 import { useSessaoAuth } from "../../hooks/useSessaoAuth";
 import { ErroHttp } from "../../api/clienteHttp";
-import { listarComunicadosAdmin, excluirComunicadoAdmin, type ComunicadoAdminItem } from "../../api/comunicados.api";
+import {
+    listarCarrosselAdmin,
+    deletarCarrossel,
+    type CarouselItemResumo,
+} from "../../api/carousel.api";
 
 import "../PaginaComunicados.css";
 
@@ -17,31 +21,22 @@ function isAbortError(e: any) {
     );
 }
 
-export function PaginaAdminComunicados() {
+export function PaginaAdminCarousel() {
     const navigate = useNavigate();
     const { sessao, estaLogadoAdmin, sair } = useSessaoAuth();
 
     const [estado, setEstado] = useState<"carregando" | "erro" | "pronto">("carregando");
     const [erro, setErro] = useState<string | null>(null);
-    const [itens, setItens] = useState<ComunicadoAdminItem[]>([]);
-    const [busca, setBusca] = useState("");
+    const [itens, setItens] = useState<CarouselItemResumo[]>([]);
 
     const [menuAbertoId, setMenuAbertoId] = useState<number | null>(null);
     const menuRef = useRef<HTMLDivElement | null>(null);
-
     const acRef = useRef<AbortController | null>(null);
 
     const estaLogado = Boolean(sessao?.token);
     const role = sessao?.role;
 
-    const filtrados = useMemo(() => {
-        const b = busca.trim().toLowerCase();
-        if (!b) return itens;
-        return itens.filter((x) => {
-            const t = `${x.titulo} ${x.descricao}`.toLowerCase();
-            return t.includes(b);
-        });
-    }, [itens, busca]);
+    const filtrados = useMemo(() => itens, [itens]);
 
     useEffect(() => {
         if (!estaLogadoAdmin || !sessao?.token) {
@@ -57,21 +52,14 @@ export function PaginaAdminComunicados() {
         (async () => {
             setEstado("carregando");
             setErro(null);
-
             try {
-                const data = await listarComunicadosAdmin(
-                    { token: sessao.token, page: 1, pageSize: 50 },
-                    ac.signal
-                );
-
-                const items = Array.isArray((data as any)?.items) ? (data as any).items : [];
-                setItens(items);
+                const data = await listarCarrosselAdmin(sessao.token);
+                setItens(data || []);
                 setEstado("pronto");
             } catch (e: any) {
                 if (isAbortError(e)) return;
-
                 const msg = e instanceof ErroHttp ? e.message : e?.message;
-                setErro(msg || "Não foi possível carregar os comunicados do painel.");
+                setErro(msg || "Não foi possível carregar os itens do carrossel.");
                 setEstado("erro");
             }
         })();
@@ -92,23 +80,21 @@ export function PaginaAdminComunicados() {
 
     async function onExcluir(id: number) {
         if (!sessao?.token) return;
-
-        const ok = window.confirm("Deseja realmente excluir este comunicado? Essa ação não pode ser desfeita.");
+        const ok = window.confirm("Deseja realmente excluir este slide? Essa ação não pode ser desfeita.");
         if (!ok) return;
-
         try {
-            await excluirComunicadoAdmin({ token: sessao.token, id });
+            await deletarCarrossel(id, sessao.token);
             setItens((prev) => prev.filter((x) => x.id !== id));
             setMenuAbertoId(null);
         } catch (e: any) {
             const msg = e instanceof ErroHttp ? e.message : e?.message;
-            alert(msg || "Não foi possível excluir o comunicado.");
+            alert(msg || "Não foi possível excluir o slide.");
         }
     }
 
     function onEditar(id: number) {
         setMenuAbertoId(null);
-        navigate(`/admin/comunicados/${id}/editar`);
+        navigate(`/admin/carousel/${id}/editar`);
     }
 
     return (
@@ -118,15 +104,15 @@ export function PaginaAdminComunicados() {
                 aoMudarBusca={() => { }}
                 mostrarBusca={false}
                 aoIrParaInicio={() => navigate("/admin")}
-                estaLogado={Boolean(sessao?.token)}
-                role={sessao?.role}
+                estaLogado={estaLogado}
+                role={role}
                 aoClicarEntrar={() => navigate("/")}
 
                 aoAdminCriarComunicado={() => navigate("/admin/criar-comunicado")}
                 aoAdminDocumentos={() => navigate("/admin/documentos")}
                 aoAdminColaboradores={() => navigate("/admin/colaboradores")}
                 aoAdminFaq={() => navigate("/admin/faq")}
-                aoAdminFaleComRh={() => navigate("/admin/fale-com-rh")}   // NOVO
+                aoAdminFaleComRh={() => navigate("/admin/fale-com-rh")}
                 aoAdminRelatorios={() => navigate("/admin/relatorios")}
                 aoAdminCarousel={() => navigate("/admin/carousel")}
 
@@ -139,11 +125,19 @@ export function PaginaAdminComunicados() {
             <main className="paginaComunicados__conteudo">
                 <section className="paginaComunicados__cabecalho">
                     <div>
-                        <h1 className="paginaComunicados__titulo">Painel Administrativo</h1>
+                        <h1 className="paginaComunicados__titulo">Manutenção do Carrossel</h1>
                         <p className="paginaComunicados__subtitulo">
-                            Gerencie comunicados, documentos, colaboradores, FAQ e relatórios.
+                            Adicione, edite ou remova slides exibidos na página inicial.
                         </p>
                     </div>
+                    <button
+                        type="button"
+                        className="paginaComunicados__btnPrim"
+                        onClick={() => navigate("/admin/carousel/novo")}
+                    >
+                        <Plus size={16} style={{ marginRight: 6 }} />
+                        Novo slide
+                    </button>
                 </section>
 
                 {estado === "carregando" ? <div className="card">Carregando...</div> : null}
@@ -153,14 +147,14 @@ export function PaginaAdminComunicados() {
                         <div style={{ fontWeight: 900, marginBottom: 8 }}>Não foi possível acessar</div>
                         <div style={{ opacity: 0.85 }}>{erro}</div>
                         <div style={{ marginTop: 12, display: "flex", gap: 10 }}>
-                            <button type="button" onClick={() => navigate("/")}>Voltar</button>
-                            <button type="button" onClick={() => window.location.reload()}>Tentar novamente</button>
+                            <button type="button" className="botaoVoltar" onClick={() => navigate("/")}>Voltar</button>
+                            <button type="button" className="botaoVoltar" onClick={() => window.location.reload()}>Tentar novamente</button>
                         </div>
                     </div>
                 ) : null}
 
                 {estado === "pronto" && filtrados.length === 0 ? (
-                    <div className="card">Nenhum comunicado encontrado.</div>
+                    <div className="card">Nenhum slide encontrado.</div>
                 ) : null}
 
                 {estado === "pronto" && filtrados.length > 0 ? (
@@ -169,17 +163,10 @@ export function PaginaAdminComunicados() {
                             <article key={c.id} className="card" style={{ position: "relative" }}>
                                 <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12 }}>
                                     <div style={{ minWidth: 0 }}>
-                                        <div style={{ display: "flex", gap: 10, alignItems: "center", marginBottom: 6 }}>
-                                            <span className="chip">{c.importancia}</span>
-                                            <span className="meta" style={{ opacity: 0.8 }}>{c.status}</span>
-                                            {c.expira_em ? <span className="meta" style={{ opacity: 0.8 }}>Expira: {c.expira_em}</span> : null}
-                                        </div>
-
                                         <div style={{ fontWeight: 900, fontSize: 16 }}>{c.titulo}</div>
-                                        <div style={{ opacity: 0.85, marginTop: 8, whiteSpace: "pre-wrap" }}>
-                                            {String(c.descricao || "").slice(0, 220)}
-                                            {String(c.descricao || "").length > 220 ? "..." : ""}
-                                        </div>
+                                        {c.publicado_em ? (
+                                            <div className="meta">Publicado em: {c.publicado_em}</div>
+                                        ) : null}
                                     </div>
 
                                     <div style={{ position: "relative" }} ref={menuAbertoId === c.id ? menuRef : undefined}>
@@ -201,60 +188,19 @@ export function PaginaAdminComunicados() {
                                         >
                                             <MoreVertical size={18} />
                                         </button>
-
                                         {menuAbertoId === c.id ? (
-                                            <div
-                                                style={{
-                                                    position: "absolute",
-                                                    top: 44,
-                                                    right: 0,
-                                                    width: 180,
-                                                    background: "#fff",
-                                                    border: "1px solid rgba(0,0,0,0.10)",
-                                                    borderRadius: 12,
-                                                    boxShadow: "0 14px 34px rgba(0,0,0,0.12)",
-                                                    padding: 8,
-                                                    zIndex: 20
-                                                }}
-                                                role="menu"
-                                            >
+                                            <div className="paginaComunicados__menuOpcoes" ref={menuRef}>
                                                 <button
                                                     type="button"
-                                                    style={{
-                                                        width: "100%",
-                                                        display: "flex",
-                                                        alignItems: "center",
-                                                        gap: 10,
-                                                        padding: "10px 10px",
-                                                        borderRadius: 10,
-                                                        border: 0,
-                                                        background: "transparent",
-                                                        cursor: "pointer",
-                                                        fontWeight: 800
-                                                    }}
                                                     onClick={() => onEditar(c.id)}
                                                 >
-                                                    <Pencil size={16} /> Editar
+                                                    <Pencil size={14} /> Editar
                                                 </button>
-
                                                 <button
                                                     type="button"
-                                                    style={{
-                                                        width: "100%",
-                                                        display: "flex",
-                                                        alignItems: "center",
-                                                        gap: 10,
-                                                        padding: "10px 10px",
-                                                        borderRadius: 10,
-                                                        border: 0,
-                                                        background: "transparent",
-                                                        cursor: "pointer",
-                                                        fontWeight: 800,
-                                                        color: "#b42318"
-                                                    }}
                                                     onClick={() => onExcluir(c.id)}
                                                 >
-                                                    <Trash2 size={16} /> Excluir
+                                                    <Trash2 size={14} /> Excluir
                                                 </button>
                                             </div>
                                         ) : null}

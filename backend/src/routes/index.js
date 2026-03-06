@@ -13,6 +13,7 @@ import { faleRhRouter } from "./faleRh.routes.js";                    // PUBLIC+
 import { calendarioRouter } from "./calendario.routes.js";           // PUBLIC+ADMIN
 import { relatoriosRouter } from "./relatorios.routes.js";           // ADMIN nivel>=2
 import { tutorialsRouter } from "./tutorials.routes.js";           // PÚBLICO + ADMIN exemplos
+import { carouselRouter } from "./carousel.routes.js";           // PÚBLICO + ADMIN slides/carrossel
 
 export const router = express.Router();
 
@@ -37,3 +38,6 @@ router.use(relatoriosRouter);
 
 // tutorials (public + admin)
 router.use(tutorialsRouter);
+
+// carousel/slides (public + admin)
+router.use(carouselRouter);

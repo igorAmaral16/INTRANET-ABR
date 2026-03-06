@@ -9,6 +9,7 @@ import { PaginaFaq } from "./pages/PaginaFaq";
 import { PaginaFaleComRh } from "./pages/PaginaFaleComRh";
 import { PaginaCalendario } from "./pages/PaginaCalendario";
 import { PaginaTutoriais } from "./pages/PaginaTutoriais";
+import { PaginaAnuncio } from "./pages/PaginaAnuncio";
 
 import { PaginaAdminComunicados } from "./pages/admin/PaginaAdminComunicados";
 import { PaginaAdminCriarComunicado } from "./pages/admin/PaginaAdminCriarComunicado";
@@ -20,6 +21,8 @@ import { PaginaAdminFaleRh } from "./pages/admin/PaginaAdminFaleRh";
 import { PaginaAdminCalendario } from "./pages/admin/PaginaAdminCalendario";
 import { PaginaAdminTutoriais } from "./pages/admin/PaginaAdminTutoriais";
 import { PaginaAdminTutoriaisSetor } from "./pages/admin/PaginaAdminTutoriaisSetor";
+import { PaginaAdminCarousel } from "./pages/admin/PaginaAdminCarousel";
+import { PaginaAdminCarouselEdit } from "./pages/admin/PaginaAdminCarouselEdit";
 
 import { useSessaoAuth } from "./hooks/useSessaoAuth";
 import { useSocketAuth } from "./hooks/useSocketAuth";
@@ -74,6 +77,7 @@ function AppInner() {
         <Route path="/fale-com-rh" element={<PaginaFaleComRh />} />
         <Route path="/calendario" element={<PaginaCalendario />} />
         <Route path="/tutoriais/:setor" element={<PaginaTutoriais />} />
+        <Route path="/anuncio/:id" element={<PaginaAnuncio />} />
 
         {/* ADMIN */}
         <Route path="/admin" element={<PaginaAdminComunicados />} />
@@ -87,6 +91,9 @@ function AppInner() {
         <Route path="/admin/calendario" element={<PaginaAdminCalendario />} />
         <Route path="/admin/tutoriais" element={<PaginaAdminTutoriais />} />
         <Route path="/admin/tutoriais/:setor" element={<PaginaAdminTutoriaisSetor />} />
+        <Route path="/admin/carousel" element={<PaginaAdminCarousel />} />
+        <Route path="/admin/carousel/novo" element={<PaginaAdminCarouselEdit />} />
+        <Route path="/admin/carousel/:id/editar" element={<PaginaAdminCarouselEdit />} />
       </Routes>
     </NotificacoesRhProvider>
   );

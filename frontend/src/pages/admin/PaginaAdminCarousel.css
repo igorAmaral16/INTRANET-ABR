@@ -1,0 +1,30 @@
+/*
+   CSS for the admin carousel list page.  Naming convention:
+   each file prefixes its classes with the component/page name
+   (BEM-style) to avoid collisions.  Here the generic overrides use
+   "admCriar" because the list reuses form styles; future updates
+   could introduce an "admCarousel" prefix if additional rules are
+   required.
+*/
+
+/* styles reused from PaginaComunicados; override if needed */
+
+/* layout para formulário de carrossel, utilizando classes de admCriar */
+.paginaBase__conteudo {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 20px 16px 40px;
+}
+
+/* botões primários da página
+   adaptação simples para o carrossel */
+.admCriar__btnPrimario,
+.admCriar__btnSec,
+.admCriar__btnGhost {
+    padding: 0 14px;
+}
+
+/* pequeno espaçamento extra antes do cabeçalho */
+.paginaBase__voltar {
+    margin-bottom: 12px;
+}
