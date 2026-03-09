@@ -23,6 +23,17 @@
     min-width: 0;
 }
 
+@media (min-width: 880px) {
+    .paginaAnuncio__conteudo {
+        max-width: 860px;
+        padding: 32px 24px 64px;
+    }
+
+    .paginaAnuncio__titulo {
+        font-size: 36px;
+    }
+}
+
 .paginaAnuncio__artigo {
     display: grid;
     gap: 24px;

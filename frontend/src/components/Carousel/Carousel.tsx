@@ -10,6 +10,7 @@ export function Carousel() {
     const [index, setIndex] = useState(0);
     const trackRef = useRef<HTMLDivElement | null>(null);
     const startXRef = useRef<number | null>(null);
+    const isDraggingRef = useRef(false);
     const navigate = useNavigate();
 
     // advance automatically
@@ -42,6 +43,9 @@ export function Carousel() {
     const onPointerMove = (ev: React.PointerEvent) => {
         if (startXRef.current === null || !trackRef.current) return;
         const delta = ev.clientX - startXRef.current;
+        if (Math.abs(delta) > 5) {
+            isDraggingRef.current = true;
+        }
         const width = trackRef.current.offsetWidth;
         const percent = (delta / width) * 100;
         trackRef.current.style.transform = `translateX(-${index * 100 - percent}%)`;
@@ -50,14 +54,30 @@ export function Carousel() {
     const onPointerUp = (ev: React.PointerEvent) => {
         if (startXRef.current === null) return;
         const delta = ev.clientX - startXRef.current;
-        const threshold = 50; // pixels
-        if (delta > threshold) {
-            goTo(index - 1);
-        } else if (delta < -threshold) {
-            goTo(index + 1);
+        const threshold = 30; // pixels, more sensitive
+        if (!isDraggingRef.current || Math.abs(delta) < threshold) {
+            // treat as click
+            navigate(`/anuncio/${itens[index].id}`);
+        } else {
+            // standard behaviour: swipe left → next slide; swipe right → previous slide
+            if (delta < -threshold) {
+                goTo(index + 1);
+            } else if (delta > threshold) {
+                goTo(index - 1);
+            }
         }
+        isDraggingRef.current = false;
         startXRef.current = null;
         // restore normal transform
+        if (trackRef.current) {
+            trackRef.current.style.transform = `translateX(-${index * 100}%)`;
+        }
+    };
+
+    const onPointerCancel = () => {
+        // reset state if pointer capture lost
+        isDraggingRef.current = false;
+        startXRef.current = null;
         if (trackRef.current) {
             trackRef.current.style.transform = `translateX(-${index * 100}%)`;
         }
@@ -81,6 +101,20 @@ export function Carousel() {
 
     return (
         <div className="carousel">
+            <button
+                className="carousel__arrow carousel__arrow--left"
+                onClick={() => goTo(index - 1)}
+                aria-label="Anterior"
+            >
+                ‹
+            </button>
+            <button
+                className="carousel__arrow carousel__arrow--right"
+                onClick={() => goTo(index + 1)}
+                aria-label="Próximo"
+            >
+                ›
+            </button>
             <div
                 ref={trackRef}
                 className="carousel__track"
@@ -88,6 +122,7 @@ export function Carousel() {
                 onPointerDown={onPointerDown}
                 onPointerMove={onPointerMove}
                 onPointerUp={onPointerUp}
+                onPointerCancel={onPointerCancel}
             >
                 {itens.map((item: CarouselItemResumo) => (
                     <div
