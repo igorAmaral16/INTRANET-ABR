@@ -51,10 +51,10 @@ export async function listAniversariantesMes() {
             data_nascimento,
             DAY(data_nascimento) as dia
         FROM Colaboradores
-        WHERE status = 'ATIVO'
+        WHERE status = :status
         AND MONTH(data_nascimento) = :mes
         ORDER BY dia ASC`,
-        { mes: mesAtual }
+        { status: 'ATIVO', mes: mesAtual }
     );
 
     return aniversariantes || [];
