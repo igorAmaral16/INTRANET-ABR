@@ -3,9 +3,19 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { authJwt } from "../middlewares/authJwt.js";
 import { requireRole } from "../middlewares/requireRole.js";
 import { requireNivel } from "../middlewares/requireNivel.js";
-import { listar, obter, criar, atualizar, excluir } from "../controllers/colaboradores.controller.js";
+import {
+    listar,
+    obter,
+    criar,
+    atualizar,
+    excluir,
+    listarAniversariantesMes
+} from "../controllers/colaboradores.controller.js";
 
 export const colaboradoresRouter = express.Router();
+
+// ROTA PÚBLICA - Aniversariantes do mês
+colaboradoresRouter.get("/aniversariantes", asyncHandler(listarAniversariantesMes));
 
 // IMPORTANTE:
 // Antes estava: colaboradoresRouter.use(authJwt, requireRole("ADMIN"), requireNivel(2));

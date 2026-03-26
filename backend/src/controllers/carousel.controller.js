@@ -19,7 +19,15 @@ const CreateUpdateSchema = z.object({
     imagem_url: z.string().max(500).optional(),
     status: StatusEnum.default("PUBLICADO"),
     publicado_em: z.string().min(10).max(10).optional(), // dd/mm/aaaa
-});
+    eh_evento: z.boolean().optional().default(false),
+    foto_perfil: z.string().max(500).optional(),
+}).refine(
+    (data) => !data.eh_evento || (data.eh_evento && data.foto_perfil),
+    {
+        message: "Foto de perfil é obrigatória quando marcado como evento",
+        path: ["foto_perfil"],
+    }
+);
 
 /* ===== PÚBLICO ===== */
 export async function listarPublico(req, res) {

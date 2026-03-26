@@ -1,0 +1,225 @@
+/* ===== SEÇÃO MAIS UTILIZADOS ===== */
+
+.secaoMaisUtilizados {
+    padding: 40px 20px;
+    background: #fff;
+    border-top: 1px solid #f0f0f0;
+}
+
+.secaoMaisUtilizados__container {
+    width: 100%;
+    padding: 0 20px;
+    box-sizing: border-box;
+}
+
+@media (max-width: 900px) {
+    .secaoMaisUtilizados {
+        padding: 32px 16px;
+    }
+
+    .secaoMaisUtilizados__container {
+        padding: 0 8px;
+    }
+
+    .secaoMaisUtilizados__titulo {
+        font-size: 24px;
+    }
+}
+
+@media (max-width: 768px) {
+    .secaoMaisUtilizados {
+        padding: 24px 12px;
+    }
+
+    .secaoMaisUtilizados__container {
+        padding: 0 4px;
+    }
+
+    .secaoMaisUtilizados__titulo {
+        font-size: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .secaoMaisUtilizados {
+        padding: 20px 12px;
+    }
+}
+
+.secaoMaisUtilizados__titulo {
+    font-size: 28px;
+    font-weight: 700;
+    color: #1e3c72;
+    margin: 0 0 8px;
+}
+
+.secaoMaisUtilizados__subtitulo {
+    font-size: 14px;
+    color: #666;
+    margin: 0 0 32px;
+}
+
+.secaoMaisUtilizados__grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+}
+
+@media (max-width: 1200px) {
+    .secaoMaisUtilizados__grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 18px;
+    }
+}
+
+@media (max-width: 900px) {
+    .secaoMaisUtilizados__grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+    }
+}
+
+@media (max-width: 768px) {
+    .secaoMaisUtilizados__grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    .secaoMaisUtilizados__grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+}
+
+/* ===== CARTÃO MAIS UTILIZADO ===== */
+
+.cartaoMaisUtilizado {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 12px;
+    padding: 24px 16px;
+    background: #fff;
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.cartaoMaisUtilizado::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    transition: all 0.3s ease;
+}
+
+.cartaoMaisUtilizado--azul::before {
+    background: linear-gradient(90deg, #1e3c72 0%, #2a5298 100%);
+}
+
+.cartaoMaisUtilizado--verde::before {
+    background: linear-gradient(90deg, #4caf50 0%, #388e3c 100%);
+}
+
+.cartaoMaisUtilizado--laranja::before {
+    background: linear-gradient(90deg, #ff9800 0%, #f57c00 100%);
+}
+
+.cartaoMaisUtilizado--vermelho::before {
+    background: linear-gradient(90deg, #f44336 0%, #d32f2f 100%);
+}
+
+.cartaoMaisUtilizado:hover {
+    border-color: #2a5298;
+    background: linear-gradient(135deg, #f8fbff 0%, #f5f8ff 100%);
+    box-shadow: 0 8px 24px rgba(42, 82, 152, 0.15);
+    transform: translateY(-4px);
+}
+
+.cartaoMaisUtilizado:active {
+    transform: translateY(-2px);
+}
+
+.cartaoMaisUtilizado__icone {
+    width: 64px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    flex-shrink: 0;
+    color: #fff;
+}
+
+.cartaoMaisUtilizado--azul .cartaoMaisUtilizado__icone {
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+}
+
+.cartaoMaisUtilizado--verde .cartaoMaisUtilizado__icone {
+    background: linear-gradient(135deg, #4caf50 0%, #388e3c 100%);
+}
+
+.cartaoMaisUtilizado--laranja .cartaoMaisUtilizado__icone {
+    background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
+}
+
+.cartaoMaisUtilizado--vermelho .cartaoMaisUtilizado__icone {
+    background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
+}
+
+.cartaoMaisUtilizado__titulo {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1e3c72;
+    margin: 0;
+    line-height: 1.3;
+}
+
+.cartaoMaisUtilizado__descricao {
+    font-size: 12px;
+    color: #999;
+    margin: 0;
+    line-height: 1.4;
+    flex-grow: 1;
+}
+
+.cartaoMaisUtilizado__arrow {
+    font-size: 20px;
+    color: #2a5298;
+    opacity: 0;
+    transition: all 0.3s ease;
+}
+
+.cartaoMaisUtilizado:hover .cartaoMaisUtilizado__arrow {
+    opacity: 1;
+    transform: translateX(4px);
+}
+
+@media (max-width: 480px) {
+    .cartaoMaisUtilizado {
+        padding: 16px 12px;
+        gap: 8px;
+        min-height: 140px;
+    }
+
+    .cartaoMaisUtilizado__icone {
+        width: 56px;
+        height: 56px;
+    }
+
+    .cartaoMaisUtilizado__titulo {
+        font-size: 14px;
+    }
+
+    .cartaoMaisUtilizado__descricao {
+        font-size: 11px;
+    }
+}

@@ -13,6 +13,7 @@ export async function getCarouselItemById(id) {
     const [rows] = await pool.query(
         `SELECT id, titulo, conteudo, imagem_url, status,
             publicado_por_admin_id, publicado_por_nome, publicado_em,
+            eh_evento, foto_perfil,
             created_at, updated_at
      FROM Carrossel
      WHERE id = :id
@@ -25,7 +26,7 @@ export async function getCarouselItemById(id) {
 // admin helpers
 export async function listAdminCarouselItems() {
     const [rows] = await pool.query(
-        `SELECT id, titulo, status, publicado_em, created_at, updated_at
+        `SELECT id, titulo, status, publicado_em, eh_evento, foto_perfil, created_at, updated_at
      FROM Carrossel
      ORDER BY updated_at DESC`);
     return rows || [];
@@ -40,13 +41,15 @@ export async function createCarouselItem(data) {
         publicado_por_admin_id,
         publicado_por_nome,
         publicado_em,
+        eh_evento,
+        foto_perfil,
     } = data;
 
     const [result] = await pool.query(
         `INSERT INTO Carrossel
-      (titulo, conteudo, imagem_url, status, publicado_por_admin_id, publicado_por_nome, publicado_em)
+      (titulo, conteudo, imagem_url, status, publicado_por_admin_id, publicado_por_nome, publicado_em, eh_evento, foto_perfil)
      VALUES
-      (:titulo, :conteudo, :imagem_url, :status, :publicado_por_admin_id, :publicado_por_nome, :publicado_em)`,
+      (:titulo, :conteudo, :imagem_url, :status, :publicado_por_admin_id, :publicado_por_nome, :publicado_em, :eh_evento, :foto_perfil)`,
         {
             titulo,
             conteudo,
@@ -55,6 +58,8 @@ export async function createCarouselItem(data) {
             publicado_por_admin_id,
             publicado_por_nome,
             publicado_em,
+            eh_evento: eh_evento || false,
+            foto_perfil: foto_perfil || null,
         }
     );
 
@@ -70,6 +75,8 @@ export async function updateCarouselItem(id, data) {
         publicado_por_admin_id,
         publicado_por_nome,
         publicado_em,
+        eh_evento,
+        foto_perfil,
     } = data;
 
     const [result] = await pool.query(
@@ -80,7 +87,9 @@ export async function updateCarouselItem(id, data) {
          status = :status,
          publicado_por_admin_id = :publicado_por_admin_id,
          publicado_por_nome = :publicado_por_nome,
-         publicado_em = :publicado_em
+         publicado_em = :publicado_em,
+         eh_evento = :eh_evento,
+         foto_perfil = :foto_perfil
      WHERE id = :id`,
         {
             id,
@@ -91,6 +100,8 @@ export async function updateCarouselItem(id, data) {
             publicado_por_admin_id,
             publicado_por_nome,
             publicado_em,
+            eh_evento: eh_evento || false,
+            foto_perfil: foto_perfil || null,
         }
     );
 

@@ -1,11 +1,13 @@
 import { z } from "zod";
+import { logger } from "../utils/logger.js";
 import { parseDdMmYyyyToDate } from "../utils/date.js";
 import {
     listColaboradores,
     getColaboradorByMatricula,
     createColaborador,
     updateColaboradorByMatricula,
-    deleteColaboradorByMatricula
+    deleteColaboradorByMatricula,
+    listAniversariantesMes
 } from "../services/colaboradores.service.js";
 
 const StatusEnum = z.enum(["ATIVO", "INATIVO"]);
@@ -140,4 +142,14 @@ export async function excluir(req, res) {
 
     // resposta mínima (não vaza dados)
     return res.status(204).send();
+}
+
+export async function listarAniversariantesMes(req, res) {
+    try {
+        const aniversariantes = await listAniversariantesMes();
+        return res.json({ aniversariantes });
+    } catch (erro) {
+        logger.error("[erro] listarAniversariantesMes:", erro);
+        return res.status(500).json({ erro: "Erro ao listar aniversariantes" });
+    }
 }

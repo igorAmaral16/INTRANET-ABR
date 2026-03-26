@@ -41,6 +41,25 @@ export async function listColaboradores({ status, search, page, pageSize }) {
     return { total, page, pageSize, items: rows };
 }
 
+export async function listAniversariantesMes() {
+    const hoje = new Date();
+    const mesAtual = hoje.getMonth() + 1; // 1-12
+
+    const [aniversariantes] = await pool.query(
+        `SELECT 
+            nome_completo,
+            data_nascimento,
+            DAY(data_nascimento) as dia
+        FROM Colaboradores
+        WHERE status = 'ATIVO'
+        AND MONTH(data_nascimento) = :mes
+        ORDER BY dia ASC`,
+        { mes: mesAtual }
+    );
+
+    return aniversariantes || [];
+}
+
 export async function getColaboradorByMatricula(matriculaRaw) {
     const matricula = normalizeMatricula(matriculaRaw);
 

@@ -11,6 +11,7 @@ import { bibliotecaRouter } from "./biblioteca.routes.js";           // PUBLIC+A
 import { faqRouter } from "./faq.routes.js";
 import { faleRhRouter } from "./faleRh.routes.js";                    // PUBLIC+ADMIN
 import { calendarioRouter } from "./calendario.routes.js";           // PUBLIC+ADMIN
+import { eventosRouter } from "./eventos.routes.js";                 // PUBLIC+ADMIN eventos
 import { relatoriosRouter } from "./relatorios.routes.js";           // ADMIN nivel>=2
 import { tutorialsRouter } from "./tutorials.routes.js";           // PÚBLICO + ADMIN exemplos
 import { carouselRouter } from "./carousel.routes.js";           // PÚBLICO + ADMIN slides/carrossel
@@ -26,6 +27,7 @@ router.use(comunicadosRouter);
 router.use(bibliotecaRouter);
 router.use(faqRouter);
 router.use(calendarioRouter);
+router.use(eventosRouter);
 
 // colaborador
 router.use(comunicadoReadsRouter);

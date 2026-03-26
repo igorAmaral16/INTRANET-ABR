@@ -1,0 +1,181 @@
+/* ===== SEÇÃO ANIVERSARIANTES ===== */
+
+.secaoAniversariantes {
+    padding: 40px 20px;
+    background: #fff;
+    border-top: 1px solid #f0f0f0;
+}
+
+.secaoAniversariantes__container {
+    width: 100%;
+    padding: 0 20px;
+    box-sizing: border-box;
+}
+
+@media (max-width: 900px) {
+    .secaoAniversariantes {
+        padding: 32px 16px;
+    }
+
+    .secaoAniversariantes__container {
+        padding: 0 8px;
+    }
+
+    .secaoAniversariantes__titulo {
+        font-size: 20px;
+    }
+}
+
+@media (max-width: 768px) {
+    .secaoAniversariantes {
+        padding: 24px 12px;
+    }
+
+    .secaoAniversariantes__container {
+        padding: 0 4px;
+    }
+
+    .secaoAniversariantes__titulo {
+        font-size: 18px;
+        margin-bottom: 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    .secaoAniversariantes {
+        padding: 20px 12px;
+    }
+}
+
+.secaoAniversariantes__titulo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 24px;
+    font-weight: 700;
+    color: #1e3c72;
+    margin: 0 0 24px;
+}
+
+.secaoAniversariantes__mensagem {
+    padding: 40px 20px;
+    text-align: center;
+}
+
+.secaoAniversariantes__vazio,
+.secaoAniversariantes__erro {
+    font-size: 16px;
+    color: #999;
+    margin: 0;
+}
+
+.secaoAniversariantes__erro {
+    color: #d32f2f;
+}
+
+.secaoAniversariantes__lista {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 16px;
+}
+
+@media (max-width: 1400px) {
+    .secaoAniversariantes__lista {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 16px;
+    }
+}
+
+@media (max-width: 1200px) {
+    .secaoAniversariantes__lista {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 14px;
+    }
+}
+
+@media (max-width: 900px) {
+    .secaoAniversariantes__lista {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+    }
+}
+
+@media (max-width: 768px) {
+    .secaoAniversariantes__lista {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .secaoAniversariantes__lista {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ===== CARTÃO ANIVERSARIANTE ===== */
+
+.cartaoAniversariante {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px;
+    background: linear-gradient(135deg, #fff8e1 0%, #fff9c4 100%);
+    border: 2px solid #ffe0b2;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(255, 152, 0, 0.1);
+}
+
+.cartaoAniversariante:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(255, 152, 0, 0.2);
+    border-color: #ffb74d;
+    background: linear-gradient(135deg, #fff9c4 0%, #ffeb3b 100%);
+}
+
+.cartaoAniversariante__data {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+    background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
+    color: #fff;
+    font-size: 24px;
+    font-weight: 700;
+    border-radius: 8px;
+    flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(255, 152, 0, 0.2);
+}
+
+.cartaoAniversariante__info {
+    flex: 1;
+    min-width: 0;
+}
+
+.cartaoAniversariante__nome {
+    font-size: 15px;
+    font-weight: 600;
+    color: #333;
+    margin: 0;
+    word-break: break-word;
+    line-height: 1.4;
+}
+
+@media (max-width: 480px) {
+    .cartaoAniversariante {
+        padding: 12px;
+        gap: 12px;
+    }
+
+    .cartaoAniversariante__data {
+        width: 48px;
+        height: 48px;
+        font-size: 18px;
+    }
+
+    .cartaoAniversariante__nome {
+        font-size: 13px;
+    }
+}

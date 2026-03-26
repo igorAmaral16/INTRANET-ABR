@@ -1,6 +1,7 @@
 import { BrowserRouter, Route, Routes, useNavigate } from "react-router-dom";
 import { useEffect, useMemo } from "react";
 
+import { PaginaHome } from "./pages/PaginaHome";
 import { PaginaComunicados } from "./pages/PaginaComunicados";
 import { PaginaMeuPerfil } from "./pages/PaginaMeuPerfil";
 import { PaginaDocumentos } from "./pages/PaginaDocumentos";
@@ -68,8 +69,11 @@ function AppInner() {
     <NotificacoesRhProvider role={roleNormalizada} token={sessao?.token}>
       <AuthListener />
       <Routes>
+        {/* PUBLIC - HOME */}
+        <Route path="/" element={<PaginaHome />} />
+
         {/* COLAB */}
-        <Route path="/" element={<PaginaComunicados />} />
+        <Route path="/comunicados" element={<PaginaComunicados />} />
         <Route path="/meu-perfil" element={<PaginaMeuPerfil />} />
         <Route path="/documentos" element={<PaginaDocumentos />} />
         <Route path="/meus-documentos" element={<PaginaMeusDocumentos />} />
