@@ -1,9 +1,12 @@
 import { useEffect, useState } from "react";
-import { listarEventosPublicados, obterEventoAtual, Evento } from "../api/eventos.api";
+import { listarEventos, type CarouselItemDetalhe } from "../api/carousel.api";
+
+export interface Evento extends CarouselItemDetalhe {
+    // extends CarouselItemDetalhe para ter titulo, conteudo, foto_perfil, etc
+}
 
 export function useEventos() {
     const [eventos, setEventos] = useState<Evento[]>([]);
-    const [eventoAtual, setEventoAtual] = useState<Evento | null>(null);
     const [estado, setEstado] = useState<"carregando" | "pronto" | "erro">("carregando");
     const [erro, setErro] = useState<string | null>(null);
 
@@ -16,16 +19,8 @@ export function useEventos() {
             setEstado("carregando");
             setErro(null);
 
-            const { eventos: data } = await listarEventosPublicados();
-            setEventos(data || []);
-
-            try {
-                const { evento } = await obterEventoAtual();
-                setEventoAtual(evento || null);
-            } catch {
-                // Evento atual é opcional, não falha se erro
-            }
-
+            const data = await listarEventos();
+            setEventos((data as Evento[]) || []);
             setEstado("pronto");
         } catch (err: any) {
             const mensagem = err?.message || "Erro ao carregar eventos";
@@ -36,7 +31,7 @@ export function useEventos() {
 
     return {
         eventos,
-        eventoAtual,
+        eventoAtual: null, // Não há mais "evento atual" nos slides do carrossel
         estado,
         erro,
         recarregar: buscarEventos,

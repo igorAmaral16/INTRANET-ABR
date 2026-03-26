@@ -352,12 +352,13 @@
     background: #fff;
     border-radius: 12px;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-    max-width: 600px;
+    max-width: 700px;
     width: 100%;
     max-height: 90vh;
-    overflow-y: auto;
     position: relative;
     animation: slideUp 0.3s ease;
+    display: flex;
+    flex-direction: column;
 }
 
 @keyframes slideUp {
@@ -400,13 +401,19 @@
 
 .secaoEventos__modalImg {
     width: 100%;
-    height: 300px;
+    height: 380px;
     object-fit: cover;
     display: block;
+    border-radius: 12px 12px 0 0;
+    flex-shrink: 0;
 }
 
 .secaoEventos__modalConteudo {
-    padding: 32px 24px;
+    padding: 32px 28px;
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
 }
 
 .secaoEventos__modalAvatar {
@@ -433,16 +440,40 @@
 }
 
 .secaoEventos__modalDescricao {
-    font-size: 14px;
+    font-size: 15px;
     color: #666;
-    line-height: 1.6;
-    margin: 0 0 24px;
+    line-height: 1.7;
+    margin: 0 0 auto;
+    flex: 1;
+}
+
+.secaoEventos__modalDescricao p {
+    margin: 0 0 14px;
+    word-wrap: break-word;
+}
+
+.secaoEventos__modalDescricao p:last-child {
+    margin-bottom: 0;
+}
+
+.secaoEventos__modalDescricao ul,
+.secaoEventos__modalDescricao ol {
+    margin: 12px 0 12px 20px;
+    padding: 0;
+}
+
+.secaoEventos__modalDescricao li {
+    margin: 6px 0;
 }
 
 .secaoEventos__modalMeta {
     display: flex;
     flex-direction: column;
     gap: 12px;
+    margin-top: 24px;
+    padding-top: 24px;
+    border-top: 1px solid #e0e0e0;
+    flex-shrink: 0;
 }
 
 .secaoEventos__modalItem {
@@ -465,13 +496,25 @@
     line-height: 1.5;
 }
 
-@media (max-width: 480px) {
+@media (max-width: 768px) {
     .secaoEventos__modal {
-        border-radius: 8px;
+        max-width: 90%;
     }
 
     .secaoEventos__modalImg {
-        height: 200px;
+        height: 300px;
+    }
+}
+
+@media (max-width: 480px) {
+    .secaoEventos__modal {
+        border-radius: 8px;
+        max-width: 95%;
+    }
+
+    .secaoEventos__modalImg {
+        height: 240px;
+        border-radius: 8px 8px 0 0;
     }
 
     .secaoEventos__modalConteudo {
@@ -480,9 +523,16 @@
 
     .secaoEventos__modalTitulo {
         font-size: 20px;
+        margin-bottom: 12px;
     }
 
     .secaoEventos__modalDescricao {
         font-size: 13px;
+        line-height: 1.6;
+    }
+
+    .secaoEventos__modalMeta {
+        margin-top: 16px;
+        padding-top: 16px;
     }
 }

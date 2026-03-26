@@ -6,6 +6,7 @@ import { requireNivel } from "../middlewares/requireNivel.js";
 
 import {
     listarPublico,
+    listarEventos,
     obterPublico,
     listarAdmin,
     obterAdmin,
@@ -18,6 +19,7 @@ export const carouselRouter = express.Router();
 
 // Público
 carouselRouter.get("/carousel", asyncHandler(listarPublico));
+carouselRouter.get("/carousel/eventos", asyncHandler(listarEventos));
 carouselRouter.get("/carousel/:id", asyncHandler(obterPublico));
 
 // Admin (RH nível>=1)

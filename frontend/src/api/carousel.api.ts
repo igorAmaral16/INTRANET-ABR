@@ -9,6 +9,10 @@ export function listarCarrossel() {
     return httpGet<CarouselItemResumo[]>(`/carousel`);
 }
 
+export function listarEventos() {
+    return httpGet<CarouselItemDetalhe[]>(`/carousel/eventos`);
+}
+
 export function obterCarrossel(id: number, signal?: AbortSignal) {
     return httpGet<CarouselItemDetalhe>(`/carousel/${id}`, { signal });
 }

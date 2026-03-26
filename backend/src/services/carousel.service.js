@@ -5,6 +5,17 @@ export async function listPublicCarouselItems() {
         `SELECT id, titulo, imagem_url, publicado_em
      FROM Carrossel
      WHERE status = 'PUBLICADO'
+     AND (eh_evento IS NULL OR eh_evento = false)
+     ORDER BY publicado_em DESC`);
+    return rows || [];
+}
+
+export async function listPublicEventos() {
+    const [rows] = await pool.query(
+        `SELECT id, titulo, conteudo, imagem_url, foto_perfil, publicado_em
+     FROM Carrossel
+     WHERE status = 'PUBLICADO'
+     AND eh_evento = true
      ORDER BY publicado_em DESC`);
     return rows || [];
 }

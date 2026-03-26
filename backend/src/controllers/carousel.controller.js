@@ -2,6 +2,7 @@ import { z } from "zod";
 import { parseDdMmYyyyToDate } from "../utils/date.js";
 import {
     listPublicCarouselItems,
+    listPublicEventos,
     getCarouselItemById,
     listAdminCarouselItems,
     createCarouselItem,
@@ -32,6 +33,11 @@ const CreateUpdateSchema = z.object({
 /* ===== PÚBLICO ===== */
 export async function listarPublico(req, res) {
     const data = await listPublicCarouselItems();
+    res.json(data);
+}
+
+export async function listarEventos(req, res) {
+    const data = await listPublicEventos();
     res.json(data);
 }
 

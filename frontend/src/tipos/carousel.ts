@@ -12,4 +12,6 @@ export interface CarouselItemDetalhe extends CarouselItemResumo {
     publicado_por_admin_id?: number | null;
     created_at?: string;
     updated_at?: string;
+    eh_evento?: boolean | null;
+    foto_perfil?: string | null;
 }
