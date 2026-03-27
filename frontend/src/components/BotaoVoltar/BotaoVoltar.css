@@ -3,8 +3,8 @@
     display: flex;
     align-items: center;
     gap: 6px;
-    padding: 8px 12px;
-    border: none;
+    padding: 10px 14px;
+    border: 1px solid transparent;
     background: transparent;
     color: #666;
     font-size: 14px;
@@ -12,42 +12,93 @@
     cursor: pointer;
     border-radius: 6px;
     transition: all 0.2s ease;
-    margin-bottom: 12px;
+    margin-bottom: 16px;
+    min-height: 40px;
+    min-width: fit-content;
+    align-self: flex-start;
 }
 
 .botaoVoltar:hover {
     background-color: #f0f0f0;
     color: #333;
+    border-color: #ddd;
 }
 
 .botaoVoltar:active {
     background-color: #e8e8e8;
+    border-color: #ccc;
+}
+
+.botaoVoltar:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(102, 102, 102, 0.1);
 }
 
 /* Versão discreta - mais sutil */
 .botaoVoltar--discreto {
     color: #999;
-    padding: 6px 8px;
+    padding: 8px 12px;
     font-size: 13px;
+    min-height: 36px;
 }
 
 .botaoVoltar--discreto:hover {
-    background-color: rgba(100, 100, 100, 0.05);
+    background-color: rgba(100, 100, 100, 0.08);
     color: #666;
+    border-color: rgba(100, 100, 100, 0.15);
 }
 
 .botaoVoltar svg {
     flex-shrink: 0;
+    min-width: 18px;
+    height: 18px;
 }
 
-/* Mobile */
+/* Tablet */
+@media (max-width: 1024px) {
+    .botaoVoltar {
+        margin-bottom: 14px;
+        padding: 9px 12px;
+    }
+}
+
+/* Mobile - Melhorado */
 @media (max-width: 768px) {
     .botaoVoltar {
-        padding: 6px 10px;
+        padding: 10px 12px;
         font-size: 13px;
+        margin-bottom: 14px;
+        min-height: 44px;
+        /* Área de toque iOS */
+        width: fit-content;
     }
 
     .botaoVoltar span {
-        display: none;
+        display: inline;
+        /* Manter texto visível */
+    }
+
+    .botaoVoltar svg {
+        min-width: 16px;
+        height: 16px;
+    }
+}
+
+/* Mobile pequeno */
+@media (max-width: 480px) {
+    .botaoVoltar {
+        padding: 9px 10px;
+        font-size: 12px;
+        min-height: 40px;
+        gap: 4px;
+    }
+
+    .botaoVoltar svg {
+        min-width: 16px;
+        height: 16px;
+    }
+
+    .botaoVoltar span {
+        display: inline;
     }
 }

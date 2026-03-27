@@ -24,7 +24,7 @@ export function SecaoMaisUtilizados({ role }: Props) {
                 if (role === "ADMIN") {
                     window.location.href = "/admin/tutoriais";
                 } else {
-                    navigate("/tutoriais/Geral");
+                    navigate("/tutoriais");
                 }
             },
             cor: "azul",

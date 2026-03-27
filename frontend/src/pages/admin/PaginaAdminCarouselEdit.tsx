@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Save, Upload, Image as IconImage, FileText, Trash2, ArrowLeft } from "lucide-react";
+import { Save, Upload, Image as IconImage, FileText, Trash2 } from "lucide-react";
 
 import { SidebarAdmin } from "../../components/SidebarAdmin/SidebarAdmin";
 import { BotaoVoltar } from "../../components/BotaoVoltar/BotaoVoltar";
@@ -256,13 +256,6 @@ export function PaginaAdminCarouselEdit() {
 
             <main className="paginaBase__conteudo">
                 <BotaoVoltar destino="/admin/carousel" />
-                <button
-                    type="button"
-                    className="botaoVoltar paginaBase__voltar"
-                    onClick={() => navigate(-1)}
-                >
-                    <ArrowLeft size={18} /> Voltar
-                </button>
 
                 <h1>{modo === "CRIAR" ? "Novo slide" : "Editar slide"}</h1>
 

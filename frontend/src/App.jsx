@@ -10,6 +10,7 @@ import { PaginaFaq } from "./pages/PaginaFaq";
 import { PaginaFaleComRh } from "./pages/PaginaFaleComRh";
 import { PaginaCalendario } from "./pages/PaginaCalendario";
 import { PaginaTutoriais } from "./pages/PaginaTutoriais";
+import { PaginaTutoriaisSetor } from "./pages/PaginaTutoriaisSetor";
 import { PaginaAnuncio } from "./pages/PaginaAnuncio";
 
 import { PaginaAdminHome } from "./pages/admin/PaginaAdminHome";
@@ -81,7 +82,8 @@ function AppInner() {
         <Route path="/faq" element={<PaginaFaq />} />
         <Route path="/fale-com-rh" element={<PaginaFaleComRh />} />
         <Route path="/calendario" element={<PaginaCalendario />} />
-        <Route path="/tutoriais/:setor" element={<PaginaTutoriais />} />
+        <Route path="/tutoriais" element={<PaginaTutoriais />} />
+        <Route path="/tutoriais/:setor" element={<PaginaTutoriaisSetor />} />
         <Route path="/anuncio/:id" element={<PaginaAnuncio />} />
 
         {/* ADMIN */}

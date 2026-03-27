@@ -1,47 +1,233 @@
+/* ===== PAGE LAYOUT ===== */
 .paginaTutoriais {
-    padding: 16px;
+    min-height: 100vh;
+    background: #f5f6fa;
+    color: #0f172a;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+    width: calc(100% - 240px);
+    margin-left: 240px;
+    box-sizing: border-box;
 }
 
+.paginaTutoriais__conteudo {
+    flex: 1;
+    padding: 24px 32px 40px;
+    max-width: 1400px;
+    width: 100%;
+    margin: 0 auto;
+    box-sizing: border-box;
+}
+
+@media (max-width: 1024px) {
+    .paginaTutoriais__conteudo {
+        padding: 20px 24px 40px;
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 768px) {
+    .paginaTutoriais {
+        margin-left: 0;
+        width: 100%;
+    }
+
+    .paginaTutoriais__conteudo {
+        padding: 16px 16px 32px;
+    }
+}
+
+@media (max-width: 480px) {
+    .paginaTutoriais__conteudo {
+        padding: 12px 12px 24px;
+    }
+}
+
+/* ===== HEADER ===== */
 .paginaTutoriais__header {
-    margin-bottom: 16px;
+    margin-bottom: 32px;
+}
+
+.paginaTutoriais__titulo {
+    margin: 0 0 8px 0;
+    font-size: 32px;
+    font-weight: 700;
+    color: #0f172a;
+    line-height: 1.2;
+}
+
+.paginaTutoriais__subtitulo {
+    margin: 0;
+    font-size: 15px;
+    color: #64748b;
+    font-weight: 400;
+    line-height: 1.6;
+}
+
+/* ===== INFO BAR ===== */
+.paginaTutoriais__info {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+    padding: 12px 16px;
+    background: white;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+}
+
+.paginaTutoriais__contador {
+    font-size: 13px;
+    font-weight: 600;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* ===== GRID LAYOUT (BRADESCO STYLE) ===== */
+.paginaTutoriais__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 24px;
+    margin-bottom: 40px;
+}
+
+@media (max-width: 1024px) {
+    .paginaTutoriais__grid {
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 20px;
+    }
+}
+
+@media (max-width: 768px) {
+    .paginaTutoriais__grid {
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+        gap: 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    .paginaTutoriais__grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+}
+
+/* ===== CARD STYLES ===== */
+.paginaTutoriais__card {
+    background: white;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    padding: 0;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.paginaTutoriais__card:hover {
+    border-color: #cbd5e1;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    transform: translateY(-4px);
+}
+
+/* Card Header - Icon Container */
+.paginaTutoriais__cardIcone {
+    width: 100%;
+    height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 700;
+    position: relative;
+    overflow: hidden;
+}
+
+.paginaTutoriais__cardIcone::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.1) 100%);
+    pointer-events: none;
+}
+
+.paginaTutoriais__cardIcone svg {
+    z-index: 1;
+    opacity: 0.95;
+}
+
+/* Card Content */
+.paginaTutoriais__cardConteudo {
+    flex: 1;
+    padding: 20px 16px 0;
     display: flex;
     flex-direction: column;
     gap: 8px;
 }
 
-.paginaTutoriais__setor {
-    font-weight: 600;
-}
-
-.paginaTutoriais__busca input {
-    width: 100%;
-    padding: 6px 8px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-}
-
-.paginaTutoriais__titulo {
+.paginaTutoriais__cardTitulo {
     margin: 0;
-    font-size: 1.5rem;
+    font-size: 16px;
+    font-weight: 700;
+    color: #0f172a;
+    line-height: 1.4;
 }
 
-.paginaTutoriais__lista {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 16px;
+.paginaTutoriais__cardDescricao {
+    margin: 0;
+    font-size: 13px;
+    color: #64748b;
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 
-.paginaTutoriais__lista .card {
-    padding: 12px;
+/* Card Footer */
+.paginaTutoriais__cardFooter {
+    padding: 16px;
+    background: #f8fafc;
+    border-top: 1px solid #e2e8f0;
+    margin-top: auto;
 }
 
-.paginaTutoriais__data {
-    font-size: 0.85rem;
-    color: #666;
-    margin-top: 4px;
-    margin-bottom: 8px;
+.paginaTutoriais__cardVideos {
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 600;
+    color: #0f172a;
+    background: #e0e7ff;
+    padding: 6px 12px;
+    border-radius: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
 }
 
-.error {
-    color: red;
+/* ===== LOADING STATE ===== */
+.paginaTutoriais__loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 80px 20px;
+    text-align: center;
+    background: white;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+}
+
+.paginaTutoriais__loading p {
+    margin: 0;
+    font-size: 15px;
+    color: #64748b;
 }
