@@ -13,6 +13,7 @@ import { useSessaoAuth } from "../hooks/useSessaoAuth";
 import { inferirTipoAnexoPorUrl, resolverUrlApi } from "../utils/urlApi";
 import { useNavigate } from "react-router-dom";
 import { confirmarLeituraColab } from "../api/comunicados.api";
+import "../styles/imageDisplay.css";
 import React from "react";
 
 export function PaginaComunicados() {
@@ -209,8 +210,13 @@ export function PaginaComunicados() {
                                             <a className="paginaComunicados__anexo" href={url} target="_blank" rel="noreferrer">
                                                 Abrir imagem
                                             </a>
-                                            <div className="paginaComunicados__previewImagem">
-                                                <img src={url} alt="Anexo do comunicado" loading="lazy" />
+                                            <div className="paginaComunicados__previewImagem comunicadoImageWrapper">
+                                                <img
+                                                    src={url}
+                                                    alt="Anexo do comunicado"
+                                                    className="comunicadoCom__image"
+                                                    loading="lazy"
+                                                />
                                             </div>
                                         </div>
                                     );

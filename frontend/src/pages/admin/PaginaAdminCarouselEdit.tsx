@@ -4,8 +4,10 @@ import { Save, Upload, Image as IconImage, FileText, Trash2 } from "lucide-react
 
 import { SidebarAdmin } from "../../components/SidebarAdmin/SidebarAdmin";
 import { BotaoVoltar } from "../../components/BotaoVoltar/BotaoVoltar";
+import { ImageUploadField } from "../../components/ImageUploadField/ImageUploadField";
 import { useSessaoAuth } from "../../hooks/useSessaoAuth";
 import { ErroHttp } from "../../api/clienteHttp";
+import { validateImage } from "../../utils/imageValidation";
 import {
     criarCarrossel,
     atualizarCarrossel,
@@ -17,6 +19,7 @@ import { uploadAnexoAdmin } from "../../api/uploads.api";
 import "../../pages/PaginaBase.css";
 import "./PaginaAdminCarousel.css";
 import "./PaginaAdminCriarComunicado.css"; // reuse form / upload styles
+import "../../components/ImageUploadField/ImageUploadField.css";
 
 function isAbortError(e: any) {
     return e?.name === "AbortError" || String(e?.message || "").toLowerCase().includes("abort");
@@ -87,6 +90,16 @@ export function PaginaAdminCarouselEdit() {
             setErro("Tipo de arquivo inválido. Use PNG/JPG/WEBP ou PDF.");
             return;
         }
+
+        // Validar imagem se for imagem
+        if (tipoInferido === "IMAGEM") {
+            const validation = await validateImage(file, "CAROUSEL", 5 * 1024 * 1024);
+            if (!validation.isValid) {
+                setErro(validation.error || "Imagem inválida");
+                return;
+            }
+        }
+
         setUploading(true);
         setErro(null);
         try {
@@ -119,6 +132,14 @@ export function PaginaAdminCarouselEdit() {
             setErro("Selecione uma foto de perfil para anexar.");
             return;
         }
+
+        // Validar imagem antes de enviar
+        const validation = await validateImage(fileFotoPerfil, "CAROUSEL_EVENT", 5 * 1024 * 1024);
+        if (!validation.isValid) {
+            setErro(validation.error || "Imagem inválida");
+            return;
+        }
+
         const tipoInferido = inferTipo(fileFotoPerfil);
         if (tipoInferido !== "IMAGEM") {
             setErro("A foto de perfil deve ser um arquivo de imagem (PNG/JPG/WEBP).");
@@ -305,43 +326,29 @@ export function PaginaAdminCarouselEdit() {
                                 <div className="admCriar__anexoTitulo">
                                     <Upload size={18} /> Foto de Perfil do Evento (Obrigatório)
                                 </div>
-                                <div className="admCriar__anexoSub">Envie PNG/JPG/WEBP (&lt;5MB) para representar o evento.</div>
+                                <div className="admCriar__anexoSub">Imagem representativa do evento com tamanho ideal quadrado (1:1)</div>
                             </div>
-                            {!fotoPerfilAnexo ? (
-                                <>
-                                    <label className="admCriar__file">
-                                        <input
-                                            type="file"
-                                            accept="image/png,image/jpeg,image/webp"
-                                            onChange={(e) => setFileFotoPerfil(e.target.files?.[0] || null)}
-                                        />
-                                        <div className="admCriar__fileBox">
-                                            <Upload size={18} />
-                                            <div>
-                                                <div className="admCriar__fileTxt">Selecionar foto de perfil</div>
-                                                <div className="admCriar__fileHint">Até 5MB (backend).</div>
-                                            </div>
-                                        </div>
-                                    </label>
 
-                                    {fileFotoPerfil ? (
-                                        <div className="admCriar__filePreview">
-                                            <div className="admCriar__fileName">{fileFotoPerfil.name}</div>
-                                            <div className="admCriar__fileMeta">
-                                                IMAGEM • {(fileFotoPerfil.size / 1024 / 1024).toFixed(2)} MB
-                                            </div>
-                                        </div>
-                                    ) : null}
+                            {!fotoPerfilAnexo ? (
+                                <div style={{ padding: "16px 0" }}>
+                                    <ImageUploadField
+                                        label="Foto de Perfil do Evento"
+                                        context="CAROUSEL_EVENT"
+                                        selectedFile={fileFotoPerfil}
+                                        onFileSelect={setFileFotoPerfil}
+                                        showRecommendations={true}
+                                    />
 
                                     <button
                                         type="button"
                                         className="admCriar__btnAnexo"
                                         onClick={enviarFotoPerfil}
                                         disabled={uploadingFotoPerfil || !fileFotoPerfil}
+                                        style={{ marginTop: "12px" }}
                                     >
                                         {uploadingFotoPerfil ? "Enviando..." : "Enviar foto de perfil"}
                                     </button>
-                                </>
+                                </div>
                             ) : (
                                 <div className="admCriar__anexoOk">
                                     <div className="admCriar__anexoBadge">
@@ -377,43 +384,30 @@ export function PaginaAdminCarouselEdit() {
                             <div className="admCriar__anexoTitulo">
                                 <Upload size={18} /> Imagem do slide
                             </div>
-                            <div className="admCriar__anexoSub">Envie PNG/JPG/WEBP (&lt;5MB) ou PDF.</div>
+                            <div className="admCriar__anexoSub">Faça upload de uma imagem otimizada para o carrossel</div>
                         </div>
                         {!anexo ? (
-                            <>
-                                <label className="admCriar__file">
-                                    <input
-                                        type="file"
-                                        accept="image/png,image/jpeg,image/webp,application/pdf"
-                                        onChange={(e) => setFile(e.target.files?.[0] || null)}
-                                    />
-                                    <div className="admCriar__fileBox">
-                                        <Upload size={18} />
-                                        <div>
-                                            <div className="admCriar__fileTxt">Selecionar arquivo</div>
-                                            <div className="admCriar__fileHint">Até 5MB (backend).</div>
-                                        </div>
-                                    </div>
-                                </label>
+                            <div style={{ padding: "16px 0" }}>
+                                <ImageUploadField
+                                    label="Imagem do Slide"
+                                    context="CAROUSEL"
+                                    selectedFile={file}
+                                    onFileSelect={setFile}
+                                    showRecommendations={true}
+                                />
 
-                                {file ? (
-                                    <div className="admCriar__filePreview">
-                                        <div className="admCriar__fileName">{file.name}</div>
-                                        <div className="admCriar__fileMeta">
-                                            {inferTipo(file)} • {(file.size / 1024 / 1024).toFixed(2)} MB
-                                        </div>
-                                    </div>
-                                ) : null}
-
-                                <button
-                                    type="button"
-                                    className="admCriar__btnAnexo"
-                                    onClick={enviarAnexo}
-                                    disabled={uploading || !file}
-                                >
-                                    {uploading ? "Enviando..." : "Enviar imagem"}
-                                </button>
-                            </>
+                                {file && inferTipo(file) === "IMAGEM" && (
+                                    <button
+                                        type="button"
+                                        className="admCriar__btnAnexo"
+                                        onClick={enviarAnexo}
+                                        disabled={uploading || !file}
+                                        style={{ marginTop: "12px" }}
+                                    >
+                                        {uploading ? "Enviando..." : "Enviar imagem"}
+                                    </button>
+                                )}
+                            </div>
                         ) : (
                             <div className="admCriar__anexoOk">
                                 <div className="admCriar__anexoBadge">

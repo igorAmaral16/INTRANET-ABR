@@ -7,6 +7,7 @@ import { EstadoErro } from "../components/Estados/EstadoErro";
 import { useCarouselItem } from "../hooks/useCarousel";
 import { useSessaoAuth } from "../hooks/useSessaoAuth";
 import { resolverUrlApi } from "../utils/urlApi";
+import "../styles/imageDisplay.css";
 
 export function PaginaAnuncio() {
     const { id } = useParams();
@@ -64,14 +65,19 @@ export function PaginaAnuncio() {
             />
 
             <main className="paginaAnuncio__conteudo">
-                <BotaoVoltar destino="/comunicados" />
+                <BotaoVoltar destino="/" />
                 {estado === "carregando" && <EstadoCarregando />}
                 {estado === "erro" && <EstadoErro mensagem={erro || "Erro"} aoTentarNovamente={() => { }} />}
                 {estado === "pronto" && item && (
                     <article className="paginaAnuncio__artigo">
                         {item.imagem_url && (
-                            <div className="paginaAnuncio__hero">
-                                <img src={resolverUrlApi(item.imagem_url)} alt={item.titulo} />
+                            <div className="paginaAnuncio__hero announcementCard__imageWrapper">
+                                <img
+                                    src={resolverUrlApi(item.imagem_url)}
+                                    alt={item.titulo}
+                                    className="announcementCard__image"
+                                    loading="lazy"
+                                />
                             </div>
                         )}
                         <h1 className="paginaAnuncio__titulo">{item.titulo}</h1>

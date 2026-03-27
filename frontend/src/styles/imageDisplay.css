@@ -1,0 +1,219 @@
+/**
+ * Image Display Styles
+ * Estilos para garantir que imagens sejam exibidas com tamanho perfeito em cada contexto
+ * Nunca serão estouradas (overflow) e sempre ajustadas corretamente
+ */
+
+/* ====== IMAGENS DE EVENTOS (Profile/Square) ====== */
+.eventProfile__image,
+.eventCard__image,
+.thumbnail__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+}
+
+.eventProfile__wrapper,
+.eventCard__wrapper,
+.thumbnail__wrapper {
+    aspect-ratio: 1 / 1;
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+    background: #f0f0f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+}
+
+/* ====== IMAGENS DE COMUNICADOS ====== */
+.comunicadoCom__image,
+.comunicadoAttachment__image {
+    width: 100%;
+    height: 100%;
+    display: block;
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    object-position: center;
+}
+
+.comunicadoImageWrapper {
+    max-width: 100%;
+    width: 100%;
+    min-height: 300px;
+    max-height: 500px;
+    background: #f9f9f9;
+    border-radius: 8px;
+    overflow: hidden;
+    aspect-ratio: 4 / 3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 12px 0;
+}
+
+/* ====== IMAGENS DE ANÚNCIOS (Carousel em cards) ====== */
+.announcementCard__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+    max-width: 100%;
+    max-height: 100%;
+}
+
+.announcementCard__imageWrapper {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    min-height: 300px;
+    max-height: 600px;
+    overflow: hidden;
+    background: #f0f0f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0;
+}
+
+/* ====== IMAGENS EM CONTAINERS RESPONSIVOS ====== */
+.responsiveImage {
+    width: 100%;
+    height: auto;
+    display: block;
+    max-width: 100%;
+}
+
+.responsiveImageContainer {
+    position: relative;
+    width: 100%;
+    padding-bottom: 66.667%;
+    /* 3:2 aspect ratio */
+    overflow: hidden;
+    background: #f0f0f0;
+}
+
+.responsiveImageContainer img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* ====== PRESETS DE TAMANHO ====== */
+
+/* 16:9 (padrão para vídeos e heróis) */
+.imageAspect--16by9 {
+    aspect-ratio: 16 / 9;
+}
+
+/* 4:3 (padrão para várias situações) */
+.imageAspect--4by3 {
+    aspect-ratio: 4 / 3;
+}
+
+/* 1:1 (quadrado, ideal para perfis) */
+.imageAspect--1by1 {
+    aspect-ratio: 1 / 1;
+}
+
+/* 2:1 (wide, ideal para heróis) */
+.imageAspect--2by1 {
+    aspect-ratio: 2 / 1;
+}
+
+/* ====== TAMANHOS ESPECÍFICOS ====== */
+
+/* Grande - para destaque */
+.imageSizeL {
+    width: 100%;
+    max-width: 800px;
+}
+
+/* Médio - para conteúdo principal */
+.imageSizeM {
+    width: 100%;
+    max-width: 600px;
+}
+
+/* Pequeno - para thumbnails/cards */
+.imageSizeS {
+    width: 100%;
+    max-width: 300px;
+}
+
+/* Extra pequeno - para avatares */
+.imageSizeXS {
+    width: 100%;
+    max-width: 150px;
+}
+
+/* ====== GARANTIR QUE IMAGENS SEJAM OTIMIZADAS ====== */
+
+/* Background images otimizadas */
+.imageBg {
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+/* Lazy loading */
+img[loading="lazy"] {
+    /* Mesmo sem JavaScript, não mostrar nada até carregar */
+}
+
+/* Evitar overflow em qualquer contexto */
+img,
+[role="img"] {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* Contenedores de imagem */
+.imageContainer,
+.imgContainer {
+    overflow: hidden;
+    max-width: 100%;
+}
+
+/* ====== SUPORTE A DIFERENTES ORIENTAÇÕES ====== */
+
+/* Paisagem (landscape) */
+@media (orientation: landscape) {
+    .carouselItem__wrapper {
+        aspect-ratio: 16 / 9;
+    }
+}
+
+/* Retrato (portrait) */
+@media (orientation: portrait) {
+    .carouselItem__wrapper {
+        aspect-ratio: 9 / 16;
+    }
+}
+
+/* ====== IMPRESSÃO ====== */
+@media print {
+    img {
+        max-width: 100%;
+        page-break-inside: avoid;
+    }
+}
+
+/* ====== DARK MODE (se aplicável) ====== */
+@media (prefers-color-scheme: dark) {
+
+    .carousel__imageWrapper,
+    .announcementCard__imageWrapper,
+    .comunicadoImageWrapper,
+    .eventProfile__wrapper {
+        background: #1f1f1f;
+    }
+}

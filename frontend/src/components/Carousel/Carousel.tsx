@@ -130,7 +130,14 @@ export function Carousel() {
                         className="carousel__slide"
                         onClick={() => navigate(`/anuncio/${item.id}`)}
                     >
-                        <img src={resolverUrlApi(item.imagem_url || "")} alt={item.titulo} />
+                        <div className="carousel__imageWrapper">
+                            <img
+                                src={resolverUrlApi(item.imagem_url || "")}
+                                alt={item.titulo}
+                                className="carousel__image"
+                                loading="lazy"
+                            />
+                        </div>
                         {item.titulo ? (
                             <div className="carousel__caption">{item.titulo}</div>
                         ) : null}

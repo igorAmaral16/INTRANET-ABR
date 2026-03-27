@@ -1,0 +1,39 @@
+/* 
+ * Carousel Enhancement - Fallbacks e garantias de exibição
+ */
+
+/* Garantir que imagem lazy loading não quebra o layout */
+.carousel__image {
+    display: block;
+    line-height: 0;
+    font-size: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+/* Fallback para navegadores sem aspect-ratio */
+@supports not (aspect-ratio: 16 / 9) {
+    .carousel {
+        position: relative;
+        padding-bottom: calc(100% / 16 * 9);
+        /* 56.25% para 16:9 */
+        height: auto;
+    }
+
+    .carousel__track {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+    }
+}
+
+/* Otimizar rendering em telas de alta densidade */
+@media (-webkit-min-device-pixel-ratio: 2),
+(min-resolution: 192dpi) {
+    .carousel__image {
+        image-rendering: -webkit-optimize-contrast;
+    }
+}

@@ -11,8 +11,10 @@ import {
 
 import { SidebarAdmin } from "../../components/SidebarAdmin/SidebarAdmin";
 import { BotaoVoltar } from "../../components/BotaoVoltar/BotaoVoltar";
+import { ImageUploadField } from "../../components/ImageUploadField/ImageUploadField";
 import { useSessaoAuth } from "../../hooks/useSessaoAuth";
 import { ErroHttp } from "../../api/clienteHttp";
+import { validateImage } from "../../utils/imageValidation";
 import { uploadAnexoAdmin, type UploadResponse } from "../../api/uploads.api";
 import {
     criarComunicadoAdmin,
@@ -25,6 +27,7 @@ import type { ConfirmacaoComunicado } from "../../tipos/comunicados";
 
 import "../../pages/PaginaBase.css";
 import "./PaginaAdminCriarComunicado.css";
+import "../../components/ImageUploadField/ImageUploadField.css";
 
 function isAbortError(e: any) {
     return e?.name === "AbortError" || String(e?.message || "").toLowerCase().includes("abort");
@@ -156,6 +159,15 @@ export function PaginaAdminCriarComunicado() {
         if (tipoInferido === "NENHUM") {
             setErro("Tipo de arquivo inválido. Use PNG/JPG/WEBP ou PDF.");
             return;
+        }
+
+        // Validar imagem se for imagem
+        if (tipoInferido === "IMAGEM") {
+            const validation = await validateImage(file, "COMUNICADO", 5 * 1024 * 1024);
+            if (!validation.isValid) {
+                setErro(validation.error || "Imagem inválida");
+                return;
+            }
         }
 
         setUploading(true);
@@ -312,44 +324,31 @@ export function PaginaAdminCriarComunicado() {
                             <div className="admCriar__anexoTitulo">
                                 <Paperclip size={18} /> Anexo (opcional)
                             </div>
-                            <div className="admCriar__anexoSub">Envie uma imagem (PNG/JPG/WEBP) ou PDF.</div>
+                            <div className="admCriar__anexoSub">Imagem ou PDF para ilustrar o comunicado</div>
                         </div>
 
                         {!anexo ? (
-                            <>
-                                <label className="admCriar__file">
-                                    <input
-                                        type="file"
-                                        accept="image/png,image/jpeg,image/webp,application/pdf"
-                                        onChange={(e) => setFile(e.target.files?.[0] || null)}
-                                    />
-                                    <div className="admCriar__fileBox">
-                                        <Upload size={18} />
-                                        <div>
-                                            <div className="admCriar__fileTxt">Selecionar arquivo</div>
-                                            <div className="admCriar__fileHint">Até 5MB (backend). PDF ou imagem.</div>
-                                        </div>
-                                    </div>
-                                </label>
+                            <div style={{ padding: "16px 0" }}>
+                                <ImageUploadField
+                                    label="Anexo (Imagem)"
+                                    context="COMUNICADO"
+                                    selectedFile={file}
+                                    onFileSelect={setFile}
+                                    showRecommendations={true}
+                                />
 
-                                {file ? (
-                                    <div className="admCriar__filePreview">
-                                        <div className="admCriar__fileName">{file.name}</div>
-                                        <div className="admCriar__fileMeta">
-                                            {inferTipo(file)} • {(file.size / 1024 / 1024).toFixed(2)} MB
-                                        </div>
-                                    </div>
-                                ) : null}
-
-                                <button
-                                    type="button"
-                                    className="admCriar__btnAnexo"
-                                    onClick={enviarAnexo}
-                                    disabled={uploading || !file}
-                                >
-                                    {uploading ? "Enviando..." : "Enviar anexo"}
-                                </button>
-                            </>
+                                {file && inferTipo(file) === "IMAGEM" && (
+                                    <button
+                                        type="button"
+                                        className="admCriar__btnAnexo"
+                                        onClick={enviarAnexo}
+                                        disabled={uploading || !file}
+                                        style={{ marginTop: "12px" }}
+                                    >
+                                        {uploading ? "Enviando..." : "Enviar anexo"}
+                                    </button>
+                                )}
+                            </div>
                         ) : (
                             <div className="admCriar__anexoOk">
                                 <div className="admCriar__anexoBadge">
