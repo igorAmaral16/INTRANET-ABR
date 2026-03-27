@@ -81,6 +81,8 @@ export function PaginaHome() {
                 user: resp.user,
             });
             fecharLogin();
+            // Redirecionar admin para home do painel
+            navigate("/admin/home", { replace: true });
         } catch (e: any) {
             if (e?.name === "AbortError") return;
             setErro(e?.message || "Não foi possível autenticar.");

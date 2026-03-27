@@ -1,9 +1,9 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 import { MoreVertical, Pencil, Trash2, Plus } from "lucide-react";
 
-import { BarraTopo } from "../../components/BarraTopo/BarraTopo";
-import { useSessaoAuth } from "../../hooks/useSessaoAuth";
+import { SidebarAdmin } from "../../components/SidebarAdmin/SidebarAdmin"; import { BotaoVoltar } from "../../components/BotaoVoltar/BotaoVoltar"; import { useSessaoAuth } from "../../hooks/useSessaoAuth";
 import { ErroHttp } from "../../api/clienteHttp";
 import {
     listarCarrosselAdmin,
@@ -33,8 +33,7 @@ export function PaginaAdminCarousel() {
     const menuRef = useRef<HTMLDivElement | null>(null);
     const acRef = useRef<AbortController | null>(null);
 
-    const estaLogado = Boolean(sessao?.token);
-    const role = sessao?.role;
+
 
     const filtrados = useMemo(() => itens, [itens]);
 
@@ -99,23 +98,17 @@ export function PaginaAdminCarousel() {
 
     return (
         <div className="paginaComunicados">
-            <BarraTopo
-                busca=""
-                aoMudarBusca={() => { }}
-                mostrarBusca={false}
-                aoIrParaInicio={() => navigate("/admin")}
-                estaLogado={estaLogado}
-                role={role}
-                aoClicarEntrar={() => navigate("/")}
-
-                aoAdminCriarComunicado={() => navigate("/admin/criar-comunicado")}
-                aoAdminDocumentos={() => navigate("/admin/documentos")}
-                aoAdminColaboradores={() => navigate("/admin/colaboradores")}
-                aoAdminFaq={() => navigate("/admin/faq")}
-                aoAdminFaleComRh={() => navigate("/admin/fale-com-rh")}
-                aoAdminRelatorios={() => navigate("/admin/relatorios")}
-                aoAdminCarousel={() => navigate("/admin/carousel")}
-
+            <SidebarAdmin
+                estaLogado={Boolean(sessao?.token)}
+                aoIrParaHome={() => navigate("/admin/home")}
+                aoCriarComunicado={() => navigate("/admin/criar-comunicado")}
+                aoDocumentos={() => navigate("/admin/documentos")}
+                aoColaboradores={() => navigate("/admin/colaboradores")}
+                aoCalendario={() => navigate("/admin/calendario")}
+                aoFaq={() => navigate("/admin/faq")}
+                aoFaleComRh={() => navigate("/admin/fale-com-rh")}
+                aoRelatorios={() => navigate("/admin/relatorios")}
+                aoCarrossel={() => navigate("/admin/carousel")}
                 aoSair={() => {
                     sair();
                     navigate("/", { replace: true });
@@ -123,6 +116,7 @@ export function PaginaAdminCarousel() {
             />
 
             <main className="paginaComunicados__conteudo">
+                <BotaoVoltar destino="/admin/home" />
                 <section className="paginaComunicados__cabecalho">
                     <div>
                         <h1 className="paginaComunicados__titulo">Manutenção do Carrossel</h1>

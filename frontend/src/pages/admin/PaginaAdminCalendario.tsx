@@ -1,10 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSessaoAuth } from '../../hooks/useSessaoAuth';
+import { BotaoVoltar } from '../../components/BotaoVoltar/BotaoVoltar';
+import { SidebarAdmin } from "../../components/SidebarAdmin/SidebarAdmin";
 import './PaginaAdminCalendario.css';
 // @ts-ignore
 import { CalendarWidget } from '../../components/CalendarWidget/CalendarWidget';
-import { BarraTopo } from '../../components/BarraTopo/BarraTopo';
 import { X, Plus, Edit2, Trash2 } from 'lucide-react';
 
 interface Configuracao {
@@ -306,31 +307,26 @@ export function PaginaAdminCalendario() {
     ];
 
     return (
-        <div className="pagina-admin-calendario">
-            <BarraTopo
-                busca=""
-                aoMudarBusca={() => { }}
-                mostrarBusca={false}
-                aoIrParaInicio={() => navigate('/admin')}
+        <div className="paginaAdminCalendario">
+            <SidebarAdmin
                 estaLogado={Boolean(sessao?.token)}
-                role={sessao?.role}
-                aoClicarEntrar={() => navigate('/')}
-
-                aoAdminCriarComunicado={() => navigate('/admin/criar-comunicado')}
-                aoAdminDocumentos={() => navigate('/admin/documentos')}
-                aoAdminColaboradores={() => navigate('/admin/colaboradores')}
-                aoAdminFaq={() => navigate('/admin/faq')}
-                aoAdminFaleComRh={() => navigate('/admin/fale-com-rh')}
-                aoAdminRelatorios={() => navigate('/admin/relatorios')}
-                aoAdminCalendario={() => navigate('/admin/calendario')}
-
+                aoIrParaHome={() => navigate('/admin/home')}
+                aoCriarComunicado={() => navigate('/admin/criar-comunicado')}
+                aoDocumentos={() => navigate('/admin/documentos')}
+                aoColaboradores={() => navigate('/admin/colaboradores')}
+                aoCalendario={() => navigate('/admin/calendario')}
+                aoFaq={() => navigate('/admin/faq')}
+                aoFaleComRh={() => navigate('/admin/fale-com-rh')}
+                aoRelatorios={() => navigate('/admin/relatorios')}
+                aoCarrossel={() => navigate('/admin/carousel')}
                 aoSair={() => {
                     sair();
                     navigate('/', { replace: true });
                 }}
             />
 
-            <div className="container-admin">
+            <div className="paginaAdminCalendario__conteudo">
+                <BotaoVoltar destino="/admin/home" />
                 {erro && (
                     <div className="alert alert-error">
                         <span>{erro}</span>

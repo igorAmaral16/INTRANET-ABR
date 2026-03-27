@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Folder, FileText, ChevronDown, ChevronRight } from "lucide-react";
-import { BarraTopo } from "../components/BarraTopo/BarraTopo";
+import { Folder, FileText, ChevronDown, ChevronRight } from "lucide-react";
+import { SidebarFixed } from "../components/SidebarFixed/SidebarFixed";
+import { BotaoVoltar } from "../components/BotaoVoltar/BotaoVoltar";
 import { useSessaoAuth } from "../hooks/useSessaoAuth";
 import { obterArvoreBiblioteca, type NoBiblioteca } from "../api/biblioteca.api";
 import { resolverUrlApi } from "../utils/urlApi";
-import "./PaginaBase.css";
 import "./PaginaDocumentos.css";
 
 function isAbortError(e: any) {
@@ -55,7 +55,7 @@ function NoArvore({
 
 export function PaginaDocumentos() {
     const navigate = useNavigate();
-    const { estaLogadoColab, sair } = useSessaoAuth();
+    const { sessao, sair } = useSessaoAuth();
 
     const [carregando, setCarregando] = useState(true);
     const [erro, setErro] = useState<string | null>(null);
@@ -99,33 +99,30 @@ export function PaginaDocumentos() {
     );
 
     return (
-        <div className="paginaBase">
-            <BarraTopo
-                busca=""
-                aoMudarBusca={() => { }}
-                mostrarBusca={false}
-                aoIrParaInicio={() => navigate("/")}
-
-                estaLogado={Boolean(estaLogadoColab)}
-                role={"COLAB"}
-
-                aoClicarEntrar={() => navigate("/")}
-
+        <div className="paginaDoc">
+            <SidebarFixed
+                estaLogado={Boolean(sessao?.token)}
+                role={sessao?.role}
+                aoIrParaHome={() => navigate("/")}
                 aoMeuPerfil={() => navigate("/meu-perfil")}
                 aoVerDocumentos={() => navigate("/documentos")}
                 aoMeusDocumentos={() => navigate("/meus-documentos")}
+                aoCalendario={() => navigate("/calendario")}
                 aoFaq={() => navigate("/faq")}
                 aoFaleComRh={() => navigate("/fale-com-rh")}
-                aoSair={sair}
+                aoComunicados={() => navigate("/comunicados")}
+                aoAcessarPainel={() => navigate("/admin")}
+                aoClicarEntrar={() => navigate("/")}
+                aoSair={() => {
+                    sair();
+                    navigate("/", { replace: true });
+                }}
             />
 
-
-            <main className="paginaBase__conteudo">
-                <div className="paginaBase__topoInterno">
-                    <button className="botaoVoltar" type="button" onClick={() => navigate(-1)}>
-                        <ArrowLeft size={18} /> Voltar
-                    </button>
-                    <h1 className="paginaBase__titulo">Biblioteca de Documentos</h1>
+            <main className="paginaDoc__conteudo">
+                <BotaoVoltar destino="/" />
+                <div className="paginaDoc__cabecalho">
+                    <h1 className="paginaDoc__titulo">Biblioteca de Documentos</h1>
                 </div>
 
                 {carregando ? <div className="card">Carregando...</div> : null}

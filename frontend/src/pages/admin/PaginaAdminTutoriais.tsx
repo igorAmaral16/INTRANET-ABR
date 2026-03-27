@@ -1,9 +1,9 @@
 import { useNavigate } from "react-router-dom";
 import {
-    ArrowLeft,
     Video as IconVideo,
 } from "lucide-react";
-import { BarraTopo } from "../../components/BarraTopo/BarraTopo";
+import { SidebarAdmin } from "../../components/SidebarAdmin/SidebarAdmin";
+import { BotaoVoltar } from "../../components/BotaoVoltar/BotaoVoltar";
 import "./PaginaAdminTutoriais.css";
 import { setores } from "../../utils/setores";
 import { useSessaoAuth } from "../../hooks/useSessaoAuth";
@@ -14,21 +14,17 @@ export function PaginaAdminTutoriais() {
 
     return (
         <div className="paginaBase paginaAdminTutoriais">
-            <BarraTopo
-                busca=""
-                aoMudarBusca={() => { }}
-                mostrarBusca={false}
-                aoIrParaInicio={() => navigate("/admin")}
+            <SidebarAdmin
                 estaLogado={Boolean(sessao?.token)}
-                role={sessao?.role}
-                aoClicarEntrar={() => navigate("/")}
-
-                aoAdminCriarComunicado={() => navigate("/admin/criar-comunicado")}
-                aoAdminDocumentos={() => navigate("/admin/documentos")}
-                aoAdminColaboradores={() => navigate("/admin/colaboradores")}
-                aoAdminFaq={() => navigate("/admin/faq")}
-                aoAdminRelatorios={() => navigate("/admin/relatorios")}
-
+                aoIrParaHome={() => navigate("/admin/home")}
+                aoCriarComunicado={() => navigate("/admin/criar-comunicado")}
+                aoDocumentos={() => navigate("/admin/documentos")}
+                aoColaboradores={() => navigate("/admin/colaboradores")}
+                aoCalendario={() => navigate("/admin/calendario")}
+                aoFaq={() => navigate("/admin/faq")}
+                aoFaleComRh={() => navigate("/admin/fale-com-rh")}
+                aoRelatorios={() => navigate("/admin/relatorios")}
+                aoCarrossel={() => navigate("/admin/carousel")}
                 aoSair={() => {
                     sair();
                     navigate("/", { replace: true });
@@ -36,11 +32,8 @@ export function PaginaAdminTutoriais() {
             />
 
             <main className="paginaBase__conteudo">
+                <BotaoVoltar destino="/admin/home" />
                 <div className="paginaBase__topoInterno">
-                    <button className="botaoVoltar" type="button" onClick={() => navigate(-1)}>
-                        <ArrowLeft size={18} /> Voltar
-                    </button>
-
                     <div className="admDocs__header">
                         <h1 className="paginaBase__titulo">
                             Admin <IconVideo size={20} /> Tutoriais

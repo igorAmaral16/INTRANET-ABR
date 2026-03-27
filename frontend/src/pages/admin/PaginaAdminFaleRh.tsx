@@ -1,8 +1,9 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Inbox, Send, ShieldAlert, CheckCircle2, XCircle } from "lucide-react";
+import { Inbox, Send, ShieldAlert, CheckCircle2, XCircle, ArrowLeft } from "lucide-react";
 
-import { BarraTopo } from "../../components/BarraTopo/BarraTopo";
+import { SidebarAdmin } from "../../components/SidebarAdmin/SidebarAdmin";
+import { BotaoVoltar } from "../../components/BotaoVoltar/BotaoVoltar";
 import { useSessaoAuth } from "../../hooks/useSessaoAuth";
 import { ErroHttp } from "../../api/clienteHttp";
 import {
@@ -395,30 +396,25 @@ export function PaginaAdminFaleRh() {
 
     return (
         <div className="paginaBase">
-            <BarraTopo
-                busca=""
-                aoMudarBusca={() => { }}
-                mostrarBusca={false}
-                aoIrParaInicio={() => navigate("/admin")}
+            <SidebarAdmin
                 estaLogado={Boolean(sessao?.token)}
-                role={sessao?.role}
-                aoClicarEntrar={() => navigate("/")}
-                aoAdminCriarComunicado={() => navigate("/admin/criar-comunicado")}
-                aoAdminDocumentos={() => navigate("/admin/documentos")}
-                aoAdminColaboradores={() => navigate("/admin/colaboradores")}
-                aoAdminFaq={() => navigate("/admin/faq")}
-                aoAdminFaleComRh={() => navigate("/admin/fale-com-rh")}
-                aoAdminRelatorios={() => navigate("/admin/relatorios")}
-                aoSair={handleLogout}
+                aoIrParaHome={() => navigate("/admin/home")}
+                aoCriarComunicado={() => navigate("/admin/criar-comunicado")}
+                aoDocumentos={() => navigate("/admin/documentos")}
+                aoColaboradores={() => navigate("/admin/colaboradores")}
+                aoCalendario={() => navigate("/admin/calendario")}
+                aoFaq={() => navigate("/admin/faq")}
+                aoFaleComRh={() => navigate("/admin/fale-com-rh")}
+                aoRelatorios={() => navigate("/admin/relatorios")}
+                aoCarrossel={() => navigate("/admin/carousel")}
+                aoSair={() => {
+                    handleLogout();
+                }}
             />
 
             <main className="paginaBase__conteudo">
-                <div className="paginaBase__topoInterno">
-                    <button className="botaoVoltar" type="button" onClick={() => navigate(-1)}>
-                        <ArrowLeft size={18} /> Voltar
-                    </button>
-                    <h1 className="paginaBase__titulo">Admin — Fale com o RH</h1>
-                </div>
+                <BotaoVoltar destino="/admin/home" />
+                <h1 className="paginaBase__titulo">Admin — Fale com o RH</h1>
 
                 {erro ? (
                     <div className="rhAdm__alert card cardErro" role="alert">

@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSessaoAuth } from '../hooks/useSessaoAuth';
+import { BotaoVoltar } from '../components/BotaoVoltar/BotaoVoltar';
+import { SidebarFixed } from '../components/SidebarFixed/SidebarFixed';
 import './PaginaCalendario.css';
 // @ts-ignore
 import { CalendarWidget } from '../components/CalendarWidget/CalendarWidget';
-import { BarraTopo } from '../components/BarraTopo/BarraTopo';
 
 interface Configuracao {
     id: number;
@@ -78,58 +79,56 @@ export function PaginaCalendario() {
     };
 
     return (
-        <div className="pagina-calendario">
-            <BarraTopo
-                busca=""
-                aoMudarBusca={() => { }}
-                mostrarBusca={false}
-                aoIrParaInicio={() => navigate('/')}
+        <div className="paginaCalendario">
+            <SidebarFixed
                 estaLogado={Boolean(sessao?.token)}
                 role={sessao?.role}
-                aoClicarEntrar={() => navigate('/')}
-
+                aoIrParaHome={() => navigate('/')}
                 aoMeuPerfil={() => navigate('/meu-perfil')}
                 aoVerDocumentos={() => navigate('/documentos')}
                 aoMeusDocumentos={() => navigate('/meus-documentos')}
                 aoCalendario={() => navigate('/calendario')}
                 aoFaq={() => navigate('/faq')}
                 aoFaleComRh={() => navigate('/fale-com-rh')}
-
+                aoClicarEntrar={() => navigate('/')}
                 aoSair={() => {
                     sair();
                     navigate('/', { replace: true });
                 }}
             />
 
-            <div className="container">
-                <div className="calendario-content">
-                    {carregando && (
-                        <div className="loading">
-                            <div className="spinner" />
-                            <p>Carregando calendário...</p>
-                        </div>
-                    )}
+            <main className="paginaCalendario__conteudo">
+                <BotaoVoltar destino="/" />
+                {carregando && (
+                    <div className="paginaCalendario__loading">
+                        <div className="paginaCalendario__spinner" />
+                        <p>Carregando calendário...</p>
+                    </div>
+                )}
 
-                    {erro && (
-                        <div className="error-message">
-                            <p>{erro}</p>
-                            <button onClick={buscarDados}>Tentar Novamente</button>
-                        </div>
-                    )}
+                {erro && (
+                    <div className="paginaCalendario__erro">
+                        <p>{erro}</p>
+                        <button onClick={buscarDados} className="paginaCalendario__btnRetry">
+                            Tentar Novamente
+                        </button>
+                    </div>
+                )}
 
-                    {!carregando && !erro && (
-                        <>
-                            {configuracao && (
-                                <div className="config-info">
-                                    {configuracao.titulo && (
-                                        <h1 className="config-title">{configuracao.titulo}</h1>
-                                    )}
-                                    {configuracao.descricao && (
-                                        <p className="config-description">{configuracao.descricao}</p>
-                                    )}
-                                </div>
-                            )}
+                {!carregando && !erro && (
+                    <>
+                        {configuracao && (
+                            <div className="paginaCalendario__header">
+                                {configuracao.titulo && (
+                                    <h1 className="paginaCalendario__titulo">{configuracao.titulo}</h1>
+                                )}
+                                {configuracao.descricao && (
+                                    <p className="paginaCalendario__descricao">{configuracao.descricao}</p>
+                                )}
+                            </div>
+                        )}
 
+                        <div className="paginaCalendario__widget">
                             <CalendarWidget
                                 feriados={feriados}
                                 ano={configuracao?.ano_vigencia || new Date().getFullYear()}
@@ -137,21 +136,21 @@ export function PaginaCalendario() {
                                 mesFim={configuracao?.mes_fim || 12}
                                 readOnly={true}
                             />
+                        </div>
 
-                            <div className="info-rodape">
-                                <div className="info-item">
-                                    <span className="color-sample" style={{ backgroundColor: '#FF6B6B' }} />
-                                    <span>Feriados Nacionais e Customizados</span>
-                                </div>
-                                <p className="info-texto">
-                                    Visualize os feriados nacionais e aqueles criados pela administração.
-                                    Clique sobre qualquer data para mais informações.
-                                </p>
+                        <div className="paginaCalendario__info">
+                            <div className="paginaCalendario__infoItem">
+                                <span className="paginaCalendario__colorSample" style={{ backgroundColor: '#FF6B6B' }} />
+                                <span>Feriados Nacionais e Customizados</span>
                             </div>
-                        </>
-                    )}
-                </div>
-            </div>
+                            <p className="paginaCalendario__infoTexto">
+                                Visualize os feriados nacionais e aqueles criados pela administração.
+                                Clique sobre qualquer data para mais informações.
+                            </p>
+                        </div>
+                    </>
+                )}
+            </main>
         </div>
     );
 }

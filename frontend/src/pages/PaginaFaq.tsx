@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, HelpCircle, ChevronDown, ChevronRight } from "lucide-react";
-import { BarraTopo } from "../components/BarraTopo/BarraTopo";
+import { ChevronDown, ChevronRight, HelpCircle } from "lucide-react";
+import { SidebarFixed } from "../components/SidebarFixed/SidebarFixed";
+import { BotaoVoltar } from "../components/BotaoVoltar/BotaoVoltar";
 import { useSessaoAuth } from "../hooks/useSessaoAuth";
 import { listarFaq, type FaqItem } from "../api/faq.api";
 import "./PaginaBase.css";
@@ -13,7 +14,7 @@ function isAbortError(e: any) {
 
 export function PaginaFaq() {
     const navigate = useNavigate();
-    const { estaLogadoColab, sair } = useSessaoAuth();
+    const { sessao, sair } = useSessaoAuth();
 
     const [carregando, setCarregando] = useState(true);
     const [erro, setErro] = useState<string | null>(null);
@@ -57,33 +58,25 @@ export function PaginaFaq() {
 
     return (
         <div className="paginaBase">
-            <BarraTopo
-                busca=""
-                aoMudarBusca={() => { }}
-                mostrarBusca={false}
-                aoIrParaInicio={() => navigate("/")}
-
-                estaLogado={Boolean(estaLogadoColab)}
-                role={"COLAB"}  // ou role={sessao?.role} se você tiver aqui
-
-                aoClicarEntrar={() => navigate("/")}
-
+            <SidebarFixed
+                estaLogado={Boolean(sessao?.token)}
+                role={sessao?.role}
+                aoIrParaHome={() => navigate("/")}
                 aoMeuPerfil={() => navigate("/meu-perfil")}
                 aoVerDocumentos={() => navigate("/documentos")}
                 aoMeusDocumentos={() => navigate("/meus-documentos")}
+                aoCalendario={() => navigate("/calendario")}
                 aoFaq={() => navigate("/faq")}
                 aoFaleComRh={() => navigate("/fale-com-rh")}
-                aoSair={sair}
+                aoClicarEntrar={() => navigate("/")}
+                aoSair={() => {
+                    sair();
+                    navigate("/", { replace: true });
+                }}
             />
 
-
             <main className="paginaBase__conteudo">
-                <div className="paginaBase__topoInterno">
-                    <button className="botaoVoltar" type="button" onClick={() => navigate(-1)}>
-                        <ArrowLeft size={18} /> Voltar
-                    </button>
-                    <h1 className="paginaBase__titulo">Dúvidas Frequentes (FAQ)</h1>
-                </div>
+                <BotaoVoltar destino="/" />
 
                 {carregando ? <div className="card">Carregando...</div> : null}
                 {!carregando && erro ? <div className="card cardErro">{erro}</div> : null}

@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-    ArrowLeft,
     Search,
     Filter,
     Plus,
@@ -14,7 +13,8 @@ import {
     Save,
 } from "lucide-react";
 
-import { BarraTopo } from "../../components/BarraTopo/BarraTopo";
+import { SidebarAdmin } from "../../components/SidebarAdmin/SidebarAdmin";
+import { BotaoVoltar } from "../../components/BotaoVoltar/BotaoVoltar";
 import { Modal } from "../../components/Modal/Modal";
 import { useSessaoAuth } from "../../hooks/useSessaoAuth";
 import { ErroHttp } from "../../api/clienteHttp";
@@ -87,8 +87,8 @@ export function PaginaAdminFaq() {
 
     const acRef = useRef<AbortController | null>(null);
 
-    const estaLogado = Boolean(sessao?.token);
-    const role = sessao?.role;
+    // const estaLogado = Boolean(sessao?.token);
+    // const role = sessao?.role;
 
     useEffect(() => {
         if (!estaLogadoAdmin || !sessao?.token) {
@@ -309,22 +309,17 @@ export function PaginaAdminFaq() {
 
     return (
         <div className="paginaBase">
-            <BarraTopo
-                busca=""
-                aoMudarBusca={() => { }}
-                mostrarBusca={false}
-                aoIrParaInicio={() => navigate("/admin")}
+            <SidebarAdmin
                 estaLogado={Boolean(sessao?.token)}
-                role={sessao?.role}
-                aoClicarEntrar={() => navigate("/")}
-
-                aoAdminCriarComunicado={() => navigate("/admin/criar-comunicado")}
-                aoAdminDocumentos={() => navigate("/admin/documentos")}
-                aoAdminColaboradores={() => navigate("/admin/colaboradores")}
-                aoAdminFaq={() => navigate("/admin/faq")}
-                aoAdminFaleComRh={() => navigate("/admin/fale-com-rh")}   // NOVO
-                aoAdminRelatorios={() => navigate("/admin/relatorios")}
-
+                aoIrParaHome={() => navigate("/admin/home")}
+                aoCriarComunicado={() => navigate("/admin/criar-comunicado")}
+                aoDocumentos={() => navigate("/admin/documentos")}
+                aoColaboradores={() => navigate("/admin/colaboradores")}
+                aoCalendario={() => navigate("/admin/calendario")}
+                aoFaq={() => navigate("/admin/faq")}
+                aoFaleComRh={() => navigate("/admin/fale-com-rh")}
+                aoRelatorios={() => navigate("/admin/relatorios")}
+                aoCarrossel={() => navigate("/admin/carousel")}
                 aoSair={() => {
                     sair();
                     navigate("/", { replace: true });
@@ -333,11 +328,8 @@ export function PaginaAdminFaq() {
 
 
             <main className="paginaBase__conteudo">
+                <BotaoVoltar destino="/admin/home" />
                 <div className="paginaBase__topoInterno">
-                    <button className="botaoVoltar" type="button" onClick={() => navigate(-1)}>
-                        <ArrowLeft size={18} /> Voltar
-                    </button>
-
                     <div className="admFaq__header">
                         <h1 className="paginaBase__titulo">Admin — FAQ</h1>
                         <div className="admFaq__sub">

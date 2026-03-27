@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, Save, Upload, Image as IconImage, FileText, Trash2 } from "lucide-react";
+import { Save, Upload, Image as IconImage, FileText, Trash2, ArrowLeft } from "lucide-react";
 
-import { BarraTopo } from "../../components/BarraTopo/BarraTopo";
+import { SidebarAdmin } from "../../components/SidebarAdmin/SidebarAdmin";
+import { BotaoVoltar } from "../../components/BotaoVoltar/BotaoVoltar";
 import { useSessaoAuth } from "../../hooks/useSessaoAuth";
 import { ErroHttp } from "../../api/clienteHttp";
 import {
@@ -236,23 +237,17 @@ export function PaginaAdminCarouselEdit() {
 
     return (
         <div className="paginaBase">
-            <BarraTopo
-                busca=""
-                aoMudarBusca={() => { }}
-                mostrarBusca={false}
-                aoIrParaInicio={() => navigate("/admin")}
+            <SidebarAdmin
                 estaLogado={Boolean(sessao?.token)}
-                role={sessao?.role}
-                aoClicarEntrar={() => navigate("/")}
-
-                aoAdminCriarComunicado={() => navigate("/admin/criar-comunicado")}
-                aoAdminDocumentos={() => navigate("/admin/documentos")}
-                aoAdminColaboradores={() => navigate("/admin/colaboradores")}
-                aoAdminFaq={() => navigate("/admin/faq")}
-                aoAdminFaleComRh={() => navigate("/admin/fale-com-rh")}
-                aoAdminRelatorios={() => navigate("/admin/relatorios")}
-                aoAdminCarousel={() => navigate("/admin/carousel")}
-
+                aoIrParaHome={() => navigate("/admin/home")}
+                aoCriarComunicado={() => navigate("/admin/criar-comunicado")}
+                aoDocumentos={() => navigate("/admin/documentos")}
+                aoColaboradores={() => navigate("/admin/colaboradores")}
+                aoCalendario={() => navigate("/admin/calendario")}
+                aoFaq={() => navigate("/admin/faq")}
+                aoFaleComRh={() => navigate("/admin/fale-com-rh")}
+                aoRelatorios={() => navigate("/admin/relatorios")}
+                aoCarrossel={() => navigate("/admin/carousel")}
                 aoSair={() => {
                     sair();
                     navigate("/", { replace: true });
@@ -260,6 +255,7 @@ export function PaginaAdminCarouselEdit() {
             />
 
             <main className="paginaBase__conteudo">
+                <BotaoVoltar destino="/admin/carousel" />
                 <button
                     type="button"
                     className="botaoVoltar paginaBase__voltar"

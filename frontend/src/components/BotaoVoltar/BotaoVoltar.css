@@ -1,0 +1,53 @@
+/* Botão Voltar - Discreto e estratégico */
+.botaoVoltar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    border: none;
+    background: transparent;
+    color: #666;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    margin-bottom: 12px;
+}
+
+.botaoVoltar:hover {
+    background-color: #f0f0f0;
+    color: #333;
+}
+
+.botaoVoltar:active {
+    background-color: #e8e8e8;
+}
+
+/* Versão discreta - mais sutil */
+.botaoVoltar--discreto {
+    color: #999;
+    padding: 6px 8px;
+    font-size: 13px;
+}
+
+.botaoVoltar--discreto:hover {
+    background-color: rgba(100, 100, 100, 0.05);
+    color: #666;
+}
+
+.botaoVoltar svg {
+    flex-shrink: 0;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+    .botaoVoltar {
+        padding: 6px 10px;
+        font-size: 13px;
+    }
+
+    .botaoVoltar span {
+        display: none;
+    }
+}

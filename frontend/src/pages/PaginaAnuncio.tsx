@@ -1,6 +1,7 @@
 import "./PaginaAnuncio.css";
 import { useParams, useNavigate } from "react-router-dom";
-import { BarraTopo } from "../components/BarraTopo/BarraTopo";
+import { SidebarFixed } from "../components/SidebarFixed/SidebarFixed";
+import { BotaoVoltar } from "../components/BotaoVoltar/BotaoVoltar";
 import { EstadoCarregando } from "../components/Estados/EstadoCarregando";
 import { EstadoErro } from "../components/Estados/EstadoErro";
 import { useCarouselItem } from "../hooks/useCarousel";
@@ -43,23 +44,27 @@ export function PaginaAnuncio() {
 
     return (
         <div className="paginaAnuncio">
-            <BarraTopo
-                busca=""
-                aoMudarBusca={() => { }}
-                mostrarBusca={false}
-                aoIrParaInicio={() => navigate("/")}
+            <SidebarFixed
                 estaLogado={estaLogado}
                 role={role}
-                aoClicarEntrar={() => navigate("/")}
+                aoIrParaHome={() => navigate("/")}
                 aoMeuPerfil={() => navigate("/meu-perfil")}
                 aoVerDocumentos={() => navigate("/documentos")}
                 aoMeusDocumentos={() => navigate("/meus-documentos")}
+                aoCalendario={() => navigate("/calendario")}
                 aoFaq={() => navigate("/faq")}
                 aoFaleComRh={() => navigate("/fale-com-rh")}
-                aoSair={sair}
+                aoComunicados={() => navigate("/comunicados")}
+                aoAcessarPainel={() => navigate("/admin")}
+                aoClicarEntrar={() => navigate("/")}
+                aoSair={() => {
+                    sair();
+                    navigate("/", { replace: true });
+                }}
             />
 
             <main className="paginaAnuncio__conteudo">
+                <BotaoVoltar destino="/comunicados" />
                 {estado === "carregando" && <EstadoCarregando />}
                 {estado === "erro" && <EstadoErro mensagem={erro || "Erro"} aoTentarNovamente={() => { }} />}
                 {estado === "pronto" && item && (

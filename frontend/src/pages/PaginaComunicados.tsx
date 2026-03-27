@@ -1,11 +1,11 @@
 import "./PaginaComunicados.css";
-import { BarraTopo } from "../components/BarraTopo/BarraTopo";
-import { Carousel } from "../components/Carousel/Carousel";
+import { SidebarFixed } from "../components/SidebarFixed/SidebarFixed";
 import { CartaoComunicado } from "../components/CartaoComunicado/CartaoComunicado";
 import { Modal } from "../components/Modal/Modal";
 import { EstadoCarregando } from "../components/Estados/EstadoCarregando";
 import { EstadoErro } from "../components/Estados/EstadoErro";
 import { EstadoVazio } from "../components/Estados/EstadoVazio";
+import { BotaoVoltar } from "../components/BotaoVoltar/BotaoVoltar";
 import { useComunicados } from "../hooks/useComunicados";
 import { ModalLogin } from "../components/ModalLogin/ModalLogin";
 import { ModalInfo } from "../components/ModalInfo/ModalInfo";
@@ -22,8 +22,6 @@ export function PaginaComunicados() {
         estado,
         erro,
         itens,
-        busca,
-        setBusca,
         filtroImportancia,
         setFiltroImportancia,
         recarregar,
@@ -44,25 +42,27 @@ export function PaginaComunicados() {
 
     return (
         <div className="paginaComunicados">
-            <BarraTopo
-                busca={busca}
-                aoMudarBusca={setBusca}
-                mostrarBusca={true}
-                aoIrParaInicio={() => navigate("/")}
+            <SidebarFixed
                 estaLogado={estaLogado}
                 role={role}
-                aoClicarEntrar={() => setLoginColabAberto(true)}
+                aoIrParaHome={() => navigate("/")}
                 aoMeuPerfil={() => navigate("/meu-perfil")}
                 aoVerDocumentos={() => navigate("/documentos")}
                 aoMeusDocumentos={() => navigate("/meus-documentos")}
+                aoCalendario={() => navigate("/calendario")}
                 aoFaq={() => navigate("/faq")}
                 aoFaleComRh={() => navigate("/fale-com-rh")}
-                aoSair={sair}
+                aoComunicados={() => navigate("/comunicados")}
+                aoAcessarPainel={() => navigate("/admin")}
+                aoClicarEntrar={() => setLoginColabAberto(true)}
+                aoSair={() => {
+                    sair();
+                    navigate("/", { replace: true });
+                }}
             />
 
             <main className="paginaComunicados__conteudo">
-                {/* carousel exibido abaixo do cabeçalho */}
-                <Carousel />
+                <BotaoVoltar destino="/" />
 
                 <section className="paginaComunicados__cabecalho card">
                     <div className="paginaComunicados__cabecalhoTextos">

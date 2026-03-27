@@ -1,11 +1,12 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { MoreVertical, Pencil, Trash2 } from "lucide-react";
 
-import { BarraTopo } from "../../components/BarraTopo/BarraTopo";
+import { SidebarAdmin } from "../../components/SidebarAdmin/SidebarAdmin";
+import { BotaoVoltar } from "../../components/BotaoVoltar/BotaoVoltar";
 import { useSessaoAuth } from "../../hooks/useSessaoAuth";
 import { ErroHttp } from "../../api/clienteHttp";
-import { listarComunicadosAdmin, excluirComunicadoAdmin, type ComunicadoAdminItem } from "../../api/comunicados.api";
+import { listarComunicadosAdmin, excluirComunicadoAdmin, type CommunicadoAdminItem } from "../../api/comunicados.api";
 
 import "../PaginaComunicados.css";
 
@@ -23,25 +24,11 @@ export function PaginaAdminComunicados() {
 
     const [estado, setEstado] = useState<"carregando" | "erro" | "pronto">("carregando");
     const [erro, setErro] = useState<string | null>(null);
-    const [itens, setItens] = useState<ComunicadoAdminItem[]>([]);
-    const [busca, setBusca] = useState("");
-
+    const [itens, setItens] = useState<CommunicadoAdminItem[]>([]);
     const [menuAbertoId, setMenuAbertoId] = useState<number | null>(null);
     const menuRef = useRef<HTMLDivElement | null>(null);
 
     const acRef = useRef<AbortController | null>(null);
-
-    const estaLogado = Boolean(sessao?.token);
-    const role = sessao?.role;
-
-    const filtrados = useMemo(() => {
-        const b = busca.trim().toLowerCase();
-        if (!b) return itens;
-        return itens.filter((x) => {
-            const t = `${x.titulo} ${x.descricao}`.toLowerCase();
-            return t.includes(b);
-        });
-    }, [itens, busca]);
 
     useEffect(() => {
         if (!estaLogadoAdmin || !sessao?.token) {
@@ -113,23 +100,17 @@ export function PaginaAdminComunicados() {
 
     return (
         <div className="paginaComunicados">
-            <BarraTopo
-                busca=""
-                aoMudarBusca={() => { }}
-                mostrarBusca={false}
-                aoIrParaInicio={() => navigate("/admin")}
+            <SidebarAdmin
                 estaLogado={Boolean(sessao?.token)}
-                role={sessao?.role}
-                aoClicarEntrar={() => navigate("/")}
-
-                aoAdminCriarComunicado={() => navigate("/admin/criar-comunicado")}
-                aoAdminDocumentos={() => navigate("/admin/documentos")}
-                aoAdminColaboradores={() => navigate("/admin/colaboradores")}
-                aoAdminFaq={() => navigate("/admin/faq")}
-                aoAdminFaleComRh={() => navigate("/admin/fale-com-rh")}   // NOVO
-                aoAdminRelatorios={() => navigate("/admin/relatorios")}
-                aoAdminCarousel={() => navigate("/admin/carousel")}
-
+                aoIrParaHome={() => navigate("/admin/home")}
+                aoCriarComunicado={() => navigate("/admin/criar-comunicado")}
+                aoDocumentos={() => navigate("/admin/documentos")}
+                aoColaboradores={() => navigate("/admin/colaboradores")}
+                aoCalendario={() => navigate("/admin/calendario")}
+                aoFaq={() => navigate("/admin/faq")}
+                aoFaleComRh={() => navigate("/admin/fale-com-rh")}
+                aoRelatorios={() => navigate("/admin/relatorios")}
+                aoCarrossel={() => navigate("/admin/carousel")}
                 aoSair={() => {
                     sair();
                     navigate("/", { replace: true });
@@ -137,12 +118,11 @@ export function PaginaAdminComunicados() {
             />
 
             <main className="paginaComunicados__conteudo">
+                <BotaoVoltar destino="/admin/home" />
                 <section className="paginaComunicados__cabecalho">
-                    <div>
-                        <h1 className="paginaComunicados__titulo">Painel Administrativo</h1>
-                        <p className="paginaComunicados__subtitulo">
-                            Gerencie comunicados, documentos, colaboradores, FAQ e relatórios.
-                        </p>
+                    <div className="paginaComunicados__cabecalhoTextos">
+                        <h1 className="paginaComunicados__titulo">Comunicados</h1>
+                        <p className="paginaComunicados__subtitulo">Gerencie avisos e informações do RH</p>
                     </div>
                 </section>
 
@@ -159,13 +139,13 @@ export function PaginaAdminComunicados() {
                     </div>
                 ) : null}
 
-                {estado === "pronto" && filtrados.length === 0 ? (
+                {estado === "pronto" && itens.length === 0 ? (
                     <div className="card">Nenhum comunicado encontrado.</div>
                 ) : null}
 
-                {estado === "pronto" && filtrados.length > 0 ? (
+                {estado === "pronto" && itens.length > 0 ? (
                     <section className="paginaComunicados__lista">
-                        {filtrados.map((c) => (
+                        {itens.map((c) => (
                             <article key={c.id} className="card" style={{ position: "relative" }}>
                                 <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12 }}>
                                     <div style={{ minWidth: 0 }}>

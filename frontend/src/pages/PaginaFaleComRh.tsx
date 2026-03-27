@@ -2,7 +2,8 @@ import React, { useEffect, useMemo, useRef, useState, useCallback } from "react"
 import { useLocation, useNavigate } from "react-router-dom";
 import { ArrowLeft, MessageSquare, Send, XCircle, Plus, ShieldAlert } from "lucide-react";
 
-import { BarraTopo } from "../components/BarraTopo/BarraTopo";
+import { SidebarFixed } from "../components/SidebarFixed/SidebarFixed";
+import { BotaoVoltar } from "../components/BotaoVoltar/BotaoVoltar";
 import { Modal } from "../components/Modal/Modal";
 import { useSessaoAuth } from "../hooks/useSessaoAuth";
 import { ErroHttp } from "../api/clienteHttp";
@@ -577,27 +578,23 @@ export function PaginaFaleComRh() {
 
     return (
         <div className="paginaBase">
-            <BarraTopo
-                busca=""
-                aoMudarBusca={() => { }}
-                mostrarBusca={false}
-                aoIrParaInicio={() => navigate("/")}
+            <SidebarFixed
                 estaLogado={Boolean(estaLogadoColab)}
                 role={"COLAB"}
-                aoClicarEntrar={() => navigate("/")}
+                aoIrParaHome={() => navigate("/")}
                 aoMeuPerfil={() => navigate("/meu-perfil")}
                 aoVerDocumentos={() => navigate("/documentos")}
                 aoMeusDocumentos={() => navigate("/meus-documentos")}
+                aoCalendario={() => navigate("/calendario")}
                 aoFaq={() => navigate("/faq")}
                 aoFaleComRh={() => navigate("/fale-com-rh")}
+                aoClicarEntrar={() => navigate("/")}
                 aoSair={sair}
             />
 
             <main className="paginaBase__conteudo">
+                <BotaoVoltar destino="/" />
                 <div className="paginaBase__topoInterno">
-                    <button className="botaoVoltar" type="button" onClick={() => navigate(-1)}>
-                        <ArrowLeft size={18} /> Voltar
-                    </button>
                     <h1 className="paginaBase__titulo">Fale com o RH</h1>
                 </div>
 

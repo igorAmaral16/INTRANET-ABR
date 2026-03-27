@@ -12,6 +12,7 @@ import { PaginaCalendario } from "./pages/PaginaCalendario";
 import { PaginaTutoriais } from "./pages/PaginaTutoriais";
 import { PaginaAnuncio } from "./pages/PaginaAnuncio";
 
+import { PaginaAdminHome } from "./pages/admin/PaginaAdminHome";
 import { PaginaAdminComunicados } from "./pages/admin/PaginaAdminComunicados";
 import { PaginaAdminCriarComunicado } from "./pages/admin/PaginaAdminCriarComunicado";
 import { PaginaAdminDocumentos } from "./pages/admin/PaginaAdminDocumentos";
@@ -84,7 +85,9 @@ function AppInner() {
         <Route path="/anuncio/:id" element={<PaginaAnuncio />} />
 
         {/* ADMIN */}
+        <Route path="/admin/home" element={<PaginaAdminHome />} />
         <Route path="/admin" element={<PaginaAdminComunicados />} />
+        <Route path="/admin/comunicados" element={<PaginaAdminComunicados />} />
         <Route path="/admin/criar-comunicado" element={<PaginaAdminCriarComunicado />} />
         <Route path="/admin/comunicados/:id/editar" element={<PaginaAdminCriarComunicado />} />
         <Route path="/admin/documentos" element={<PaginaAdminDocumentos />} />

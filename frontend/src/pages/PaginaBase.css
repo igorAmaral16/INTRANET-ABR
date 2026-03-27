@@ -5,14 +5,41 @@
     display: flex;
     flex-direction: column;
     overflow-x: hidden;
+    width: calc(100% - 240px);
+    margin-left: 240px;
+    box-sizing: border-box;
 }
 
 .paginaBase__conteudo {
-    max-width: 980px;
+    max-width: 1200px;
     width: 100%;
     margin: 0 auto;
-    padding: 16px 16px 40px;
+    padding: 24px 32px 40px;
     flex: 1;
+}
+
+@media (max-width: 1024px) {
+    .paginaBase__conteudo {
+        padding: 20px 24px 40px;
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 768px) {
+    .paginaBase {
+        margin-left: 0;
+        width: 100%;
+    }
+
+    .paginaBase__conteudo {
+        padding: 16px 16px 32px;
+    }
+}
+
+@media (max-width: 480px) {
+    .paginaBase__conteudo {
+        padding: 12px 12px 24px;
+    }
 }
 
 .paginaBase__topoInterno {

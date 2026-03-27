@@ -1,25 +1,83 @@
+.paginaDoc {
+    min-height: 100vh;
+    background: #fff;
+    color: #0f172a;
+    display: flex;
+    flex-direction: column;
+    width: calc(100% - 240px);
+    margin-left: 240px;
+    box-sizing: border-box;
+    overflow-x: hidden;
+}
+
+.paginaDoc__conteudo {
+    flex: 1;
+    padding: 24px 32px 40px;
+    max-width: 1200px;
+    width: 100%;
+    margin: 0 auto;
+    box-sizing: border-box;
+}
+
+@media (max-width: 1024px) {
+    .paginaDoc__conteudo {
+        padding: 20px 24px 40px;
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 768px) {
+    .paginaDoc {
+        margin-left: 0;
+        width: 100%;
+    }
+
+    .paginaDoc__conteudo {
+        padding: 16px 16px 32px;
+    }
+}
+
+@media (max-width: 480px) {
+    .paginaDoc__conteudo {
+        padding: 12px 12px 24px;
+    }
+}
+
+.paginaDoc__cabecalho {
+    margin-bottom: 24px;
+}
+
+.paginaDoc__titulo {
+    margin: 0;
+    font-size: 26px;
+    font-weight: 700;
+    color: #1e3c72;
+}
+
 .card {
     padding: 14px;
-    border-radius: 16px;
-    border: 1px solid rgba(0, 0, 0, 0.10);
-    background: rgba(255, 255, 255, 0.96);
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+    background: #f9f9f9;
+    font-weight: 500;
 }
 
 .cardErro {
-    border-color: rgba(239, 68, 68, 0.35);
-    background: rgba(239, 68, 68, 0.10);
-    font-weight: 900;
+    border-color: rgba(220, 38, 38, 0.3);
+    background: rgba(220, 38, 38, 0.12);
+    font-weight: 600;
+    color: #c62828;
 }
 
 .arvore {
     display: grid;
-    gap: 10px;
+    gap: 12px;
 }
 
 .pasta {
-    border-radius: 16px;
-    border: 1px solid rgba(59, 130, 246, 0.20);
-    background: linear-gradient(135deg, rgba(219, 234, 254, 0.5) 0%, rgba(239, 246, 255, 0.5) 100%);
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+    background: #f9f9f9;
     overflow: hidden;
 }
 
@@ -34,17 +92,17 @@
     border: none;
     background: transparent;
     cursor: pointer;
-    font-weight: 950;
-    color: #1e40af;
+    font-weight: 600;
+    color: #1e3c72;
     transition: all 0.2s ease;
 }
 
 .pasta__topo:hover {
-    background: rgba(59, 130, 246, 0.08);
+    background: rgba(30, 60, 114, 0.08);
 }
 
 .pasta__topo svg {
-    color: #3b82f6;
+    color: #1e3c72;
     flex-shrink: 0;
 }
 
@@ -58,7 +116,7 @@
     padding: 10px 12px 12px 0;
     display: grid;
     gap: 8px;
-    border-top: 1px solid rgba(59, 130, 246, 0.15);
+    border-top: 1px solid #e0e0e0;
 }
 
 .docItem {
@@ -67,21 +125,22 @@
     gap: 10px;
     height: 44px;
     padding: 0 12px;
-    border-radius: 14px;
-    border: 1px solid rgba(107, 114, 128, 0.20);
-    background: linear-gradient(135deg, rgba(249, 250, 251, 0.8) 0%, rgba(243, 244, 246, 0.8) 100%);
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+    background: #fff;
     text-decoration: none;
-    color: #374151;
-    font-weight: 900;
+    color: #1e3c72;
+    font-weight: 600;
     transition: all 0.2s ease;
 }
 
 .docItem:hover {
-    background: linear-gradient(135deg, rgba(229, 231, 235, 0.9) 0%, rgba(219, 222, 225, 0.9) 100%);
-    border-color: rgba(107, 114, 128, 0.35);
+    background: #f9f9f9;
+    border-color: #1e3c72;
+    box-shadow: 0 2px 8px rgba(30, 60, 114, 0.12);
 }
 
 .docItem svg {
-    color: #6366f1;
+    color: #1e3c72;
     flex-shrink: 0;
 }

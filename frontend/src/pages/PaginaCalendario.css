@@ -1,89 +1,52 @@
-.pagina-calendario {
+/* ===== PÁGINA CALENDÁRIO ===== */
+
+.paginaCalendario {
     min-height: 100vh;
-    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    background: #fff;
     display: flex;
     flex-direction: column;
+    width: calc(100% - 240px);
+    margin-left: 240px;
+    box-sizing: border-box;
+    overflow-x: hidden;
 }
 
-.container {
+.paginaCalendario__conteudo {
     flex: 1;
-    padding: 24px;
+    padding: 24px 32px 40px;
     max-width: 1200px;
+    width: 100%;
     margin: 0 auto;
-    width: 100%;
+    box-sizing: border-box;
 }
 
-.calendario-content {
-    width: 100%;
-}
-
-.loading {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 60px 20px;
-    text-align: center;
-}
-
-.spinner {
-    width: 48px;
-    height: 48px;
-    border: 4px solid #f0f0f0;
-    border-top: 4px solid #007bff;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    margin-bottom: 16px;
-}
-
-@keyframes spin {
-    0% {
-        transform: rotate(0deg);
-    }
-
-    100% {
-        transform: rotate(360deg);
+@media (max-width: 1024px) {
+    .paginaCalendario__conteudo {
+        padding: 20px 24px 40px;
+        max-width: 100%;
     }
 }
 
-.loading p {
-    font-size: 16px;
-    color: #666;
-    margin: 0;
+@media (max-width: 768px) {
+    .paginaCalendario {
+        margin-left: 0;
+        width: 100%;
+    }
+
+    .paginaCalendario__conteudo {
+        padding: 16px 16px 32px;
+    }
 }
 
-.error-message {
-    background: #fee;
-    border: 2px solid #f88;
-    border-radius: 12px;
-    padding: 24px;
-    text-align: center;
-    margin-bottom: 24px;
+@media (max-width: 480px) {
+    .paginaCalendario__conteudo {
+        padding: 12px 12px 24px;
+    }
 }
 
-.error-message p {
-    margin: 0 0 16px 0;
-    color: #c33;
-    font-size: 16px;
-}
+/* ===== HEADER ===== */
 
-.error-message button {
-    background: #c33;
-    color: white;
-    border: none;
-    padding: 8px 20px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: 600;
-    transition: background 0.2s;
-}
-
-.error-message button:hover {
-    background: #a22;
-}
-
-.config-info {
+.paginaCalendario__header {
     text-align: center;
     margin-bottom: 32px;
     animation: slideInDown 0.5s ease;
@@ -101,15 +64,15 @@
     }
 }
 
-.config-title {
-    font-size: 32px;
+.paginaCalendario__titulo {
+    font-size: 28px;
     font-weight: 700;
-    color: #1a1a1a;
+    color: #1e3c72;
     margin: 0 0 12px 0;
 }
 
-.config-description {
-    font-size: 16px;
+.paginaCalendario__descricao {
+    font-size: 15px;
     color: #666;
     margin: 0;
     max-width: 600px;
@@ -118,35 +81,116 @@
     line-height: 1.6;
 }
 
-.info-rodape {
+/* ===== WIDGET ===== */
+
+.paginaCalendario__widget {
+    margin-bottom: 40px;
+}
+
+/* ===== LOADING ===== */
+
+.paginaCalendario__loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 80px 20px;
+    text-align: center;
+}
+
+.paginaCalendario__spinner {
+    width: 48px;
+    height: 48px;
+    border: 4px solid #e0e0e0;
+    border-top-color: #1e3c72;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 16px;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.paginaCalendario__loading>p {
+    font-size: 16px;
+    color: #666;
+    margin: 0;
+}
+
+/* ===== ERROR ===== */
+
+.paginaCalendario__erro {
+    background: #fce4e6;
+    border: 1px solid #f48fb1;
+    border-radius: 12px;
+    padding: 24px;
+    text-align: center;
+    margin-bottom: 24px;
+}
+
+.paginaCalendario__erro>p {
+    margin: 0 0 16px 0;
+    color: #c2185b;
+    font-size: 15px;
+    font-weight: 500;
+}
+
+.paginaCalendario__btnRetry {
+    background: #1e3c72;
+    color: white;
+    border: none;
+    padding: 10px 24px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.paginaCalendario__btnRetry:hover {
+    background: #152d52;
+    box-shadow: 0 4px 12px rgba(30, 60, 114, 0.2);
+}
+
+/* ===== INFO ===== */
+
+.paginaCalendario__info {
     margin-top: 40px;
     padding: 24px;
     background: white;
     border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    border: 1px solid #e0e0e0;
 }
 
-.info-item {
+.paginaCalendario__infoItem {
     display: flex;
     align-items: center;
     gap: 12px;
     margin-bottom: 12px;
 }
 
-.color-sample {
+.paginaCalendario__colorSample {
     width: 24px;
     height: 24px;
     border-radius: 6px;
     flex-shrink: 0;
 }
 
-.info-item span:last-child {
+.paginaCalendario__infoItem>span:last-child {
     font-size: 14px;
-    color: #1a1a1a;
+    color: #333;
     font-weight: 500;
 }
 
-.info-texto {
+.paginaCalendario__infoTexto {
     margin: 12px 0 0 0;
     font-size: 14px;
     color: #666;
@@ -154,15 +198,11 @@
 }
 
 @media (max-width: 768px) {
-    .container {
-        padding: 16px;
+    .paginaCalendario__titulo {
+        font-size: 22px;
     }
 
-    .config-title {
-        font-size: 24px;
-    }
-
-    .config-description {
+    .paginaCalendario__descricao {
         font-size: 14px;
     }
 }

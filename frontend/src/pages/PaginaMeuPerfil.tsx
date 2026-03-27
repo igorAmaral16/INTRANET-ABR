@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, BadgeCheck, BadgeX, IdCard, CalendarDays } from "lucide-react";
-import { BarraTopo } from "../components/BarraTopo/BarraTopo";
+import { BadgeCheck, BadgeX, IdCard, CalendarDays } from "lucide-react";
+import { SidebarFixed } from "../components/SidebarFixed/SidebarFixed";
 import { useSessaoAuth } from "../hooks/useSessaoAuth";
 import { obterMeuPerfilColaborador, type PerfilColaborador } from "../api/colaborador.api";
 import "./PaginaBase.css";
@@ -33,14 +33,14 @@ function isAbortError(e: any) {
 
 export function PaginaMeuPerfil() {
     const navigate = useNavigate();
-    const { sessao, estaLogadoColab, sair } = useSessaoAuth();
+    const { sessao, sair } = useSessaoAuth();
 
     const [carregando, setCarregando] = useState(true);
     const [erro, setErro] = useState<string | null>(null);
     const [perfil, setPerfil] = useState<PerfilColaborador | null>(null);
 
     useEffect(() => {
-        if (!estaLogadoColab || !sessao?.token) {
+        if (!sessao?.token) {
             setCarregando(false);
             setErro("Faça login como colaborador para visualizar seu perfil.");
             setPerfil(null);
@@ -70,35 +70,29 @@ export function PaginaMeuPerfil() {
 
         return () => ac.abort();
         // Observação: manter dependências simples evita reexecuções desnecessárias
-    }, [estaLogadoColab, sessao?.token]);
+    }, [sessao?.token]);
 
     return (
         <div className="paginaBase">
-            <BarraTopo
-                busca=""
-                aoMudarBusca={() => { }}
-                mostrarBusca={false}
-                aoIrParaInicio={() => navigate("/")}
-
-                estaLogado={Boolean(sessao?.token && estaLogadoColab)}
+            <SidebarFixed
+                estaLogado={Boolean(sessao?.token)}
                 role={sessao?.role}
-
-                aoClicarEntrar={() => navigate("/")}
-
+                aoIrParaHome={() => navigate("/")}
                 aoMeuPerfil={() => navigate("/meu-perfil")}
                 aoVerDocumentos={() => navigate("/documentos")}
                 aoMeusDocumentos={() => navigate("/meus-documentos")}
+                aoCalendario={() => navigate("/calendario")}
                 aoFaq={() => navigate("/faq")}
                 aoFaleComRh={() => navigate("/fale-com-rh")}
-                aoSair={sair}
+                aoClicarEntrar={() => navigate("/")}
+                aoSair={() => {
+                    sair();
+                    navigate("/", { replace: true });
+                }}
             />
-
 
             <main className="paginaBase__conteudo">
                 <div className="paginaBase__topoInterno">
-                    <button className="botaoVoltar" type="button" onClick={() => navigate(-1)}>
-                        <ArrowLeft size={18} /> Voltar
-                    </button>
                     <h1 className="paginaBase__titulo">Meu Perfil</h1>
                 </div>
 

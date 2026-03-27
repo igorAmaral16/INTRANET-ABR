@@ -1,5 +1,8 @@
 import "./SecaoAcessoRapido.css";
 import { ExternalLink as IconExternalLink } from "lucide-react";
+import Logo_NFE from "../../assets/nfe_power.png";
+import Logo_BI from "../../assets/QlickView_BI.png";
+import Logo_ABR from "../../assets/icon-trackload.png";
 
 type SistemaExterno = {
     id: string;
@@ -14,36 +17,36 @@ const SISTEMAS_EXTERNOS: SistemaExterno[] = [
         id: "trackload",
         nome: "Trackload",
         url: "https://10.0.0.48:5173",
-        icone: "icon-trackload.png",
-        descricao: "Sistema de rastreamento",
+        icone: Logo_ABR,
+        descricao: "Rastreamento das NFs",
     },
     {
         id: "nfe-power",
         nome: "NF-e Power",
         url: "http://10.0.0.1:42801/smdLogin.asp",
-        icone: "icon-nfe-power.png",
+        icone: Logo_NFE,
         descricao: "Gerenciamento de notas fiscais",
     },
     {
         id: "qlikview",
-        nome: "QlikView",
+        nome: "QlikView - BI",
         url: "http://10.0.0.252/qlikview/index.htm",
-        icone: "icon-qlikview.png",
-        descricao: "Business Intelligence",
+        icone: Logo_BI,
+        descricao: "Consulta de Dados",
     },
     {
         id: "varredor",
-        nome: "Varredor de Arquivos",
+        nome: "Varredor Recursivo",
         url: "https://10.0.0.48:5175",
-        icone: "icon-varredor.png",
-        descricao: "Gerenciamento de arquivos",
+        icone: Logo_ABR,
+        descricao: "Ajuste das NF de entrada",
     },
     {
         id: "catalogo-abr",
         nome: "Catálogo ABR",
         url: "https://abr-catalogo.vercel.app",
-        icone: "icon-catalogo-abr.png",
-        descricao: "Catálogo de produtos",
+        icone: Logo_ABR,
+        descricao: "Catálogo Web de produtos ",
     },
 ];
 
@@ -71,7 +74,7 @@ export function SecaoAcessoRapido() {
                         >
                             <div className="cartaoAcessoRapido__icone">
                                 <img
-                                    src={`/assets/${sistema.icone}`}
+                                    src={`${sistema.icone}`}
                                     alt=""
                                     className="cartaoAcessoRapido__img"
                                     onError={(e) => {

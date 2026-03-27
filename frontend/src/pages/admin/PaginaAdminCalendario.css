@@ -1,69 +1,83 @@
-.pagina-admin-calendario {
+@import "./PaginaAdminBase.css";
+
+.paginaAdminCalendario {
     min-height: 100vh;
-    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    background: #fff;
+    color: #0f172a;
     display: flex;
     flex-direction: column;
+    overflow-x: hidden;
+    width: calc(100% - 240px);
+    margin-left: 240px;
+    box-sizing: border-box;
 }
 
-.container-admin {
+.paginaAdminCalendario__conteudo {
     flex: 1;
-    padding: 24px;
+    padding: 24px 32px 40px;
     max-width: 1200px;
-    margin: 0 auto;
     width: 100%;
+    margin: 0 auto;
+    box-sizing: border-box;
 }
 
-.alert {
-    padding: 16px 20px;
-    border-radius: 8px;
-    margin-bottom: 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    animation: slideInDown 0.3s ease;
+@media (max-width: 1024px) {
+    .paginaAdminCalendario__conteudo {
+        padding: 20px 24px 40px;
+        max-width: 100%;
+    }
 }
 
-.alert-error {
-    background: #fee;
-    border: 2px solid #f88;
-    color: #c33;
+@media (max-width: 768px) {
+    .paginaAdminCalendario {
+        margin-left: 0;
+        width: 100%;
+    }
+
+    .paginaAdminCalendario__conteudo {
+        padding: 16px 16px 32px;
+    }
 }
 
-.alert-success {
-    background: #efe;
-    border: 2px solid #8f8;
-    color: #3a3;
+@media (max-width: 480px) {
+    .paginaAdminCalendario__conteudo {
+        padding: 12px 12px 24px;
+    }
 }
 
-.alert button {
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: inherit;
-    padding: 4px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+.paginaAdminCalendario__header {
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #e0e0e0;
 }
 
-.alert button:hover {
-    opacity: 0.7;
+.paginaAdminCalendario__titulo {
+    margin: 0;
+    font-size: 26px;
+    font-weight: 700;
+    color: #1e3c72;
 }
 
-.loading {
+.paginaAdminCalendario__descricao {
+    margin: 6px 0 0 0;
+    color: #666;
+    opacity: 0.8;
+}
+
+.paginaAdminCalendario__loading {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 60px 20px;
+    padding: 80px 20px;
     text-align: center;
 }
 
-.spinner {
+.paginaAdminCalendario__spinner {
     width: 48px;
     height: 48px;
-    border: 4px solid #f0f0f0;
-    border-top: 4px solid #007bff;
+    border: 4px solid #e0e0e0;
+    border-top-color: #1e3c72;
     border-radius: 50%;
     animation: spin 1s linear infinite;
     margin-bottom: 16px;
@@ -79,262 +93,167 @@
     }
 }
 
-@keyframes slideInDown {
-    from {
-        opacity: 0;
-        transform: translateY(-20px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.loading p {
+.paginaAdminCalendario__loading > p {
     font-size: 16px;
     color: #666;
     margin: 0;
 }
 
-.admin-section {
-    background: white;
-    border-radius: 12px;
-    padding: 28px;
-    margin-bottom: 24px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.section-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 24px;
-    gap: 16px;
-    flex-wrap: wrap;
-}
-
-.section-header h2 {
-    font-size: 22px;
-    font-weight: 700;
-    color: #1a1a1a;
-    margin: 0;
-}
-
-.btn {
-    padding: 10px 20px;
-    border: none;
+.paginaAdminCalendario__erro {
+    background: #fce4e6;
+    border: 1px solid #f48fb1;
     border-radius: 8px;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: 600;
-    transition: all 0.2s ease;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.btn-primary {
-    background: #007bff;
-    color: white;
-}
-
-.btn-primary:hover {
-    background: #0056b3;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
-}
-
-.btn-success {
-    background: #28a745;
-    color: white;
-}
-
-.btn-success:hover {
-    background: #1e7e34;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
-}
-
-.btn-secondary {
-    background: #6c757d;
-    color: white;
-}
-
-.btn-secondary:hover {
-    background: #5a6268;
-}
-
-.config-card {
-    background: #f8f9fa;
-    border: 2px solid #e0e0e0;
-    border-radius: 8px;
-    padding: 20px;
-}
-
-.config-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 12px 0;
-    border-bottom: 1px solid #e0e0e0;
-}
-
-.config-item:last-child {
-    border-bottom: none;
-}
-
-.config-item label {
-    font-weight: 600;
-    color: #1a1a1a;
-    min-width: 150px;
-}
-
-.config-item span {
-    color: #666;
-    text-align: right;
-}
-
-.filtro-feriados {
-    display: flex;
-    gap: 12px;
-    margin-bottom: 24px;
-    flex-wrap: wrap;
-}
-
-.form-select {
-    padding: 8px 12px;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    font-size: 14px;
-    background: white;
-    cursor: pointer;
-    flex: 1;
-    min-width: 150px;
-}
-
-.form-select:focus {
-    outline: none;
-    border-color: #007bff;
-    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
-}
-
-.vazio {
+    padding: 24px;
     text-align: center;
-    padding: 40px 20px;
-    color: #999;
-    font-style: italic;
+    margin-bottom: 24px;
 }
 
-.feriados-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 16px;
+.paginaAdminCalendario__erro > p {
+    margin: 0 0 16px 0;
+    color: #c2185b;
+    font-size: 15px;
+    font-weight: 500;
 }
 
-.feriado-card {
-    background: #f8f9fa;
-    border: 2px solid #e0e0e0;
+.paginaAdminCalendario__btnRetry {
+    background: #1e3c72;
+    color: white;
+    border: none;
+    padding: 10px 24px;
     border-radius: 8px;
-    padding: 16px;
-    display: flex;
-    gap: 12px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
     transition: all 0.2s ease;
 }
 
-.feriado-card:hover {
-    border-color: #007bff;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+.paginaAdminCalendario__btnRetry:hover {
+    background: #152d52;
+    box-shadow: 0 4px 12px rgba(30, 60, 114, 0.2);
 }
 
-.feriado-color {
-    width: 40px;
-    height: 40px;
+.paginaAdminCalendario__widget {
+    margin-bottom: 40px;
+    background: #f9f9f9;
+    padding: 20px;
     border-radius: 8px;
+    border: 1px solid #e0e0e0;
+}
+
+.paginaAdminCalendario__info {
+    margin-top: 40px;
+    padding: 24px;
+    background: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    border: 1px solid #e0e0e0;
+}
+
+.paginaAdminCalendario__infoItem {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.paginaAdminCalendario__colorSample {
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
     flex-shrink: 0;
 }
 
-.feriado-info {
-    flex: 1;
+.paginaAdminCalendario__infoItem > span:last-child {
+    font-size: 14px;
+    color: #333;
+    font-weight: 500;
 }
 
-.feriado-data {
-    font-size: 12px;
-    color: #999;
-    margin-bottom: 4px;
-}
-
-.feriado-info h4 {
-    margin: 0 0 4px 0;
-    font-size: 16px;
-    color: #1a1a1a;
-}
-
-.feriado-info p {
-    margin: 4px 0;
-    font-size: 13px;
+.paginaAdminCalendario__infoTexto {
+    margin: 12px 0 0 0;
+    font-size: 14px;
     color: #666;
+    line-height: 1.6;
 }
 
-.tipo {
-    display: inline-block;
-    padding: 4px 8px;
-    border-radius: 4px;
-    font-size: 11px;
-    font-weight: 600;
-    margin-top: 8px;
+/* Admin Config Modal */
+.paginaAdminCalendario__configModal {
+    display: grid;
+    gap: 16px;
 }
 
-.tipo.nacional {
-    background: #e7f3ff;
-    color: #0056b3;
+.paginaAdminCalendario__formField {
+    display: grid;
+    gap: 6px;
 }
 
-.tipo.customizado {
-    background: #fff3e0;
-    color: #f57c00;
+.paginaAdminCalendario__label {
+    font-size: 13px;
+    font-weight: 700;
+    color: #333;
 }
 
-.feriado-actions {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.btn-icon {
-    width: 36px;
-    height: 36px;
-    padding: 0;
-    border: none;
+.paginaAdminCalendario__input,
+.paginaAdminCalendario__select,
+.paginaAdminCalendario__textarea {
+    padding: 10px 12px;
+    border: 1px solid #e0e0e0;
     border-radius: 6px;
-    cursor: pointer;
+    font-size: 14px;
+    font-family: inherit;
+    background: #fff;
+    color: #333;
+    transition: border-color 0.2s ease;
+}
+
+.paginaAdminCalendario__input:focus,
+.paginaAdminCalendario__select:focus,
+.paginaAdminCalendario__textarea:focus {
+    outline: none;
+    border-color: #1e3c72;
+    box-shadow: 0 0 0 3px rgba(30, 60, 114, 0.1);
+}
+
+.paginaAdminCalendario__actions {
     display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s;
+    gap: 12px;
+    margin-top: 24px;
 }
 
-.btn-icon.edit {
-    background: #e7f3ff;
-    color: #007bff;
+.paginaAdminCalendario__btnPrimario,
+.paginaAdminCalendario__btnSecundario {
+    flex: 1;
+    height: 42px;
+    padding: 0 14px;
+    border-radius: 8px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
 }
 
-.btn-icon.edit:hover {
-    background: #007bff;
-    color: white;
+.paginaAdminCalendario__btnPrimario {
+    background: #1e3c72;
+    color: #fff;
+    border: none;
 }
 
-.btn-icon.delete {
-    background: #fee;
-    color: #dc3545;
+.paginaAdminCalendario__btnPrimario:hover {
+    background: #152d52;
+    box-shadow: 0 4px 12px rgba(30, 60, 114, 0.2);
 }
 
-.btn-icon.delete:hover {
-    background: #dc3545;
-    color: white;
+.paginaAdminCalendario__btnSecundario {
+    background: #fff;
+    color: #1e3c72;
+    border: 1px solid #e0e0e0;
 }
 
-/* Modal */
+.paginaAdminCalendario__btnSecundario:hover {
+    background: #f9f9f9;
+    border-color: #1e3c72;
+}
+
+/* ===== MODAL STYLES ===== */
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -346,162 +265,441 @@
     align-items: center;
     justify-content: center;
     z-index: 1000;
+    padding: 20px;
 }
 
 .modal {
     background: white;
     border-radius: 12px;
-    max-width: 500px;
-    width: 90%;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    max-width: 600px;
+    width: 100%;
     max-height: 90vh;
     overflow-y: auto;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
 }
 
 .modal-header {
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    justify-content: space-between;
     padding: 24px;
-    border-bottom: 2px solid #f0f0f0;
+    border-bottom: 1px solid #e0e0e0;
 }
 
 .modal-header h3 {
     margin: 0;
-    font-size: 20px;
+    font-size: 18px;
     font-weight: 700;
-    color: #1a1a1a;
+    color: #333;
 }
 
 .btn-close {
     background: none;
     border: none;
     cursor: pointer;
-    color: #666;
-    padding: 4px;
+    color: #999;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: color 0.2s;
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    transition: all 0.2s ease;
 }
 
 .btn-close:hover {
-    color: #1a1a1a;
+    background: #f0f0f0;
+    color: #333;
 }
 
 .modal-body {
     padding: 24px;
 }
 
-.form-group {
-    margin-bottom: 20px;
+.modal-footer {
+    display: flex;
+    gap: 12px;
+    padding: 24px;
+    border-top: 1px solid #e0e0e0;
+    background: #f9f9f9;
+    border-radius: 0 0 12px 12px;
 }
 
-.form-group:last-child {
-    margin-bottom: 0;
+/* ===== FORM STYLES ===== */
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 16px;
 }
 
 .form-group label {
-    display: block;
-    font-weight: 600;
-    margin-bottom: 8px;
-    color: #1a1a1a;
+    font-size: 13px;
+    font-weight: 700;
+    color: #333;
+}
+
+.form-input,
+.form-select,
+.form-textarea {
+    padding: 10px 12px;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
     font-size: 14px;
+    font-family: inherit;
+    background: #fff;
+    color: #333;
+    transition: all 0.2s ease;
+}
+
+.form-input:focus,
+.form-select:focus,
+.form-textarea:focus {
+    outline: none;
+    border-color: #1e3c72;
+    box-shadow: 0 0 0 3px rgba(30, 60, 114, 0.1);
+}
+
+.form-textarea {
+    resize: vertical;
+    min-height: 80px;
+    font-family: inherit;
 }
 
 .form-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 12px;
+    gap: 16px;
 }
 
-.form-input,
-.form-textarea,
-.form-select {
-    width: 100%;
-    padding: 10px 12px;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    font-size: 14px;
-    font-family: inherit;
-}
-
-.form-input:focus,
-.form-textarea:focus,
-.form-select:focus {
-    outline: none;
-    border-color: #007bff;
-    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
-}
-
-.form-textarea {
-    resize: vertical;
-}
-
-.color-picker {
-    display: flex;
-    align-items: center;
-    gap: 12px;
+@media (max-width: 480px) {
+    .form-row {
+        grid-template-columns: 1fr;
+    }
 }
 
 .form-color {
     width: 50px;
-    height: 50px;
-    border: 1px solid #ddd;
+    height: 42px;
+    border: 1px solid #e0e0e0;
     border-radius: 6px;
     cursor: pointer;
 }
 
+.color-picker {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
 .color-value {
-    font-family: monospace;
-    font-size: 14px;
+    font-size: 13px;
+    font-weight: 600;
     color: #666;
+    font-family: monospace;
+}
+
+/* ===== BUTTON STYLES ===== */
+.btn {
+    padding: 10px 16px;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-primary {
+    background: #1e3c72;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #152d52;
+    box-shadow: 0 4px 12px rgba(30, 60, 114, 0.2);
+}
+
+.btn-secondary {
+    background: white;
+    color: #1e3c72;
+    border: 1px solid #e0e0e0;
+}
+
+.btn-secondary:hover {
+    background: #f9f9f9;
+    border-color: #1e3c72;
+}
+
+.btn-success {
+    background: #28a745;
+    color: white;
+}
+
+.btn-success:hover {
+    background: #218838;
+    box-shadow: 0 4px 12px rgba(40, 167, 69, 0.2);
+}
+
+.btn-icon {
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    color: #666;
+}
+
+.btn-icon:hover {
+    background: #f0f0f0;
+    color: #333;
+}
+
+.btn-icon.edit {
+    color: #1e3c72;
+}
+
+.btn-icon.edit:hover {
+    background: rgba(30, 60, 114, 0.1);
+}
+
+.btn-icon.delete {
+    color: #d32f2f;
+}
+
+.btn-icon.delete:hover {
+    background: rgba(211, 47, 47, 0.1);
+}
+
+/* ===== SECTION STYLES ===== */
+.admin-section {
+    margin-bottom: 32px;
+    background: white;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+    padding: 24px;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.section-header h2 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+    color: #333;
+}
+
+/* ===== ALERT STYLES ===== */
+.alert {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    padding: 16px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    border-left: 4px solid;
+    position: relative;
+}
+
+.alert button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: inherit;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+    position: absolute;
+    top: 8px;
+    right: 8px;
+}
+
+.alert button:hover {
+    opacity: 1;
+}
+
+.alert-error {
+    background: #fce4e6;
+    color: #c2185b;
+    border-left-color: #c2185b;
+}
+
+.alert-success {
+    background: #e8f5e9;
+    color: #2e7d32;
+    border-left-color: #2e7d32;
+}
+
+/* ===== LOADING STYLES ===== */
+.loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 80px 20px;
+    text-align: center;
+}
+
+.spinner {
+    width: 48px;
+    height: 48px;
+    border: 4px solid #e0e0e0;
+    border-top-color: #1e3c72;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 16px;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.loading > p {
+    font-size: 16px;
+    color: #666;
+    margin: 0;
+}
+
+/* ===== FERIADO STYLES ===== */
+.filtro-feriados {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+.vazio {
+    text-align: center;
+    color: #999;
+    padding: 40px 20px;
+    font-size: 15px;
+}
+
+.feriados-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+}
+
+.feriado-card {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 16px;
+    background: white;
+    display: flex;
+    gap: 12px;
+    transition: all 0.2s ease;
+}
+
+.feriado-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-color: #1e3c72;
+}
+
+.feriado-color {
+    width: 40px;
+    height: 40px;
+    border-radius: 6px;
+    flex-shrink: 0;
+}
+
+.feriado-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.feriado-data {
+    font-size: 12px;
+    color: #999;
     font-weight: 600;
 }
 
-.modal-footer {
-    display: flex;
-    gap: 12px;
-    justify-content: flex-end;
-    padding: 24px;
-    border-top: 2px solid #f0f0f0;
-    background: #f8f9fa;
+.feriado-info h4 {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 700;
+    color: #333;
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-    .container-admin {
-        padding: 16px;
-    }
+.feriado-info p {
+    margin: 0;
+    font-size: 13px;
+    color: #666;
+    line-height: 1.4;
+}
 
-    .admin-section {
-        padding: 20px;
-    }
+.tipo {
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 8px;
+    border-radius: 4px;
+    background: #f0f0f0;
+    color: #666;
+    margin-top: 4px;
+}
 
-    .section-header {
-        flex-direction: column;
-        align-items: flex-start;
-    }
+.tipo.nacional {
+    background: #e3f2fd;
+    color: #1976d2;
+}
 
-    .section-header h2 {
-        font-size: 18px;
-    }
+.tipo.customizado {
+    background: #fce4e6;
+    color: #c2185b;
+}
 
-    .form-row {
-        grid-template-columns: 1fr;
-    }
+.feriado-actions {
+    display: flex;
+    gap: 8px;
+    flex-direction: column;
+    justify-content: center;
+}
 
-    .feriados-grid {
-        grid-template-columns: 1fr;
-    }
+/* ===== CONFIG CARD ===== */
+.config-card {
+    background: #f9f9f9;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 20px;
+    display: grid;
+    gap: 12px;
+}
 
-    .config-item {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 8px;
-    }
+.config-item {
+    display: grid;
+    grid-template-columns: 150px 1fr;
+    gap: 12px;
+    align-items: center;
+}
 
-    .config-item span {
-        text-align: left;
-    }
+.config-item label {
+    font-weight: 700;
+    color: #333;
+    font-size: 13px;
+}
+
+.config-item span {
+    color: #666;
+    font-size: 14px;
 }

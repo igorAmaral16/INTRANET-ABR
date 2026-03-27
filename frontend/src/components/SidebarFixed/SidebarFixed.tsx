@@ -14,9 +14,9 @@ import {
     Bell as IconBell,
     Settings as IconSettings,
 } from "lucide-react";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { setores } from "../../utils/setores";
-import logo from "../../assets/logo.webp";
+import logo from "../../assets/logo.png";
 
 type Role = "COLAB" | "ADMIN" | null | undefined;
 

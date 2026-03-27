@@ -1,0 +1,288 @@
+/* ===== PÁGINA INICIAL ADMIN ===== */
+
+.paginaAdminHome {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #f5f7fa 0%, #f9fbff 100%);
+}
+
+/* HEADER */
+.paginaAdminHome__header {
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+    color: #fff;
+    padding: 24px 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.paginaAdminHome__headerConteudo {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 24px;
+}
+
+.paginaAdminHome__headerInfo {
+    flex: 1;
+}
+
+.paginaAdminHome__headerTitulo {
+    font-size: 28px;
+    font-weight: 700;
+    margin: 0 0 4px;
+    letter-spacing: -0.5px;
+}
+
+.paginaAdminHome__headerSubtitulo {
+    font-size: 14px;
+    margin: 0;
+    opacity: 0.9;
+}
+
+.paginaAdminHome__headerSubtitulo strong {
+    font-weight: 600;
+    text-transform: capitalize;
+}
+
+/* BOTÃO SAIR */
+.paginaAdminHome__btnSair {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: #fff;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+
+.paginaAdminHome__btnSair:hover {
+    background: rgba(255, 255, 255, 0.25);
+    border-color: rgba(255, 255, 255, 0.4);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.paginaAdminHome__btnSair:active {
+    transform: translateY(0);
+}
+
+/* CONTEÚDO PRINCIPAL */
+.paginaAdminHome__main {
+    flex: 1;
+    padding: 40px 20px;
+    overflow-y: auto;
+}
+
+.paginaAdminHome__container {
+    max-width: 1400px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.paginaAdminHome__secao {
+    width: 100%;
+}
+
+.paginaAdminHome__secaoDesc {
+    font-size: 16px;
+    color: #666;
+    margin: 0 0 32px;
+    text-align: center;
+    line-height: 1.6;
+}
+
+/* GRID DE CARDS */
+.paginaAdminHome__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    width: 100%;
+}
+
+/* CARDS */
+.paginaAdminHome__card {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 24px;
+    background: #fff;
+    border: 1px solid #e8e8e8;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: left;
+    box-sizing: border-box;
+    position: relative;
+    overflow: hidden;
+}
+
+.paginaAdminHome__card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(135deg, #1e3c72, #2a5298);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s ease;
+}
+
+.paginaAdminHome__card:hover {
+    border-color: #2a5298;
+    box-shadow: 0 8px 24px rgba(42, 82, 152, 0.15);
+    transform: translateY(-4px);
+}
+
+.paginaAdminHome__card:hover::before {
+    transform: scaleX(1);
+}
+
+.paginaAdminHome__cardIcon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+    color: #fff;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.paginaAdminHome__card:hover .paginaAdminHome__cardIcon {
+    transform: scale(1.1);
+}
+
+.paginaAdminHome__cardTitulo {
+    font-size: 18px;
+    font-weight: 700;
+    margin: 0;
+    color: #1e3c72;
+    line-height: 1.3;
+}
+
+.paginaAdminHome__cardDesc {
+    font-size: 13px;
+    color: #999;
+    margin: 0;
+    line-height: 1.5;
+    flex: 1;
+}
+
+.paginaAdminHome__cardSeta {
+    align-self: flex-end;
+    font-size: 20px;
+    color: #1e3c72;
+    font-weight: 600;
+    opacity: 0.5;
+    transition: all 0.3s ease;
+}
+
+.paginaAdminHome__card:hover .paginaAdminHome__cardSeta {
+    opacity: 1;
+    transform: translateX(4px);
+}
+
+/* FOOTER */
+.paginaAdminHome__footer {
+    background: #f9f9f9;
+    color: #666;
+    padding: 24px 20px;
+    text-align: center;
+    border-top: 1px solid #e8e8e8;
+}
+
+.paginaAdminHome__footerTexto {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+/* RESPONSIVO */
+@media (max-width: 768px) {
+    .paginaAdminHome__header {
+        padding: 16px 12px;
+    }
+
+    .paginaAdminHome__headerConteudo {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .paginaAdminHome__headerTitulo {
+        font-size: 22px;
+    }
+
+    .paginaAdminHome__btnSair {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .paginaAdminHome__main {
+        padding: 24px 12px;
+    }
+
+    .paginaAdminHome__grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    .paginaAdminHome__card {
+        padding: 20px;
+    }
+
+    .paginaAdminHome__secaoDesc {
+        margin-bottom: 20px;
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 480px) {
+    .paginaAdminHome__headerTitulo {
+        font-size: 18px;
+    }
+
+    .paginaAdminHome__headerSubtitulo {
+        font-size: 12px;
+    }
+
+    .paginaAdminHome__main {
+        padding: 16px 8px;
+    }
+
+    .paginaAdminHome__card {
+        padding: 16px;
+        gap: 12px;
+    }
+
+    .paginaAdminHome__cardIcon {
+        width: 44px;
+        height: 44px;
+    }
+
+    .paginaAdminHome__cardTitulo {
+        font-size: 16px;
+    }
+
+    .paginaAdminHome__btnSair span {
+        display: none;
+    }
+
+    .paginaAdminHome__btnSair {
+        padding: 8px 12px;
+    }
+}

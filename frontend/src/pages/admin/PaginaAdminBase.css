@@ -1,0 +1,190 @@
+/* ===== BASE LAYOUT PARA PÁGINAS ADMIN ===== */
+
+.paginaAdminBase {
+    min-height: 100vh;
+    background: #fff;
+    color: #0f172a;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+    width: calc(100% - 240px);
+    margin-left: 240px;
+    box-sizing: border-box;
+}
+
+.paginaAdminBase__conteudo {
+    flex: 1;
+    padding: 24px 32px 40px;
+    max-width: 1200px;
+    width: 100%;
+    margin: 0 auto;
+    box-sizing: border-box;
+}
+
+@media (max-width: 1024px) {
+    .paginaAdminBase__conteudo {
+        padding: 20px 24px 40px;
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 768px) {
+    .paginaAdminBase {
+        margin-left: 0;
+        width: 100%;
+    }
+
+    .paginaAdminBase__conteudo {
+        padding: 16px 16px 32px;
+    }
+}
+
+@media (max-width: 480px) {
+    .paginaAdminBase__conteudo {
+        padding: 12px 12px 24px;
+    }
+}
+
+.paginaAdminBase__header {
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.paginaAdminBase__titulo {
+    margin: 0;
+    font-size: 26px;
+    font-weight: 700;
+    color: #1e3c72;
+}
+
+.paginaAdminBase__descricao {
+    margin: 6px 0 0 0;
+    color: #666;
+    opacity: 0.8;
+}
+
+.paginaAdminBase__toolbar {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+    padding: 12px;
+    background: #f9f9f9;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+}
+
+.paginaAdminBase__busca {
+    flex: 1;
+    min-width: 200px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 0 12px;
+    height: 42px;
+    background: #fff;
+}
+
+.paginaAdminBase__busca input {
+    border: 0;
+    outline: none;
+    width: 100%;
+    min-width: 0;
+    background: transparent;
+    font-size: 14px;
+}
+
+.paginaAdminBase__btnPrimario {
+    height: 42px;
+    padding: 0 14px;
+    border-radius: 8px;
+    border: none;
+    background: #1e3c72;
+    color: #fff;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+}
+
+.paginaAdminBase__btnPrimario:hover {
+    background: #152d52;
+    box-shadow: 0 4px 12px rgba(30, 60, 114, 0.2);
+}
+
+.paginaAdminBase__btnSecundario {
+    height: 42px;
+    padding: 0 14px;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+    background: #fff;
+    color: #1e3c72;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+}
+
+.paginaAdminBase__btnSecundario:hover {
+    background: #f9f9f9;
+    border-color: #1e3c72;
+    box-shadow: 0 2px 8px rgba(30, 60, 114, 0.12);
+}
+
+.card {
+    padding: 14px;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+    background: #f9f9f9;
+    font-weight: 500;
+}
+
+.cardErro {
+    border-color: rgba(220, 38, 38, 0.3);
+    background: rgba(220, 38, 38, 0.12);
+    font-weight: 600;
+    color: #c62828;
+}
+
+.chip {
+    font-size: 12px;
+    font-weight: 700;
+    padding: 6px 10px;
+    border-radius: 6px;
+    border: 1px solid #e0e0e0;
+    background: #f9f9f9;
+    color: #0b1220;
+    display: inline-block;
+}
+
+.chip--importante {
+    border-color: rgba(220, 38, 38, 0.3);
+    background: rgba(220, 38, 38, 0.12);
+    color: #c62828;
+}
+
+.chip--relevante {
+    border-color: rgba(30, 60, 114, 0.3);
+    background: rgba(30, 60, 114, 0.12);
+    color: #1e3c72;
+}
+
+.chip--pouco_relevante {
+    border-color: rgba(153, 153, 153, 0.3);
+    background: rgba(153, 153, 153, 0.12);
+    color: #666;
+}
+
+.meta {
+    font-size: 12px;
+    opacity: 0.75;
+    color: #666;
+}

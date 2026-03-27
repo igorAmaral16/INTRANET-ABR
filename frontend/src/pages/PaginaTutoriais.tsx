@@ -3,7 +3,8 @@ import { useEffect, useState } from "react";
 import { useTutorials } from "../hooks/useTutorials.ts";
 import type { TutorialResumo } from "../api/tutorials.api";
 import { useSessaoAuth } from "../hooks/useSessaoAuth";
-import { BarraTopo } from "../components/BarraTopo/BarraTopo";
+import { SidebarFixed } from "../components/SidebarFixed/SidebarFixed";
+import { BotaoVoltar } from "../components/BotaoVoltar/BotaoVoltar";
 import "./PaginaTutoriais.css";
 
 export function PaginaTutoriais() {
@@ -23,55 +24,56 @@ export function PaginaTutoriais() {
 
     return (
         <div className="paginaBase paginaTutoriais">
-            <BarraTopo
-                busca=""
-                aoMudarBusca={() => { }}
-                mostrarBusca={false}
-                aoIrParaInicio={() => navigate("/")}
+            <SidebarFixed
                 estaLogado={Boolean(sessao?.token)}
                 role={sessao?.role}
-                aoClicarEntrar={() => navigate("/")}
+                aoIrParaHome={() => navigate("/")}
                 aoMeuPerfil={() => navigate("/meu-perfil")}
                 aoVerDocumentos={() => navigate("/documentos")}
                 aoMeusDocumentos={() => navigate("/meus-documentos")}
                 aoCalendario={() => navigate("/calendario")}
                 aoFaq={() => navigate("/faq")}
                 aoFaleComRh={() => navigate("/fale-com-rh")}
+                aoClicarEntrar={() => navigate("/")}
                 aoSair={() => {
                     sair();
                     navigate("/", { replace: true });
                 }}
             />
 
-            <header className="paginaTutoriais__header card">
-                <h1 className="paginaTutoriais__titulo">Tutoriais</h1>
-                <div className="paginaTutoriais__setor">Setor: {setor}</div>
-                <div className="paginaTutoriais__busca">
-                    <input
-                        type="text"
-                        placeholder="Buscar por título..."
-                        value={busca}
-                        onChange={(e) => setBusca(e.target.value)}
-                    />
-                </div>
-            </header>
-            <main className="paginaTutoriais__lista">
-                {loading && <p>Carregando...</p>}
-                {error && <p className="error">Erro ao carregar tutoriais.</p>}
-                {!loading && itensFiltrados.length === 0 && (
-                    <p>Nenhum vídeo encontrado para este setor/termo.</p>
-                )}
-                {itensFiltrados.map((t: TutorialResumo) => (
-                    <article key={t.id} className="paginaTutoriais__item card">
-                        <h2>{t.titulo}</h2>
-                        <p className="paginaTutoriais__data">{t.data_publicacao}</p>
-                        <p>{t.descricao}</p>
-                        <video width="100%" controls>
-                            <source src={t.url} type="video/mp4" />
-                            Seu navegador não suporta o elemento de vídeo.
-                        </video>
-                    </article>
-                ))}
+            <main className="paginaTutoriais__main">
+                <BotaoVoltar destino="/" />
+                <header className="paginaTutoriais__header card">
+                    <h1 className="paginaTutoriais__titulo">Tutoriais</h1>
+                    <div className="paginaTutoriais__setor">Setor: {setor}</div>
+                    <div className="paginaTutoriais__busca">
+                        <input
+                            type="text"
+                            placeholder="Buscar por título..."
+                            value={busca}
+                            onChange={(e) => setBusca(e.target.value)}
+                        />
+                    </div>
+                </header>
+
+                <section className="paginaTutoriais__lista">
+                    {loading && <p>Carregando...</p>}
+                    {error && <p className="error">Erro ao carregar tutoriais.</p>}
+                    {!loading && itensFiltrados.length === 0 && (
+                        <p>Nenhum vídeo encontrado para este setor/termo.</p>
+                    )}
+                    {itensFiltrados.map((t: TutorialResumo) => (
+                        <article key={t.id} className="paginaTutoriais__item card">
+                            <h2>{t.titulo}</h2>
+                            <p className="paginaTutoriais__data">{t.data_publicacao}</p>
+                            <p>{t.descricao}</p>
+                            <video width="100%" controls>
+                                <source src={t.url} type="video/mp4" />
+                                Seu navegador não suporta o elemento de vídeo.
+                            </video>
+                        </article>
+                    ))}
+                </section>
             </main>
         </div>
     );

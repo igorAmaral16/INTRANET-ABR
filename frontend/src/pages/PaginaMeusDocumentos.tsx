@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Folder, FileText, ChevronDown, ChevronRight } from "lucide-react";
-import { BarraTopo } from "../components/BarraTopo/BarraTopo";
+import { Folder, FileText, ChevronDown, ChevronRight } from "lucide-react";
+import { SidebarFixed } from "../components/SidebarFixed/SidebarFixed";
+import { BotaoVoltar } from "../components/BotaoVoltar/BotaoVoltar";
 import { useSessaoAuth } from "../hooks/useSessaoAuth";
 import { obterArvoreBibliotecaColab, type NoBiblioteca } from "../api/biblioteca.api";
 import { resolverUrlApi } from "../utils/urlApi";
@@ -68,7 +69,7 @@ function NoArvore({
 
 export function PaginaMeusDocumentos() {
     const navigate = useNavigate();
-    const { estaLogadoColab, sessao, sair } = useSessaoAuth();
+    const { sessao, sair } = useSessaoAuth();
 
     const [carregando, setCarregando] = useState(true);
     const [erro, setErro] = useState<string | null>(null);
@@ -77,7 +78,7 @@ export function PaginaMeusDocumentos() {
     const [abertos, setAbertos] = useState<Set<string>>(() => new Set());
 
     useEffect(() => {
-        if (!estaLogadoColab || !sessao?.token) {
+        if (!sessao?.token) {
             setErro("Faça login como colaborador para acessar seus documentos.");
             setCarregando(false);
             setArvore([]);
@@ -102,7 +103,7 @@ export function PaginaMeusDocumentos() {
         })();
 
         return () => ac.abort();
-    }, [estaLogadoColab, sessao?.token]);
+    }, [sessao?.token]);
 
     const alternar = (id: string) => {
         setAbertos((prev) => {
@@ -120,31 +121,26 @@ export function PaginaMeusDocumentos() {
 
     return (
         <div className="paginaBase">
-            <BarraTopo
-                busca=""
-                aoMudarBusca={() => { }}
-                mostrarBusca={false}
-                aoIrParaInicio={() => navigate("/")}
-
-                estaLogado={Boolean(estaLogadoColab)}
-                role={"COLAB"}
-
-                aoClicarEntrar={() => navigate("/")}
-
+            <SidebarFixed
+                estaLogado={Boolean(sessao?.token)}
+                role={sessao?.role}
+                aoIrParaHome={() => navigate("/")}
                 aoMeuPerfil={() => navigate("/meu-perfil")}
                 aoVerDocumentos={() => navigate("/documentos")}
                 aoMeusDocumentos={() => navigate("/meus-documentos")}
+                aoCalendario={() => navigate("/calendario")}
                 aoFaq={() => navigate("/faq")}
                 aoFaleComRh={() => navigate("/fale-com-rh")}
-                aoSair={sair}
+                aoClicarEntrar={() => navigate("/")}
+                aoSair={() => {
+                    sair();
+                    navigate("/", { replace: true });
+                }}
             />
 
-
             <main className="paginaBase__conteudo">
+                <BotaoVoltar destino="/" />
                 <div className="paginaBase__topoInterno">
-                    <button className="botaoVoltar" type="button" onClick={() => navigate(-1)}>
-                        <ArrowLeft size={18} /> Voltar
-                    </button>
                     <h1 className="paginaBase__titulo">Meus Documentos</h1>
                 </div>
 
