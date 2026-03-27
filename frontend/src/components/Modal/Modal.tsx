@@ -38,7 +38,11 @@ export function Modal({ aberto, titulo, children, aoFechar }: Props) {
                         ✕
                     </button>
                 </div>
-                <div className="modal__corpo" ref={(el) => el && (el.scrollTop = 0)}>{children}</div>
+                <div className="modal__corpo" ref={(el) => {
+                    if (el) {
+                        el.scrollTop = 0;
+                    }
+                }}>{children}</div>
             </div>
         </div>
     );

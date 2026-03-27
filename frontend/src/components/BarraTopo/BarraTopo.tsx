@@ -105,13 +105,13 @@ export function BarraTopo({
                     <NotificacoesRhBell />
                     {estaLogado && role === "ADMIN" ? (
                         <MenuAdmin
-                            aoCriarComunicado={aoAdminCriarComunicado}
-                            aoDocumentos={aoAdminDocumentos}
-                            aoColaboradores={aoAdminColaboradores}
-                            aoFaq={aoAdminFaq}
-                            aoRelatorios={aoAdminRelatorios}
-                            aoFaleComRh={aoAdminFaleComRh}
-                            aoCalendario={aoAdminCalendario}
+                            aoCriarComunicado={aoAdminCriarComunicado || (() => { })}
+                            aoDocumentos={aoAdminDocumentos || (() => { })}
+                            aoColaboradores={aoAdminColaboradores || (() => { })}
+                            aoFaq={aoAdminFaq || (() => { })}
+                            aoRelatorios={aoAdminRelatorios || (() => { })}
+                            aoFaleComRh={aoAdminFaleComRh || (() => { })}
+                            aoCalendario={aoAdminCalendario || (() => { })}
                             aoSair={aoSair}
                         />
                     ) : (

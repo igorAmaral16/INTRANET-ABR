@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Upload, AlertCircle, CheckCircle, Image as IconImage } from "lucide-react";
+import { Upload, AlertCircle, CheckCircle } from "lucide-react";
 import {
     validateImage,
     getRecommendation,

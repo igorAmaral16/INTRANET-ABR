@@ -2,7 +2,6 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
     Paperclip,
-    Upload,
     Trash2,
     Image as IconImage,
     FileText,
