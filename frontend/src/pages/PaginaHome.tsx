@@ -1,6 +1,5 @@
 import "./PaginaHome.css";
 import { SidebarFixed } from "../components/SidebarFixed/SidebarFixed";
-import { Carousel } from "../components/Carousel/Carousel";
 import { SecaoAcessoRapido } from "../components/SecaoAcessoRapido/SecaoAcessoRapido";
 import { SecaoAniversariantes } from "../components/SecaoAniversariantes/SecaoAniversariantes";
 import { SecaoEventos } from "../components/SecaoEventos/SecaoEventos";
@@ -117,9 +116,6 @@ export function PaginaHome() {
 
             {/* CONTEÚDO PRINCIPAL */}
             <main className="paginaHome__main">
-                {/* CARROSSEL NO TOPO */}
-                <Carousel />
-
                 {/* SEÇÕES */}
                 <SecaoAcessoRapido />
                 <SecaoMaisUtilizados role={role} />

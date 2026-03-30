@@ -67,7 +67,7 @@
 
 /* LOGO */
 .sidebarFixed__logo {
-    padding: 20px 16px;
+    padding: 8px 12px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -75,8 +75,9 @@
 }
 
 .sidebarFixed__logoImg {
-    height: 50px;
+    height: 200px;
     width: auto;
+    max-width: 92%;
 }
 
 /* NAV */

@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 import { useState, useMemo } from "react";
 import { setores } from "../../utils/setores";
-import logo from "../../assets/logo.png";
+import logo from "../../assets/logo_intranet (1).png";
 
 type Role = "COLAB" | "ADMIN" | null | undefined;
 

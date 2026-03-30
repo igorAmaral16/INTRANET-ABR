@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import { useState, useMemo } from "react";
 import { setores } from "../../utils/setores";
-import logo from "../../assets/logo.png";
+import logo from "../../assets/logo_intranet.png";
 
 type Props = {
     estaLogado: boolean;

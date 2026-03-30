@@ -34,13 +34,13 @@ const imageRecommendations: Record<string, ImageRecommendation> = {
     CAROUSEL: {
         context: "Carrossel",
         recommendedWidth: 1200,
-        recommendedHeight: 600,
-        recommendedAspectRatio: "2:1 (16:9 é aceitável)",
+        recommendedHeight: 675,
+        recommendedAspectRatio: "16:9",
         minWidth: 800,
-        minHeight: 400,
+        minHeight: 450,
         maxWidth: 2400,
-        maxHeight: 1200,
-        message: "Para melhor exibição em telas de desktop e mobile, use 1200x600 (2:1)",
+        maxHeight: 1350,
+        message: "Recomendado: 1200x675 (16:9) para o novo carrossel mais fino e responsivo",
     },
     CAROUSEL_EVENT: {
         context: "Foto de Evento",

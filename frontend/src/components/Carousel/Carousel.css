@@ -4,7 +4,7 @@
     overflow: hidden;
     position: relative;
     aspect-ratio: 16 / 9;
-    max-height: 500px;
+    max-height: 260px;
     min-height: 0;
     margin-bottom: 16px;
     box-sizing: border-box;
@@ -15,20 +15,20 @@
 
 @media (max-width: 1024px) {
     .carousel {
-        max-height: 400px;
+        max-height: 210px;
     }
 }
 
 @media (max-width: 768px) {
     .carousel {
-        max-height: 300px;
+        max-height: 160px;
         margin-bottom: 12px;
     }
 }
 
 @media (max-width: 480px) {
     .carousel {
-        max-height: 200px;
+        max-height: 110px;
         margin-bottom: 8px;
     }
 }
