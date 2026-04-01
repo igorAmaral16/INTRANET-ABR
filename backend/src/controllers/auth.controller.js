@@ -80,7 +80,7 @@ export async function perfilColaborador(req, res) {
     const [rows] = await pool.query(
         `SELECT id, matricula, nome_completo,
             DATE_FORMAT(data_nascimento, '%d/%m/%Y') AS data_nascimento,
-            status
+            setor, status
      FROM Colaboradores
      WHERE id = :id
      LIMIT 1`,
@@ -101,6 +101,7 @@ export async function perfilColaborador(req, res) {
             matricula: normalizeMatricula(colab.matricula),
             nome_completo: colab.nome_completo,
             data_nascimento: colab.data_nascimento,
+            setor: colab.setor,
             status: colab.status
         }
     });
@@ -143,6 +144,7 @@ export async function loginColaborador(req, res) {
             nomeCompleto: colab.nome_completo,
             dataNascimento: colab.data_nascimento, // dd/mm/aaaa
             dataNascimentoIso: colab.data_nascimento_iso, // yyyy-mm-dd
+            setor: colab.setor,
             status: colab.status,
             lastLoginAt: colab.last_login_at || null,
             createdByAdminId: colab.created_by_admin_id ?? null,

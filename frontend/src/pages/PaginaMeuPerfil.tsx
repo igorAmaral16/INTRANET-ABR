@@ -127,6 +127,11 @@ export function PaginaMeuPerfil() {
                             <div className="perfil__rotulo"><CalendarDays size={16} /> Data de nascimento</div>
                             <div className="perfil__valor">{formatarDataBR(perfil.data_nascimento)}</div>
                         </div>
+
+                        <div className="perfil__campo">
+                            <div className="perfil__rotulo">Setor</div>
+                            <div className="perfil__valor">{perfil.setor || "-"}</div>
+                        </div>
                     </section>
                 ) : null}
             </main>

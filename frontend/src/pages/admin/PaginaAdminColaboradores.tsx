@@ -77,6 +77,7 @@ export function PaginaAdminColaboradores() {
     const [novoMatricula, setNovoMatricula] = useState("");
     const [novoNome, setNovoNome] = useState("");
     const [novoNascimento, setNovoNascimento] = useState(""); // dd/mm/aaaa
+    const [novoSetor, setNovoSetor] = useState("");
     const [novoStatus, setNovoStatus] = useState<"ATIVO" | "INATIVO">("ATIVO");
     const [criando, setCriando] = useState(false);
 
@@ -85,6 +86,7 @@ export function PaginaAdminColaboradores() {
     const [detalhe, setDetalhe] = useState<ColaboradorAdmin | null>(null);
     const [editNome, setEditNome] = useState("");
     const [editNascimento, setEditNascimento] = useState("");
+    const [editSetor, setEditSetor] = useState("");
     const [editStatus, setEditStatus] = useState<"ATIVO" | "INATIVO">("ATIVO");
     const [salvando, setSalvando] = useState(false);
 
@@ -161,6 +163,7 @@ export function PaginaAdminColaboradores() {
             setDetalhe(data);
             setEditNome(data.nome_completo);
             setEditNascimento(formatarDataBR(data.data_nascimento));
+            setEditSetor(data.setor || "");
             setEditStatus(data.status);
         } catch (e: any) {
             const msg = e instanceof ErroHttp ? e.message : e?.message;
@@ -176,9 +179,10 @@ export function PaginaAdminColaboradores() {
         return (
             editNome.trim() !== (detalhe.nome_completo || "").trim() ||
             editNascimento.trim() !== formatarDataBR(detalhe.data_nascimento || "").trim() ||
+            editSetor.trim() !== (detalhe.setor || "").trim() ||
             editStatus !== detalhe.status
         );
-    }, [detalhe, editNome, editNascimento, editStatus]);
+    }, [detalhe, editNome, editNascimento, editSetor, editStatus]);
 
     async function salvarAlteracoes() {
         if (!sessao?.token || !detalhe) return;
@@ -194,6 +198,7 @@ export function PaginaAdminColaboradores() {
                 body: {
                     nome_completo: editNome.trim(),
                     data_nascimento: editNascimento.trim(), // dd/mm/aaaa
+                    setor: editSetor.trim() || null,
                     status: editStatus,
                 },
             });
@@ -245,6 +250,7 @@ export function PaginaAdminColaboradores() {
             matricula: novoMatricula.trim(),
             nome_completo: novoNome.trim(),
             data_nascimento: novoNascimento.trim(),
+            setor: novoSetor.trim() || undefined,
             status: novoStatus,
         };
 
@@ -259,6 +265,7 @@ export function PaginaAdminColaboradores() {
             setNovoMatricula("");
             setNovoNome("");
             setNovoNascimento("");
+            setNovoSetor("");
             setNovoStatus("ATIVO");
             await carregarLista();
         } catch (e: any) {
@@ -517,6 +524,11 @@ export function PaginaAdminColaboradores() {
                     </label>
 
                     <label className="admColabs__modalCampo">
+                        <span>Setor</span>
+                        <input value={novoSetor} onChange={(e) => setNovoSetor(e.target.value)} placeholder="ex: Recursos Humanos" />
+                    </label>
+
+                    <label className="admColabs__modalCampo">
                         <span>Status</span>
                         <select value={novoStatus} onChange={(e) => setNovoStatus(e.target.value as any)}>
                             <option value="ATIVO">ATIVO</option>
@@ -582,6 +594,11 @@ export function PaginaAdminColaboradores() {
                                 <label className="admColabs__modalCampo">
                                     <span>Data de nascimento (dd/mm/aaaa)</span>
                                     <input value={editNascimento} onChange={(e) => setEditNascimento(e.target.value)} placeholder="dd/mm/aaaa" />
+                                </label>
+
+                                <label className="admColabs__modalCampo">
+                                    <span>Setor</span>
+                                    <input value={editSetor} onChange={(e) => setEditSetor(e.target.value)} placeholder="ex: Recursos Humanos" />
                                 </label>
 
                                 <label className="admColabs__modalCampo">

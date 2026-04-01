@@ -4,14 +4,22 @@ import fs from "fs";
 import path from "path";
 import { buildApp } from "./app.js";
 import { env } from "./config/env.js";
-import { logger } from "./utils/logger.js";
+import { logger, logStartup, logError, logWarning } from "./utils/logger.js";
 import { pool, testConnection } from "./config/db.js";
 import { initSocket } from "./realtime/socket.js";
 
 async function start() {
     const app = buildApp();
 
-    await testConnection();
+    // Verifica conexao com banco de dados
+    logStartup("Testando conexao com banco de dados...");
+    try {
+        await testConnection();
+        logStartup("Conexao com banco de dados estabelecida com sucesso");
+    } catch (err) {
+        logError("Falha ao conectar ao banco de dados", err, { critical: true });
+        throw err;
+    }
 
     const server = http.createServer(app);
 
@@ -29,46 +37,127 @@ async function start() {
             const key = fs.readFileSync(keyPath);
             const cert = fs.readFileSync(certPath);
             httpsServer = https.createServer({ key, cert }, app);
+            logStartup("Certificados HTTPS carregados com sucesso", {
+                keyPath,
+                certPath
+            });
         } catch (err) {
-            logger.error({ err, key: env.SSL_KEY_PATH, cert: env.SSL_CERT_PATH }, "Falha ao carregar certificados HTTPS");
-            throw err;
+            logError("Falha ao carregar certificados HTTPS", err, {
+                keyPath: env.SSL_KEY_PATH,
+                certPath: env.SSL_CERT_PATH,
+                critical: false
+            });
+            logWarning("Continuando sem HTTPS");
         }
     }
 
     // registra sockets em todos os servidores disponíveis
+    logStartup("Inicializando websockets...");
     initSocket(server);
     if (httpsServer) initSocket(httpsServer);
+    logStartup("Websockets inicializados");
 
     const HOST = env.HOST || "0.0.0.0";
     const PORT = Number(env.PORT) || 5053;
     // evita conflito: se não informado, usa porta seguinte
     const HTTPS_PORT = env.HTTPS_PORT != null ? Number(env.HTTPS_PORT) : PORT + 1;
 
-    // log de configuração de SSL
-    if (env.SSL_KEY_PATH && env.SSL_CERT_PATH) {
-        logger.info({ key: env.SSL_KEY_PATH, cert: env.SSL_CERT_PATH, httpsPort: HTTPS_PORT }, "HTTPS configuration detected");
-    } else {
-        logger.info("HTTPS not enabled (set SSL_KEY_PATH and SSL_CERT_PATH to enable)");
-    }
-
+    // Inicia servidor HTTP
     server.listen(PORT, HOST, () => {
-        logger.info({ host: HOST, port: PORT, nodeEnv: env.NODE_ENV }, "API listening (HTTP)");
-    });
-    server.on("error", (err) => {
-        logger.error({ err }, "HTTP server error");
+        const timestamp = new Date().toLocaleTimeString("pt-BR", { 
+            hour12: false,
+            hour: "2-digit", 
+            minute: "2-digit", 
+            second: "2-digit" 
+        });
+        const url = `http://${HOST === "0.0.0.0" ? "localhost" : HOST}:${PORT}`;
+        console.log(`
+╔════════════════════════════════════════════════════════════════╗
+║                     SERVIDOR INICIADO                          ║
+╠════════════════════════════════════════════════════════════════╣
+║ Protocolo: HTTP                                                ║
+║ Host: ${HOST.padEnd(50)}║
+║ Porta: ${String(PORT).padEnd(55)}║
+║ URL: ${url.padEnd(56)}║
+║ Ambiente: ${env.NODE_ENV.padEnd(49)}║
+║ Timestamp: ${timestamp.padEnd(53)}║
+╚════════════════════════════════════════════════════════════════╝
+        `);
+        logger.info({ 
+            protocol: "HTTP",
+            host: HOST, 
+            port: PORT, 
+            nodeEnv: env.NODE_ENV,
+            url
+        }, `API HTTP listening on ${url}`);
     });
 
+    server.on("error", (err) => {
+        logError("Erro no servidor HTTP", err, {
+            port: PORT,
+            host: HOST,
+            severity: "CRITICAL"
+        });
+    });
+
+    // Inicia servidor HTTPS se configurado
     if (httpsServer) {
         httpsServer.listen(HTTPS_PORT, HOST, () => {
-            logger.info({ host: HOST, port: HTTPS_PORT, nodeEnv: env.NODE_ENV }, "API listening (HTTPS)");
+            const timestamp = new Date().toLocaleTimeString("pt-BR", { 
+                hour12: false,
+                hour: "2-digit", 
+                minute: "2-digit", 
+                second: "2-digit" 
+            });
+            const url = `https://${HOST === "0.0.0.0" ? "localhost" : HOST}:${HTTPS_PORT}`;
+            console.log(`
+╔════════════════════════════════════════════════════════════════╗
+║                 SERVIDOR HTTPS INICIADO                        ║
+╠════════════════════════════════════════════════════════════════╣
+║ Protocolo: HTTPS                                               ║
+║ Host: ${HOST.padEnd(50)}║
+║ Porta: ${String(HTTPS_PORT).padEnd(55)}║
+║ URL: ${url.padEnd(56)}║
+║ Ambiente: ${env.NODE_ENV.padEnd(49)}║
+║ Timestamp: ${timestamp.padEnd(53)}║
+╚════════════════════════════════════════════════════════════════╝
+        `);
+            logger.info({ 
+                protocol: "HTTPS",
+                host: HOST, 
+                port: HTTPS_PORT, 
+                nodeEnv: env.NODE_ENV,
+                url
+            }, `API HTTPS listening on ${url}`);
         });
+
         httpsServer.on("error", (err) => {
-            logger.error({ err }, "HTTPS server error");
+            logError("Erro no servidor HTTPS", err, {
+                port: HTTPS_PORT,
+                host: HOST,
+                severity: "CRITICAL"
+            });
         });
     }
 
     async function shutdown(signal) {
-        logger.warn({ signal }, "Shutting down");
+        const timestamp = new Date().toLocaleTimeString("pt-BR", { 
+            hour12: false,
+            hour: "2-digit", 
+            minute: "2-digit", 
+            second: "2-digit" 
+        });
+        console.log(`
+╔════════════════════════════════════════════════════════════════╗
+║                    ENCERRANDO SERVIDOR                         ║
+╠════════════════════════════════════════════════════════════════╣
+║ Sinal: ${signal.padEnd(58)}║
+║ Timestamp: ${timestamp.padEnd(53)}║
+║ Status: Finalizando conexoes...                                ║
+╚════════════════════════════════════════════════════════════════╝
+        `);
+        logger.warn({ signal, timestamp }, `Servidor encerrando gracosamente (sinal: ${signal})`);
+
         const closePromises = [];
         closePromises.push(new Promise((r) => server.close(r)));
         if (httpsServer) closePromises.push(new Promise((r) => httpsServer.close(r)));
@@ -76,39 +165,87 @@ async function start() {
         Promise.all(closePromises)
             .then(async () => {
                 try {
+                    logStartup("Fechando pool de conexoes do banco de dados...");
                     await pool.end();
-                    logger.info("DB pool closed");
+                    logStartup("Pool de conexoes fechado com sucesso");
+                    console.log(`
+╔════════════════════════════════════════════════════════════════╗
+║              SERVIDOR ENCERRADO COM SUCESSO                    ║
+╠════════════════════════════════════════════════════════════════╣
+║ Timestamp: ${new Date().toLocaleTimeString("pt-BR", { 
+                        hour12: false,
+                        hour: "2-digit", 
+                        minute: "2-digit", 
+                        second: "2-digit" 
+                    }).padEnd(51)}║
+║ Status: Todos os servicos finalizados                          ║
+╚════════════════════════════════════════════════════════════════╝
+                    `);
                 } catch (err) {
-                    logger.error({ err }, "Error closing DB pool");
+                    logError("Erro ao fechar pool de conexoes", err);
                 } finally {
                     process.exit(0);
                 }
             })
             .catch((err) => {
-                logger.error({ err }, "Error during server shutdown");
+                logError("Erro durante encerramento do servidor", err, {
+                    severity: "CRITICAL"
+                });
                 process.exit(1);
             });
 
         setTimeout(() => {
-            logger.fatal("Forced shutdown");
+            console.error(`
+╔════════════════════════════════════════════════════════════════╗
+║          ENCERRAMENTO FORCADO APOS TIMEOUT                     ║
+╠════════════════════════════════════════════════════════════════╣
+║ Timeout: 10 segundos                                           ║
+║ Timestamp: ${new Date().toLocaleTimeString("pt-BR", { 
+                hour12: false,
+                hour: "2-digit", 
+                minute: "2-digit", 
+                second: "2-digit" 
+            }).padEnd(48)}║
+╚════════════════════════════════════════════════════════════════╝
+            `);
+            logger.fatal("Encerramento forcado apos timeout de 10 segundos");
             process.exit(1);
         }, 10_000).unref();
     }
 
-    process.on("SIGINT", shutdown);
-    process.on("SIGTERM", shutdown);
+    process.on("SIGINT", () => shutdown("SIGINT"));
+    process.on("SIGTERM", () => shutdown("SIGTERM"));
 
     process.on("unhandledRejection", (reason) => {
-        logger.error({ reason }, "Unhandled Rejection");
+        logError("Rejeicao nao tratada (Promise rejection)", reason, {
+            type: "unhandledRejection",
+            severity: "HIGH"
+        });
     });
 
     process.on("uncaughtException", (err) => {
-        logger.fatal({ err }, "Uncaught Exception");
+        logError("Excecao nao capturada", err, {
+            type: "uncaughtException",
+            severity: "CRITICAL"
+        });
         process.exit(1);
     });
 }
 
 start().catch((err) => {
-    logger.fatal({ err }, "Startup failed");
+    console.error(`
+╔════════════════════════════════════════════════════════════════╗
+║                   FALHA NA INICIALIZACAO                       ║
+╠════════════════════════════════════════════════════════════════╣
+║ Erro: ${err.message.padEnd(49)}║
+║ Timestamp: ${new Date().toLocaleTimeString("pt-BR", { 
+        hour12: false,
+        hour: "2-digit", 
+        minute: "2-digit", 
+        second: "2-digit" 
+    }).padEnd(48)}║
+╚════════════════════════════════════════════════════════════════╝
+    `);
+    logger.fatal({ err }, "Inicializacao do servidor falhou");
     process.exit(1);
 });

@@ -5,6 +5,7 @@ export type PerfilColaborador = {
     matricula: string;
     nome_completo: string;
     data_nascimento: string; // ISO ou YYYY-MM-DD
+    setor: string | null;
     status: "ATIVO" | "INATIVO" | string;
 };
 
@@ -16,6 +17,7 @@ function normalizarPerfil(data: any): PerfilColaborador {
         matricula: String(src?.matricula || ""),
         nome_completo: String(src?.nome_completo || src?.nome || ""),
         data_nascimento: String(src?.data_nascimento || src?.nascimento || ""),
+        setor: src?.setor || null,
         status: String(src?.status || "")
     };
 }
@@ -57,6 +59,7 @@ export type ColaboradorAdmin = {
     matricula: string;
     nome_completo: string;
     data_nascimento: string; // backend espera dd/mm/aaaa no create/update; no retorno pode vir yyyy-mm-dd
+    setor: string | null;
     status: "ATIVO" | "INATIVO";
 };
 
@@ -95,7 +98,7 @@ export async function obterColaboradorAdmin(
 }
 
 export async function criarColaboradorAdmin(
-    params: { token: string; body: { matricula: string; nome_completo: string; data_nascimento: string; status?: "ATIVO" | "INATIVO" } },
+    params: { token: string; body: { matricula: string; nome_completo: string; data_nascimento: string; setor?: string | null; status?: "ATIVO" | "INATIVO" } },
     signal?: AbortSignal
 ) {
     return httpPost<ColaboradorAdmin>(`/admin/colaboradores`, params.body, {
@@ -105,7 +108,7 @@ export async function criarColaboradorAdmin(
 }
 
 export async function atualizarColaboradorAdmin(
-    params: { token: string; matricula: string; body: { nome_completo: string; data_nascimento: string; status: "ATIVO" | "INATIVO" } },
+    params: { token: string; matricula: string; body: { nome_completo: string; data_nascimento: string; setor?: string | null; status: "ATIVO" | "INATIVO" } },
     signal?: AbortSignal
 ) {
     return httpPut<ColaboradorAdmin>(`/admin/colaboradores/${encodeURIComponent(params.matricula)}`, params.body, {

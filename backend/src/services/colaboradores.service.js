@@ -30,7 +30,7 @@ export async function listColaboradores({ status, search, page, pageSize }) {
 
     const [rows] = await pool.query(
         `SELECT matricula, nome_completo, DATE_FORMAT(data_nascimento, '%d/%m/%Y') AS data_nascimento,
-            status, created_at, updated_at
+            setor, status, created_at, updated_at
      FROM Colaboradores
      ${whereSql}
      ORDER BY nome_completo ASC
@@ -66,7 +66,7 @@ export async function getColaboradorByMatricula(matriculaRaw) {
     const [rows] = await pool.query(
         `SELECT id, matricula, nome_completo,
             DATE_FORMAT(data_nascimento, '%d/%m/%Y') AS data_nascimento,
-            status, created_at, updated_at
+            setor, status, created_at, updated_at
      FROM Colaboradores
      WHERE UPPER(TRIM(matricula)) = :matricula
      LIMIT 1`,
@@ -79,6 +79,7 @@ export async function createColaborador({
     matricula,
     nome_completo,
     data_nascimento_ymd,
+    setor,
     status,
     adminId
 }) {
@@ -89,14 +90,15 @@ export async function createColaborador({
 
     await pool.query(
         `INSERT INTO Colaboradores
-      (matricula, nome_completo, data_nascimento, status, password_hash, must_change_password,
+      (matricula, nome_completo, data_nascimento, setor, status, password_hash, must_change_password,
        created_by_admin_id, updated_by_admin_id)
      VALUES
-      (:matricula, :nome_completo, :data_nascimento, :status, :password_hash, 1, :adminId, :adminId)`,
+      (:matricula, :nome_completo, :data_nascimento, :setor, :status, :password_hash, 1, :adminId, :adminId)`,
         {
             matricula: matriculaNorm,
             nome_completo,
             data_nascimento: data_nascimento_ymd,
+            setor,
             status,
             password_hash,
             adminId
@@ -110,6 +112,7 @@ export async function updateColaboradorByMatricula({
     matricula,
     nome_completo,
     data_nascimento_ymd,
+    setor,
     status,
     adminId
 }) {
@@ -119,6 +122,7 @@ export async function updateColaboradorByMatricula({
         `UPDATE Colaboradores
      SET nome_completo = :nome_completo,
          data_nascimento = :data_nascimento,
+         setor = :setor,
          status = :status,
          updated_by_admin_id = :adminId
      WHERE UPPER(TRIM(matricula)) = :matricula`,
@@ -126,6 +130,7 @@ export async function updateColaboradorByMatricula({
             matricula: matriculaNorm,
             nome_completo,
             data_nascimento: data_nascimento_ymd,
+            setor,
             status,
             adminId
         }

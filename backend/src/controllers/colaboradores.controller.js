@@ -22,12 +22,14 @@ const CreateSchema = z.object({
     matricula: MatriculaSchema,
     nome_completo: z.string().min(3).max(150),
     data_nascimento: z.string().min(10).max(10), // dd/mm/aaaa
+    setor: z.string().max(100).optional().nullable(),
     status: StatusEnum.optional().default("ATIVO")
 });
 
 const UpdateSchema = z.object({
     nome_completo: z.string().min(3).max(150),
     data_nascimento: z.string().min(10).max(10),
+    setor: z.string().max(100).optional().nullable(),
     status: StatusEnum
 });
 
@@ -74,6 +76,7 @@ export async function criar(req, res) {
             matricula: body.matricula,
             nome_completo: body.nome_completo.trim(),
             data_nascimento_ymd: ymd,
+            setor: body.setor || null,
             status: body.status,
             adminId: Number(req.user.id)
         });
@@ -105,6 +108,7 @@ export async function atualizar(req, res) {
         matricula,
         nome_completo: body.nome_completo.trim(),
         data_nascimento_ymd: ymd,
+        setor: body.setor || null,
         status: body.status,
         adminId: Number(req.user.id)
     });

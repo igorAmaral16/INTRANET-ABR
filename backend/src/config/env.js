@@ -33,4 +33,16 @@ export const corsOrigins = env.CORS_ORIGINS
     ? env.CORS_ORIGINS.split(",").map((s) => s.trim()).filter(Boolean)
     : [];
 
-console.log(env);  // Para debug
+// Log de configurações de ambiente carregadas
+if (!isProd) {
+    console.log("[ENVIRONMENT LOADED]", {
+        NODE_ENV: env.NODE_ENV,
+        PORT: env.PORT,
+        LOG_LEVEL: env.LOG_LEVEL,
+        DB_HOST: env.DB_HOST,
+        DB_PORT: env.DB_PORT,
+        DB_NAME: env.DB_NAME,
+        CORS_ORIGINS_COUNT: corsOrigins.length,
+        HTTPS_ENABLED: Boolean(env.SSL_KEY_PATH && env.SSL_CERT_PATH)
+    });
+}

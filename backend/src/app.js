@@ -10,6 +10,7 @@ import { fileURLToPath } from "url";
 
 import { logger } from "./utils/logger.js";
 import { corsOrigins } from "./config/env.js";
+import { httpLogger } from "./middlewares/httpLogger.js";
 import { router } from "./routes/index.js";
 import { notFound } from "./middlewares/notFound.js";
 import { errorHandler } from "./middlewares/errorHandler.js";
@@ -32,6 +33,9 @@ export function buildApp() {
             },
         })
     );
+
+    // Middleware de logging HTTP detalhado
+    app.use(httpLogger);
 
     app.use((req, res, next) => {
         res.setHeader("X-Request-Id", req.id);
