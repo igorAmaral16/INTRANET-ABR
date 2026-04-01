@@ -10,16 +10,16 @@ export function httpLogger(req, res, next) {
     const path = req.originalUrl || req.url;
     const ip = req.ip || req.connection.remoteAddress || "unknown";
     const userAgent = req.get("user-agent") || "unknown";
-    
+
     // Log de origem para acesso
     const user = req.user?.username || req.user?.id || "anonymous";
-    const timestamp = new Date().toLocaleTimeString("pt-BR", { 
+    const timestamp = new Date().toLocaleTimeString("pt-BR", {
         hour12: false,
-        hour: "2-digit", 
-        minute: "2-digit", 
-        second: "2-digit" 
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit"
     });
-    
+
     // Dados da requisição
     const reqLog = {
         timestamp,
@@ -34,44 +34,44 @@ export function httpLogger(req, res, next) {
             contentLength: req.get("content-length") || 0
         }
     };
-    
+
     // Log inicial da requisição
     logger.debug(reqLog, `[INCOMING] ${method} ${path} from ${ip} (user: ${user})`);
-    
+
     // Captura a função original de envio de resposta
     const originalJson = res.json;
     const originalSend = res.send;
-    
+
     let responseBody = null;
-    
+
     // Intercepta res.json
-    res.json = function(body) {
+    res.json = function (body) {
         responseBody = body;
         return originalJson.call(this, body);
     };
-    
+
     // Intercepta res.send
-    res.send = function(body) {
+    res.send = function (body) {
         responseBody = body;
         return originalSend.call(this, body);
     };
-    
+
     // Hook para quando a resposta for enviada
     res.on("finish", () => {
         const duration = Date.now() - startTime;
         const statusCode = res.statusCode;
         const statusMessage = getStatusMessage(statusCode);
-        
+
         // Determine o nível de log baseado no status code
         const logLevel = statusCode < 400 ? "info" : statusCode < 500 ? "warn" : "error";
         const logMethod = logger[logLevel] ? logger[logLevel].bind(logger) : logger.info.bind(logger);
-        
+
         const resLog = {
-            timestamp: new Date().toLocaleTimeString("pt-BR", { 
+            timestamp: new Date().toLocaleTimeString("pt-BR", {
                 hour12: false,
-                hour: "2-digit", 
-                minute: "2-digit", 
-                second: "2-digit" 
+                hour: "2-digit",
+                minute: "2-digit",
+                second: "2-digit"
             }),
             requestId: req.id,
             method,
@@ -83,15 +83,15 @@ export function httpLogger(req, res, next) {
             user,
             error: responseBody?.error ? true : false
         };
-        
+
         const durationColor = getDurationColor(duration);
         const statusColor = getStatusColor(statusCode);
-        
-        logMethod(resLog, 
+
+        logMethod(resLog,
             `[RESPONSE] ${method} ${path} -> ${statusColor}${statusCode}${statusMessage}${getResetColor()} in ${durationColor}${duration}ms${getResetColor()} (${user})`
         );
     });
-    
+
     next();
 }
 

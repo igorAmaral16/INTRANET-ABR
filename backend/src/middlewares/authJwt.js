@@ -3,11 +3,11 @@ import { env } from "../config/env.js";
 import { logger } from "../utils/logger.js";
 
 export function authJwt(req, res, next) {
-    const timestamp = new Date().toLocaleTimeString("pt-BR", { 
+    const timestamp = new Date().toLocaleTimeString("pt-BR", {
         hour12: false,
-        hour: "2-digit", 
-        minute: "2-digit", 
-        second: "2-digit" 
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit"
     });
 
     const header = req.headers.authorization || "";
@@ -24,7 +24,7 @@ export function authJwt(req, res, next) {
         }, `[${timestamp}] AUTH FAILED: Missing or invalid JWT token for ${req.method} ${req.path}`);
 
         return res.status(401).json({
-            error: { 
+            error: {
                 message: "Nao autenticado. Token JWT ausente ou invalido.",
                 requestId: req.id,
                 code: "MISSING_TOKEN"
@@ -60,11 +60,11 @@ export function authJwt(req, res, next) {
 
         return next();
     } catch (err) {
-        const errorReason = err.name === "TokenExpiredError" 
-            ? "Token expirado" 
+        const errorReason = err.name === "TokenExpiredError"
+            ? "Token expirado"
             : err.name === "JsonWebTokenError"
-            ? "Token invalido"
-            : err.message;
+                ? "Token invalido"
+                : err.message;
 
         logger.warn({
             timestamp,
@@ -77,7 +77,7 @@ export function authJwt(req, res, next) {
         }, `[${timestamp}] AUTH FAILED: Invalid JWT for ${req.method} ${req.path} - ${errorReason}`);
 
         return res.status(401).json({
-            error: { 
+            error: {
                 message: `Token invalido ou expirado. ${errorReason}`,
                 requestId: req.id,
                 code: err.name

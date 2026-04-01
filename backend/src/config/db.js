@@ -18,11 +18,11 @@ export const pool = mysql.createPool({
 });
 
 export async function testConnection() {
-    const timestamp = new Date().toLocaleTimeString("pt-BR", { 
+    const timestamp = new Date().toLocaleTimeString("pt-BR", {
         hour12: false,
-        hour: "2-digit", 
-        minute: "2-digit", 
-        second: "2-digit" 
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit"
     });
 
     logStartup("Testando conexao com banco de dados MySQL", {
@@ -41,9 +41,9 @@ export async function testConnection() {
                 database: env.DB_NAME,
                 connectionLimit: 10
             });
-            logger.info({ 
-                dbHost: env.DB_HOST, 
-                dbName: env.DB_NAME, 
+            logger.info({
+                dbHost: env.DB_HOST,
+                dbName: env.DB_NAME,
                 dbPort: env.DB_PORT,
                 timestamp
             }, `[${timestamp}] DATABASE: Conexao com ${env.DB_NAME}@${env.DB_HOST}:${env.DB_PORT} estabelecida`);

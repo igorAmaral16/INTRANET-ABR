@@ -64,11 +64,11 @@ async function start() {
 
     // Inicia servidor HTTP
     server.listen(PORT, HOST, () => {
-        const timestamp = new Date().toLocaleTimeString("pt-BR", { 
+        const timestamp = new Date().toLocaleTimeString("pt-BR", {
             hour12: false,
-            hour: "2-digit", 
-            minute: "2-digit", 
-            second: "2-digit" 
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit"
         });
         const url = `http://${HOST === "0.0.0.0" ? "localhost" : HOST}:${PORT}`;
         console.log(`
@@ -83,10 +83,10 @@ async function start() {
 ║ Timestamp: ${timestamp.padEnd(53)}║
 ╚════════════════════════════════════════════════════════════════╝
         `);
-        logger.info({ 
+        logger.info({
             protocol: "HTTP",
-            host: HOST, 
-            port: PORT, 
+            host: HOST,
+            port: PORT,
             nodeEnv: env.NODE_ENV,
             url
         }, `API HTTP listening on ${url}`);
@@ -103,11 +103,11 @@ async function start() {
     // Inicia servidor HTTPS se configurado
     if (httpsServer) {
         httpsServer.listen(HTTPS_PORT, HOST, () => {
-            const timestamp = new Date().toLocaleTimeString("pt-BR", { 
+            const timestamp = new Date().toLocaleTimeString("pt-BR", {
                 hour12: false,
-                hour: "2-digit", 
-                minute: "2-digit", 
-                second: "2-digit" 
+                hour: "2-digit",
+                minute: "2-digit",
+                second: "2-digit"
             });
             const url = `https://${HOST === "0.0.0.0" ? "localhost" : HOST}:${HTTPS_PORT}`;
             console.log(`
@@ -122,10 +122,10 @@ async function start() {
 ║ Timestamp: ${timestamp.padEnd(53)}║
 ╚════════════════════════════════════════════════════════════════╝
         `);
-            logger.info({ 
+            logger.info({
                 protocol: "HTTPS",
-                host: HOST, 
-                port: HTTPS_PORT, 
+                host: HOST,
+                port: HTTPS_PORT,
                 nodeEnv: env.NODE_ENV,
                 url
             }, `API HTTPS listening on ${url}`);
@@ -141,11 +141,11 @@ async function start() {
     }
 
     async function shutdown(signal) {
-        const timestamp = new Date().toLocaleTimeString("pt-BR", { 
+        const timestamp = new Date().toLocaleTimeString("pt-BR", {
             hour12: false,
-            hour: "2-digit", 
-            minute: "2-digit", 
-            second: "2-digit" 
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit"
         });
         console.log(`
 ╔════════════════════════════════════════════════════════════════╗
@@ -172,11 +172,11 @@ async function start() {
 ╔════════════════════════════════════════════════════════════════╗
 ║              SERVIDOR ENCERRADO COM SUCESSO                    ║
 ╠════════════════════════════════════════════════════════════════╣
-║ Timestamp: ${new Date().toLocaleTimeString("pt-BR", { 
+║ Timestamp: ${new Date().toLocaleTimeString("pt-BR", {
                         hour12: false,
-                        hour: "2-digit", 
-                        minute: "2-digit", 
-                        second: "2-digit" 
+                        hour: "2-digit",
+                        minute: "2-digit",
+                        second: "2-digit"
                     }).padEnd(51)}║
 ║ Status: Todos os servicos finalizados                          ║
 ╚════════════════════════════════════════════════════════════════╝
@@ -200,11 +200,11 @@ async function start() {
 ║          ENCERRAMENTO FORCADO APOS TIMEOUT                     ║
 ╠════════════════════════════════════════════════════════════════╣
 ║ Timeout: 10 segundos                                           ║
-║ Timestamp: ${new Date().toLocaleTimeString("pt-BR", { 
+║ Timestamp: ${new Date().toLocaleTimeString("pt-BR", {
                 hour12: false,
-                hour: "2-digit", 
-                minute: "2-digit", 
-                second: "2-digit" 
+                hour: "2-digit",
+                minute: "2-digit",
+                second: "2-digit"
             }).padEnd(48)}║
 ╚════════════════════════════════════════════════════════════════╝
             `);
@@ -238,11 +238,11 @@ start().catch((err) => {
 ║                   FALHA NA INICIALIZACAO                       ║
 ╠════════════════════════════════════════════════════════════════╣
 ║ Erro: ${err.message.padEnd(49)}║
-║ Timestamp: ${new Date().toLocaleTimeString("pt-BR", { 
+║ Timestamp: ${new Date().toLocaleTimeString("pt-BR", {
         hour12: false,
-        hour: "2-digit", 
-        minute: "2-digit", 
-        second: "2-digit" 
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit"
     }).padEnd(48)}║
 ╚════════════════════════════════════════════════════════════════╝
     `);

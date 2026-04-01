@@ -1,11 +1,11 @@
 import { logger } from "../utils/logger.js";
 
 export function notFound(req, res) {
-    const timestamp = new Date().toLocaleTimeString("pt-BR", { 
+    const timestamp = new Date().toLocaleTimeString("pt-BR", {
         hour12: false,
-        hour: "2-digit", 
-        minute: "2-digit", 
-        second: "2-digit" 
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit"
     });
 
     const user = req.user?.username || req.user?.id || "anonymous";

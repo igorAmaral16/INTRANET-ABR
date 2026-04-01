@@ -3,11 +3,11 @@ import { ZodError } from "zod";
 import { logger } from "../utils/logger.js";
 
 export function errorHandler(err, req, res, next) {
-    const timestamp = new Date().toLocaleTimeString("pt-BR", { 
+    const timestamp = new Date().toLocaleTimeString("pt-BR", {
         hour12: false,
-        hour: "2-digit", 
-        minute: "2-digit", 
-        second: "2-digit" 
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit"
     });
 
     // Erros de validação Zod

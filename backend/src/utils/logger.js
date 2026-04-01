@@ -49,20 +49,20 @@ function resetColor(isProd) {
  * Helper para logar requisições HTTP com detalhes humanizados
  */
 export function logRequest(req, res = null, details = {}) {
-    const timestamp = new Date().toLocaleTimeString("pt-BR", { 
-        hour12: false, 
-        hour: "2-digit", 
-        minute: "2-digit", 
-        second: "2-digit" 
+    const timestamp = new Date().toLocaleTimeString("pt-BR", {
+        hour12: false,
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit"
     });
-    
+
     if (!res) {
         // Log de requisição recebida
         const method = req.method;
         const path = req.path || req.url;
         const userInfo = req.user ? ` [user: ${req.user.username || req.user.id}]` : "";
         const extraInfo = details.message ? ` - ${details.message}` : "";
-        
+
         logger.info({
             timestamp,
             requestId: req.id,
@@ -81,9 +81,9 @@ export function logRequest(req, res = null, details = {}) {
         const durationFormatted = typeof duration === "number" ? formatDuration(duration) : duration;
         const statusColor = getStatusColor(statusCode, isProd);
         const resetCol = resetColor(isProd);
-        
+
         const statusMsg = statusColor + statusCode + resetCol;
-        
+
         logger.info({
             timestamp,
             requestId: req.id,
@@ -101,11 +101,11 @@ export function logRequest(req, res = null, details = {}) {
  * Helper para logar sucessos de operação
  */
 export function logSuccess(message, data = {}) {
-    const timestamp = new Date().toLocaleTimeString("pt-BR", { 
+    const timestamp = new Date().toLocaleTimeString("pt-BR", {
         hour12: false,
-        hour: "2-digit", 
-        minute: "2-digit", 
-        second: "2-digit" 
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit"
     });
     logger.info({ timestamp, ...data }, `[${timestamp}] SUCCESS: ${message}`);
 }
@@ -114,19 +114,19 @@ export function logSuccess(message, data = {}) {
  * Helper para logar erros
  */
 export function logError(message, error, context = {}) {
-    const timestamp = new Date().toLocaleTimeString("pt-BR", { 
+    const timestamp = new Date().toLocaleTimeString("pt-BR", {
         hour12: false,
-        hour: "2-digit", 
-        minute: "2-digit", 
-        second: "2-digit" 
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit"
     });
     const errorMsg = error?.message || String(error);
     const stack = error?.stack;
-    logger.error({ 
-        timestamp, 
-        error: errorMsg, 
+    logger.error({
+        timestamp,
+        error: errorMsg,
         stack,
-        ...context 
+        ...context
     }, `[${timestamp}] ERROR: ${message} - ${errorMsg}`);
 }
 
@@ -134,11 +134,11 @@ export function logError(message, error, context = {}) {
  * Helper para logar avisos
  */
 export function logWarning(message, data = {}) {
-    const timestamp = new Date().toLocaleTimeString("pt-BR", { 
+    const timestamp = new Date().toLocaleTimeString("pt-BR", {
         hour12: false,
-        hour: "2-digit", 
-        minute: "2-digit", 
-        second: "2-digit" 
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit"
     });
     logger.warn({ timestamp, ...data }, `[${timestamp}] WARNING: ${message}`);
 }
@@ -147,11 +147,11 @@ export function logWarning(message, data = {}) {
  * Helper para logar informações importantes no startup
  */
 export function logStartup(message, data = {}) {
-    const timestamp = new Date().toLocaleTimeString("pt-BR", { 
+    const timestamp = new Date().toLocaleTimeString("pt-BR", {
         hour12: false,
-        hour: "2-digit", 
-        minute: "2-digit", 
-        second: "2-digit" 
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit"
     });
     logger.info({ timestamp, ...data }, `[${timestamp}] STARTUP: ${message}`);
 }
