@@ -68,11 +68,11 @@ export function useAniversariantes(token?: string) {
                         mes = parseInt(partes[1]);
                     }
 
-                    // Extrair primeiro e segundo nome
+                    // Extrair primeiro e último sobrenome
                     const nomes = colaborador.nome_completo.trim().split(/\s+/);
                     const nome =
                         nomes.length > 1
-                            ? `${nomes[0]} ${nomes[1]}`
+                            ? `${nomes[0]} ${nomes[nomes.length - 1]}`
                             : colaborador.nome_completo;
 
                     return {

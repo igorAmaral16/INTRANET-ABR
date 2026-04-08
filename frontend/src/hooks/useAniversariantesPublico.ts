@@ -45,6 +45,6 @@ export function useAniversariantesPublico() {
 function extrairPrimeiroDoNomes(nomeCompleto: string): string {
     const nomes = nomeCompleto.trim().split(/\s+/);
     return nomes.length > 1
-        ? `${nomes[0]} ${nomes[1]}`
+        ? `${nomes[0]} ${nomes[nomes.length - 1]}`
         : nomeCompleto;
 }

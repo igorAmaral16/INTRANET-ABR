@@ -8,12 +8,12 @@ import { randomUUID } from "crypto";
 import path from "path";
 import { fileURLToPath } from "url";
 
-import { logger } from "./utils/logger.js";
-import { corsOrigins } from "./config/env.js";
-import { httpLogger } from "./middlewares/httpLogger.js";
-import { router } from "./routes/index.js";
-import { notFound } from "./middlewares/notFound.js";
-import { errorHandler } from "./middlewares/errorHandler.js";
+import { logger } from "./src/utils/logger.js";
+import { corsOrigins } from "./src/config/env.js";
+import { httpLogger } from "./src/middlewares/httpLogger.js";
+import { router } from "./src/routes/index.js";
+import { notFound } from "./src/middlewares/notFound.js";
+import { errorHandler } from "./src/middlewares/errorHandler.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

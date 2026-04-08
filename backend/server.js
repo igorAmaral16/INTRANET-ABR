@@ -3,10 +3,10 @@ import https from "https";
 import fs from "fs";
 import path from "path";
 import { buildApp } from "./app.js";
-import { env } from "./config/env.js";
-import { logger, logStartup, logError, logWarning } from "./utils/logger.js";
-import { pool, testConnection } from "./config/db.js";
-import { initSocket } from "./realtime/socket.js";
+import { env } from "./src/config/env.js";
+import { logger, logStartup, logError, logWarning } from "./src/utils/logger.js";
+import { pool, testConnection } from "./src/config/db.js";
+import { initSocket } from "./src/realtime/socket.js";
 
 async function start() {
     const app = buildApp();
