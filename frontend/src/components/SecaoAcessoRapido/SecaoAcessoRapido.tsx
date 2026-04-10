@@ -37,7 +37,7 @@ const SISTEMAS_EXTERNOS: SistemaExterno[] = [
     {
         id: "varredor",
         nome: "Varredor Recursivo",
-        url: "https://10.0.0.48:5175",
+        url: "https://10.0.0.48:5174",
         icone: Logo_ABR,
         descricao: "Ajuste das NF de entrada",
     },
