@@ -1,8 +1,10 @@
 import "./SecaoAcessoRapido.css";
 import { ExternalLink as IconExternalLink } from "lucide-react";
+import type { CSSProperties } from "react";
 import Logo_NFE from "../../assets/nfe_power.png";
 import Logo_BI from "../../assets/QlickView_BI.png";
 import Logo_ABR from "../../assets/icon-trackload.png";
+import Logo_ML from "../../assets/logo_mercado-livre.png";
 
 type SistemaExterno = {
     id: string;
@@ -48,9 +50,17 @@ const SISTEMAS_EXTERNOS: SistemaExterno[] = [
         icone: Logo_ABR,
         descricao: "Catálogo Web de produtos ",
     },
+    {
+        id: "mercado-livre",
+        nome: "Mercado Livre",
+        url: "https://www.mercadolivre.com.br/pagina/abr",
+        icone: Logo_ML,
+        descricao: "Vendas online das nossas peças",
+    },
 ];
 
 export function SecaoAcessoRapido() {
+    const quantidadeColunas = Math.min(5, Math.ceil(SISTEMAS_EXTERNOS.length / 2));
     const handleClickSistema = (url: string) => {
         window.open(url, "_blank", "noopener,noreferrer");
     };
@@ -63,7 +73,10 @@ export function SecaoAcessoRapido() {
                     Acesse rapidamente os sistemas integrados da empresa
                 </p>
 
-                <div className="secaoAcessoRapido__grid">
+                <div
+                    className="secaoAcessoRapido__grid"
+                    style={{ "--quantidade-colunas": quantidadeColunas } as CSSProperties}
+                >
                     {SISTEMAS_EXTERNOS.map((sistema) => (
                         <button
                             key={sistema.id}
@@ -76,7 +89,10 @@ export function SecaoAcessoRapido() {
                                 <img
                                     src={`${sistema.icone}`}
                                     alt=""
-                                    className="cartaoAcessoRapido__img"
+                                    className={`cartaoAcessoRapido__img ${sistema.id === "nfe-power" || sistema.id === "qlikview"
+                                            ? "cartaoAcessoRapido__img--contornoVerde"
+                                            : ""
+                                        }`}
                                     onError={(e) => {
                                         // Fallback se a imagem não existir
                                         (e.target as HTMLImageElement).style.display = "none";
